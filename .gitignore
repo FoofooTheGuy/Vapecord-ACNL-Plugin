@@ -19,3 +19,5 @@ sendpost.txt
 libctrpf/Library/lib/libctrpf.a
 libctrpf/Library/lib/libctrpfd.a
 LanguageBinCreator/language.bin
+build.bat
+build.sh
