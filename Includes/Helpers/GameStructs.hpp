@@ -1019,19 +1019,19 @@ namespace CTRPluginFramework {
     /*
     Starting with FashionForward and ending with SmallTalk
     */
-    static const uint16_t InitiativeGoals[102] = {
-        0x0000, 0x0001, 0x0001, 0x0014, 0x0001, 0x2710, 0x0014, 0x0001, 0x0001, 
-        0x0001, 0x0005, 0xC350, 0x0001, 0x0003, 0x0014, 0x0014, 0x000A, 0x0001, 
-        0x0001, 0x0003, 0x0001, 0x0001, 0x0001, 0x0003, 0x0003, 0x000A, 0x0001, 
-        0x0001, 0x0001, 0x0003, 0x0003, 0x0008, 0x0001, 0x0001, 0x1388, 0x0001, 
-        0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 
-        0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 
-        0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 
-        0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0005, 
-        0x0001, 0x0001, 0x0001, 0x1388, 0x0064, 0x0001, 0x0005, 0x0001, 0x0001, 
-        0x0001, 0x0001, 0x0096, 0x0001, 0x01F4, 0x0001, 0x0005, 0x000A, 0x0001, 
-        0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0003, 0x0001, 0x0001, 
-        0x0001, 0x0001, 0x0005
+    static const u32 InitiativeGoals[102] = {
+        0, 1, 1, 20, 1, 10000, 20, 1, 1, 
+        1, 5, 50000, 1, 3, 20, 20, 10, 1, 
+        1, 3, 1, 1, 1, 3, 3, 10, 1, 
+        1, 1, 3, 3, 8, 1, 1, 5000, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 5, 
+        1, 1, 1, 5000, 100, 1, 5, 1, 1, 
+        1, 1, 150, 1, 500, 1, 5, 10, 1, 
+        1, 1, 1, 1, 1, 1, 3, 1, 1, 
+        1, 1, 5
     };
 
     enum Initiative : u8 {
@@ -1160,8 +1160,10 @@ namespace CTRPluginFramework {
         u8 Unknown2; //0x8B99 //???; Set to 0 in player ctor
         u8 Unknown3; //0x8B9A //???; Set to 0 in player ctor
         u8 Padding1; //0x8B9B //Padding: Not set in player ctor
+        
         u32 InitiativeProgress[102]; //0x8B9C //If current progress is the same or higher than initiative goal, then initiative is completed
         u8 Unknown20[0x66]; //0x8D34 //???; 0x66 buffer size set to 0 in player ctor
+        
         u8 Padding2; //0x8B9A //Padding: Not set in player ctor
         u8 Padding3; //0x8B9B //Padding: Not set in player ctor
         u32 Unknown23; //0x8D9C //???; Set to 0 in player ctor
@@ -1171,10 +1173,11 @@ namespace CTRPluginFramework {
         u32 Unknown27; //0x8DAC //???; Set to 0 in player ctor
         u32 Unknown28; //0x8DB0 //???; Set to 0 in player ctor
         u32 Unknown29; //0x8DB4 //???; Set to 0 in player ctor
+
         u32 Unknown30; //0x8DBC //???; Set to 0 in player ctor
     };
 
-    struct UnknownStruct3 {
+    struct UnknownStruct3 { //Size: 0x10
         s64 Unknown1; //0x8DEC //???; Set to 0, then 0x7FFFFFFFFFFFFFFF in player ctor
         u8 Unknown2; //0x8DF4 //???; Set to 0x21 in player ctor
         u8 Unknown3; //0x8DF5 //???; Set to 0xFF in player ctor
@@ -1185,29 +1188,29 @@ namespace CTRPluginFramework {
         u8 Unknown8; //0x8DFB //???; Set to 0xFF in player ctor
     };
 
-    struct UnknownStruct4 { //Probably exact same struct as UnknownStruct3 but is set differently
-        s64 Unknown1; //0x8DEC //???; Set to 0, then 0x7FFFFFFFFFFFFFFF in player ctor
-        u8 Unknown2; //0x8DF4 //???; Set to 0x21 in player ctor
-        u8 Unknown3; //0x8DF5 //???; Set to 0xFF in player ctor
-        u8 Unknown4; //0x8DF6 //???; Set to 0x9 in player ctor
-        u8 Padding1; //0x8DF7 //Padding: Not set in ctor
-        u16 Unknown6; //0x8DF8 //???; Set to 0x7ffe in player ctor
-        u8 Unknown7; //0x8DFA //???; Set to 0x4 in player ctor
-        u8 Unknown8; //0x8DFB //???; Set to 0xFF in player ctor
+    struct UnknownStruct4 { //Size: 0x10 //Probably exact same struct as UnknownStruct3 but is set differently
+        s64 Unknown1; //0x8DFC //???; Set to 0, then 0x7FFFFFFFFFFFFFFF in player ctor
+        u8 Unknown2; //0x8E04 //???; Set to 0x21 in player ctor
+        u8 Unknown3; //0x8E05 //???; Set to 0xFF in player ctor
+        u8 Unknown4; //0x8E06 //???; Set to 0x9 in player ctor
+        u8 Padding1; //0x8E07 //Padding: Not set in ctor
+        u16 Unknown6; //0x8E08 //???; Set to 0x7ffe in player ctor
+        u8 Unknown7; //0x8E0A //???; Set to 0x4 in player ctor
+        u8 Unknown8; //0x8E0B //???; Set to 0xFF in player ctor
     };
 
     struct UnknownStruct5 { //Similar to UnknownStruct3
-        s64 Unknown1; //0x8DEC //???; Set to 0, then 0x7FFFFFFFFFFFFFFF in player ctor
-        u8 Unknown2; //0x8DF4 //???; Set to 0x21 in player ctor
-        u8 Unknown3; //0x8DF5 //???; Set to 0xFF in player ctor
-        u8 Unknown4; //0x8DF6 //???; Set to 0x9 in player ctor
-        u8 Padding1; //0x8DF7 //Padding: Not set in ctor
-        u32 Unknown6; //0x8DF8 //???; Set to 0x00007ffe in player ctor
-        u32 Unknown7; //0x8DFC //???; Set to 0x00007ffe in player ctor
-        u8 Unknown8; //0x8E00 //???; Set to 0xFF in player ctor
-        u8 Unknown9; //0x8E01 //???; Set to 0x7 in player ctor
-        u8 Unknown10; //0x8E02 //???; Set to 0xFF in player ctor
-        u8 Padding2; //Padding: Not set in ctor;
+        s64 Unknown1; //0x8E0C //???; Set to 0, then 0x7FFFFFFFFFFFFFFF in player ctor
+        u8 Unknown2; //0x8E14 //???; Set to 0x21 in player ctor
+        u8 Unknown3; //0x8E15 //???; Set to 0xFF in player ctor
+        u8 Unknown4; //0x8E16 //???; Set to 0x9 in player ctor
+        u8 Padding1; //0x8E17 //Padding: Not set in ctor
+        u32 Unknown6; //0x8E18 //???; Set to 0x00007ffe in player ctor
+        u32 Unknown7; //0x8E1C //???; Set to 0x00007ffe in player ctor
+        u8 Unknown8; //0x8E20 //???; Set to 0xFF in player ctor
+        u8 Unknown9; //0x8E21 //???; Set to 0x7 in player ctor
+        u8 Unknown10; //0x8E22 //???; Set to 0xFF in player ctor
+        u8 Padding2; //0x8E23 //Padding: Not set in ctor;
     };
 
     struct VillagerType { //Size: 0x30
@@ -1219,53 +1222,53 @@ namespace CTRPluginFramework {
     };
 
     struct UnknownStruct6 {
-        s64 Unknown1; //???; Set to 0, then 0x7FFFFFFFFFFFFFFF in player ctor
-        u8 Unknown2; //???; Set to 0x21 in player ctor
-        u8 Unknown3; //???; Set to 0xFF in player ctor
-        u8 Unknown4; //???; Set to 0x9 in player ctor
-        u8 Padding1; //Padding: Not set in ctor
-        VillagerType Mini1;
-        VillagerType Mini2;
-        u32 Unknown6; //???; Set to 0x00007ffe in player ctor
-        u32 Unknown7; //???; Set to 0x00007ffe in player ctor
-        u8 Unknown8; //???; Set to 0 in player ctor
-        u8 Unknown9; //???; Set to 0 in player ctor
+        s64 Unknown1; //0x8E24 //???; Set to 0, then 0x7FFFFFFFFFFFFFFF in player ctor
+        u8 Unknown2; //0x8E2C //???; Set to 0x21 in player ctor
+        u8 Unknown3; //0x8E2D //???; Set to 0xFF in player ctor
+        u8 Unknown4; //0x8E2E //???; Set to 0x9 in player ctor
+        u8 Padding1; //0x8E2F //Padding: Not set in ctor
+        VillagerType Mini1; //0x8E30
+        VillagerType Mini2; //0x8E60
+        u32 Unknown6; //0x8E90 //???; Set to 0x00007ffe in player ctor
+        u32 Unknown7; //0x8E94 //???; Set to 0x00007ffe in player ctor
+        u8 Unknown8; //0x8E98 //???; Set to 0 in player ctor
+        u8 Unknown9; //0x8E99 //???; Set to 0 in player ctor
     };
 
     struct UnknownStruct7 { //Probably exact same struct as UnknownStruct4 but is set differently
-        s64 Unknown1; //???; Set to 0, then 0x7FFFFFFFFFFFFFFF in player ctor
-        u8 Unknown2; //???; Set to 0x21 in player ctor
-        u8 Unknown3; //???; Set to 0xFF in player ctor
-        u8 Unknown4; //???; Set to 0x9 in player ctor
-        u8 Unknown5; //???; Set to 0xFF in player ctor
-        u8 Unknown6; //???; Set to 0xFF in player ctor
-        u8 Padding1; //Padding: Not set in ctor
+        s64 Unknown1; //0x8E9A //???; Set to 0, then 0x7FFFFFFFFFFFFFFF in player ctor
+        u8 Unknown2; //0x8EA2 //???; Set to 0x21 in player ctor
+        u8 Unknown3; //0x8EA3 //???; Set to 0xFF in player ctor
+        u8 Unknown4; //0x8EA4 //???; Set to 0x9 in player ctor
+        u8 Unknown5; //0x8EA5 //???; Set to 0xFF in player ctor
+        u8 Unknown6; //0x8EA6 //???; Set to 0xFF in player ctor
+        u8 Padding1; //0x8EA7 //Padding: Not set in ctor
     };
 
     struct UnknownStruct8 { //Similar to UnknownStruct3
-        s64 Unknown1; //???; Set to 0, then 0x7FFFFFFFFFFFFFFF in player ctor
-        u8 Unknown2; //???; Set to 0x21 in player ctor
-        u8 Unknown3; //???; Set to 0xFF in player ctor
-        u8 Unknown4; //???; Set to 0x9 in player ctor
-        u8 Unknown7; //Padding: Not set in ctor
+        s64 Unknown1; //0x8EA8 //???; Set to 0, then 0x7FFFFFFFFFFFFFFF in player ctor
+        u8 Unknown2; //0x8EB0 //???; Set to 0x21 in player ctor
+        u8 Unknown3; //0x8EB1 //???; Set to 0xFF in player ctor
+        u8 Unknown4; //0x8EB2 //???; Set to 0x9 in player ctor
+        u8 Unknown7; //0x8EB3 //Padding: Not set in ctor
     };
 
     struct UnknownStruct9 {
-        u16 Unknown1; //???; Set to 0 in player ctor
-        u8 Unknown2; //???; Set to 0 in player ctor
-        u8 Unknown3; //???; Set to 0 in player ctor
-        u32 Unknown4; //???; Set to 0 in player ctor
-        u32 Unknown5; //???; Set to 0 in player ctor
-        u32 Unknown6; //???; Set to 0 in player ctor
-        u32 Unknown7; //???; Set to 0 in player ctor
-        u32 Unknown8; //???; Set to 0 in player ctor
-        u16 Unknown9; //???; Set to 0 in player ctor
-        u32 Unknown10; //???; Set to 0 in player ctor
-        u32 Unknown11; //???; Set to 0 in player ctor
-        u32 Unknown12; //???; Set to 0 in player ctor
-        u16 Unknown13; //???; Set to 0 in player ctor
-        u8 Unknown14; //???; Set to 0 in player ctor
-        u8 Padding1; //Padding: Not set in ctor
+        u16 Unknown1; //0x8F80 //???; Set to 0 in player ctor
+        u8 Unknown2; //0x8F82 //???; Set to 0 in player ctor
+        u8 Unknown3; //0x8F83 //???; Set to 0 in player ctor
+        u32 Unknown4; //0x8F84 //???; Set to 0 in player ctor
+        u32 Unknown5; //0x8F88 //???; Set to 0 in player ctor
+        u32 Unknown6; //0x8F8C //???; Set to 0 in player ctor
+        u32 Unknown7; //0x8F90 //???; Set to 0 in player ctor
+        u32 Unknown8; //0x8F94 //???; Set to 0 in player ctor
+        u16 Unknown9; //0x8F98 //???; Set to 0 in player ctor
+        u32 Unknown10; //0x8F9A //???; Set to 0 in player ctor
+        u32 Unknown11; //0x8F9E //???; Set to 0 in player ctor
+        u32 Unknown12; //0x8FA2 //???; Set to 0 in player ctor
+        u16 Unknown13; //0x8FA6 //???; Set to 0 in player ctor
+        u8 Unknown14; //0x8FA8 //???; Set to 0 in player ctor
+        u8 Padding1; //0x8FA9 //Padding: Not set in ctor
     };
 
     struct UnknownStruct10 {
@@ -1405,31 +1408,35 @@ namespace CTRPluginFramework {
         EncVal Unk4; //0x8DD4
         EncVal Unk5; //0x8DDC
         EncVal Unk6; //0x8DE4
-        UnknownStruct3 UnkBuffer3;
-        UnknownStruct4 UnkBuffer4;
-        UnknownStruct5 UnkBuffer5;
-        UnknownStruct6 UnkBuffer6;
-        UnknownStruct7 UnkBuffer7;
-        UnknownStruct8 UnkBuffer8;
-        u8 UnknownNotSetYet[0xAA];
-        u8 PlayerFFFF_Filler[0x16]; //Always contains 0x16 0xFF bytes. ctor sets this.
-        u8 UnknownNotSetYet2[0xC];
-        UnknownStruct9 UnkBuffer9;
-        Item UnkItem1;
-        Item UnkItem2;
-        u8 UnknownNotSetYet3[0xE];
-        u8 UnknownNotSetYet4[0xA];
-        u16 Unk_u16_1; //Set to 0x7DB in player ctor
-        u16 Unk_u16_2; //Set to 0x7DB in player ctor
-        u16 Unk_u16_3; //Set to 0 in player ctor
-        u8 Unk_u8_1; //Set to 0 in player ctor
-        u8 Unk_u8_2; //Set to 0 in player ctor
-        u8 UnknownNotSetYet5[0x45];
-        u8 UnkBuffer10[0x21]; //ctor unsets every bit except in last byte in buffer, it only unsets bits 0 to 5
-        u8 Padding_17;
-        u8 Unk_u8_3; //Set to 0 in player ctor
-        u16 Padding_18;
-        u32 AddedSongs[3]; //Bitfield for added songs
+        UnknownStruct3 UnkBuffer3; //0x8DEC
+        UnknownStruct4 UnkBuffer4; //0x8DFC
+        UnknownStruct5 UnkBuffer5; //0x8E0C
+        UnknownStruct6 UnkBuffer6; //0x8E24
+        UnknownStruct7 UnkBuffer7; //0x8E9A
+        UnknownStruct8 UnkBuffer8; //0x8EA8
+        ///////
+        u8 UnknownNotSetYet[0xA6]; //0x8EB4
+        Item RequestExterirorToRealtor; //0x8F0A //when in a different town, go to toom nook and request the exterior
+        /////
+
+        u8 PlayerFFFF_Filler[0x16]; //0x8F5E //Always contains 0x16 0xFF bytes. ctor sets this.
+        u8 UnknownNotSetYet2[0xC]; //0x8F74
+        UnknownStruct9 UnkBuffer9; //0x8F80
+        Item UnkItem1; //0x8FAA
+        Item UnkItem2; //0x8FAE
+        u8 UnknownNotSetYet3[0xE]; //0x8FB2
+        u8 UnknownNotSetYet4[0xA]; //0x8FC0
+        u16 Unk_u16_1; //0x8FCA //Set to 0x7DB in player ctor
+        u16 Unk_u16_2; //0x8FCC //Set to 0x7DB in player ctor
+        u16 Unk_u16_3; //0x8FCE //Set to 0 in player ctor
+        u8 Unk_u8_1; //0x8FD0 //Set to 0 in player ctor
+        u8 Unk_u8_2; //0x8FD1 //Set to 0 in player ctor
+        u8 UnknownNotSetYet5[0x45]; //0x8FD2
+        u8 UnkBuffer10[0x21]; //0x9017 //ctor unsets every bit except in last byte in buffer, it only unsets bits 0 to 5
+        u8 Padding_17; //0x9038
+        u8 Unk_u8_3; //0x9039 //Set to 0 in player ctor
+        u16 Padding_18; //0x903A
+        u32 AddedSongs[3]; //0x903C //Bitfield for added songs
         Item SantaBagInv[10]; //0x9048
         u8 PlayerZero_Filler[0x320]; //Always 0?? Game just memclr's in player ctor
         Item Dressers[180]; //Each dresser is 60 long
@@ -2044,20 +2051,6 @@ namespace CTRPluginFramework {
         u8 Unused4 : 1;
     };
 
-    struct Future_Letter { //Size: 0x288
-        ACNL_Letter LetterForFutureSelf;
-        Nanoseconds ReceiveDate; //ctor sets 0x7FFFFFFFFFFFFFFF (max positive U64)
-    };
-
-    struct Player_Letters { //Size: 0x1B88
-        ACNL_Letter letters[10]; //0x73958 MailBox
-        Future_Letter futureLetter; //0x75258
-    };
-
-    struct Player_Secret_Storage { //Size: 0x5A0
-        Item StorageItems[360];
-    };
-
     /*
     When a snowmen is built, 0x7FF8 is placed as a town item
     */
@@ -2322,8 +2315,244 @@ namespace CTRPluginFramework {
 
     KOKT63???
     KOKT66???
+
+
+
+    enum Initiative : u8 {
+        FashionForward,
+        CouponKickoff,
+
+        OutsideOptions,
+        ShipIt,
+        FortuneSeeker,
+        StrikeItRich,
+        LuckyItem,
+        Beekeeper,
+        InvestInYourself,
+        LetItSnowman,
+        
+        InGoodGracie,
+        CurbAppeal,
+        SouvenirSales,
+        ShellingOut,
+        BaristaBooster,
+        KeeeHaMo_ata,
+        DreamSharing,
+        PaybackTime,
+        TurnipProfit,
+        CashForClutter,
+        LocalFruit,
+        BugBoost,
+        FossilBoss,
+        JokesOnYou,
+        TropicalShop,
+        PyrotechnicPro,
+        GoodFit,
+        LocalMusic,
+        SmallTalk,
+        IslandImport,
+        RockOn,
+        ResettiOutreach,
+        Mushroom,
+        SnagASnowflake,
+        TropicalGarden,
+        GreenThumb,
+        FlowerPower,
+        HappiestHomes,
+        SlingshotSniper,
+        AxeCollector,
+        FertileLand,
+        FashionForward,
+        SmallTalk
+    };
     */
-    struct ACNL_Census_Player_Stats { //Size: 0x62C probably(?)
+
+    struct Insect_Caught {
+        u32 CommonButterflyCaught; //0x72B50
+        u32 YellowButterflyCaught; //0x72B54
+        u32 TigerButterflyCaught; //0x72B58
+        u32 PeacockButterflyCaught; //0x72B5C
+        u32 MonarchButterflyCaught; //0x72B60
+        u32 EmperorButterflyCaught; //0x72B64
+        u32 AgriasButterflyCaught; //0x72B68
+        u32 RajaBCaught; //0x72B6C
+        u32 BirdwingButterflyCaught; //0x72B70
+        u32 MothCaught; //0x72B74
+        u32 OakSilkMothCaught; //0x72B78
+        u32 HoneybeeCaught; //0x72B7C
+        u32 BeeCaught; //0x72B80
+        u32 LongLocustCaught; //0x72B84
+        u32 MigratoryLocustCaught; //0x72B88
+        u32 RiceGrasshopperCaught; //0x72B8C
+        u32 MantisCaught; //0x72B90
+        u32 OrchidMantisCaught; //0x72B94
+        u32 BrownCicadaCaught; //0x72B98
+        u32 RobustCicadaCaught; //0x72B9C
+        u32 GiantCicadaCaught; //0x72BA0
+        u32 WalkerCicadaCaught; //0x72BA4
+        u32 EveningCicadaCaught; //0x72BA8
+        u32 CicadaShellCaught; //0x72BAC
+        u32 LanternFlyCaught; //0x72BB0
+        u32 RedDragonflyCaught; //0x72BB4
+        u32 DarnerDragonflyCaught; //0x72BB8
+        u32 BandedDragonflyCaught; //0x72BBC
+        u32 PetaltailDragonflyCaught; //0x72BC0
+        u32 AntCaught; //0x72BC4
+        u32 PondskaterCaught; //0x72BC8
+        u32 DivingBeetleCaught; //0x72BCC
+        u32 StinkbugCaught; //0x72BD0
+        u32 SnailCaught; //0x72BD4
+        u32 CricketCaught; //0x72BD8
+        u32 BellCricketCaught; //0x72BDC
+        u32 GrasshopperCaught; //0x72BE0
+        u32 MoleCricketCaught; //0x72BE4
+        u32 WalkingLeafCaught; //0x72BE8
+        u32 WalkingStickCaught; //0x72BEC
+        u32 BagwormCaught; //0x72BF0
+        u32 LadybugCaught; //0x72BF4
+        u32 ViolinBeetleCaught; //0x72BF8
+        u32 LonghornBeetleCaught; //0x72BFC
+        u32 TigerBeetleCaught; //0x72C00
+        u32 DungBeetleCaught; //0x72C04
+        u32 WharfRoachCaught; //0x72C08
+        u32 HermitCrabCaught; //0x72C0C
+        u32 FireflyCaught; //0x72C10
+        u32 FruitBeetleCaught; //0x72C14
+        u32 ScarabBeetleCaught; //0x72C18
+        u32 JewelBeetleCaught; //0x72C1C
+        u32 MiyamaStagCaught; //0x72C20
+        u32 SawStagCaught; //0x72C24
+        u32 GiantStagCaught; //0x72C28
+        u32 RainbowStagCaught; //0x72C2C
+        u32 CyclommatusStagCaught; //0x72C30
+        u32 GoldenStagCaught; //0x72C34
+        u32 HornedDynastidCaught; //0x72C38
+        u32 HornedAtlasCaught; //0x72C3C
+        u32 HornedElephantCaught; //0x72C40
+        u32 HornedHerculesCaught; //0x72C44
+        u32 GoliathBeetleCaught; //0x72C48
+        u32 FleaCaught; //0x72C4C
+        u32 PillBugCaught; //0x72C50
+        u32 MosquitoCaught; //0x72C54
+        u32 FlyCaught; //0x72C58
+        u32 HouseCentipedeCaught; //0x72C5C
+        u32 CentipedeCaught; //0x72C60
+        u32 SpiderCaught; //0x72C64
+        u32 TarantulaCaught; //0x72C68
+        u32 ScorpionCaught; //0x72C6C
+    };
+
+    struct Fish_Caught {
+        u32 BitterlingCaught; //0x730F0
+        u32 PaleChubCaught; //0x730F4
+        u32 CrucianCarpCaught; //0x730F8
+        u32 DaceCaught; //0x730FC
+        u32 BarbelSteedCaught; //0x73100
+        u32 CarpCaught; //0x73104
+        u32 KoiCaught; //0x73108
+        u32 GoldfishCaught; //0x7310C
+        u32 PopEyedGoldfishCaught; //0x73110
+        u32 KillifishCaught; //0x73114
+        u32 CrawfishCaught; //0x73118
+        u32 SoftShelledTurtleCaught; //0x7311C
+        u32 TadpoleCaught; //0x73120
+        u32 FrogCaught; //0x73124
+        u32 FreshwaterGobyCaught; //0x73128
+        u32 LoachCaught; //0x7312C
+        u32 CatfishCaught; //0x73130
+        u32 EelCaught; //0x73134
+        u32 GiantSnakeheadCaught; //0x73138
+        u32 BluegillCaught; //0x7313C
+        u32 YellowPerchCaught; //0x73140
+        u32 BlackBassCaught; //0x73144
+        u32 PikeCaught; //0x73148
+        u32 PondSmeltCaught; //0x7314C
+        u32 SweetfishCaught; //0x73150
+        u32 CherrySalmonCaught; //0x73154
+        u32 CharCaught; //0x73158
+        u32 RainbowTroutCaught; //0x7315C
+        u32 StringfishCaught; //0x73160
+        u32 SalmonCaught; //0x73164
+        u32 KingSalmonCaught; //0x73168
+        u32 MittenCrabCaught; //0x7316C
+        u32 GuppyCaught; //0x73170
+        u32 NibbleFishCaught; //0x73174
+        u32 AngelfishCaught; //0x73178
+        u32 NeonTetraCaught; //0x7317C
+        u32 PiranhaCaught; //0x73180
+        u32 ArowanaCaught; //0x73184
+        u32 DoradoCaught; //0x73188
+        u32 GarCaught; //0x7318C
+        u32 ArapaimaCaught; //0x73190
+        u32 SaddledBichirCaught; //0x73194
+        u32 SeaButterflyCaught; //0x73198
+        u32 SeaHorseCaught; //0x7319C
+        u32 ClownFishCaught; //0x731A0
+        u32 SurgeonfishCaught; //0x731A4
+        u32 ButterflyFishCaught; //0x731A8
+        u32 NapoleonfishCaught; //0x731AC
+        u32 ZebraTurkeyfishCaught; //0x731B0
+        u32 BlowfishCaught; //0x731B4
+        u32 PufferFishCaught; //0x731B8
+        u32 HorsemackerelCaught; //0x731BC
+        u32 BarredKnifejawCaught; //0x731C0
+        u32 SeaBassCaught; //0x731C4
+        u32 RedSnapperCaught; //0x731C8
+        u32 DabCaught; //0x731CC
+        u32 OliveFlounderCaught; //0x731D0
+        u32 SquidCaught; //0x731D4
+        u32 MorayEelCaught; //0x731D8
+        u32 RibbonEelCaught; //0x731DC
+        u32 FootballFishCaught; //0x731E0
+        u32 TunaCaught; //0x731E4
+        u32 BlueMarlinCaught; //0x731E8
+        u32 GiantTrevallyCaught; //0x731EC
+        u32 RayCaught; //0x731F0
+        u32 OceanSunfishCaught; //0x731F4
+        u32 HammerheadSharkCaught; //0x731F8
+        u32 SharkCaught; //0x731FC
+        u32 SawSharkCaught; //0x73200
+        u32 WhaleSharkCaught; //0x73204
+        u32 OarfishCaught; //0x73208
+        u32 CoelacanthCaught; //0x7320C
+    };
+
+    struct SeaCreatures_Caught {
+        u32 SeaweedCaught; //0x736CC
+        u32 SeaGrapesCaught; //0x736D0
+        u32 SeaUrchinCaught; //0x736D4
+        u32 AcornBarnacleCaught; //0x736D8
+        u32 OysterCaught; //0x736DC
+        u32 TurbanShellCaught; //0x736E0
+        u32 AbaloneCaught; //0x736E4
+        u32 EarShellCaught; //0x736E8
+        u32 ClamCaught; //0x736EC
+        u32 PearlOysterCaught; //0x736F0
+        u32 ScallopCaught; //0x736F4
+        u32 SeaAnemoneCaught; //0x736F8
+        u32 SeaStarCaught; //0x736FC
+        u32 SeaCucumberCaught; //0x73700
+        u32 SeaSlugCaught; //0x73704
+        u32 FlatwormCaught; //0x73708
+        u32 MantisShrimpCaught; //0x7370C
+        u32 SweetShrimpCaught; //0x73710
+        u32 TigerPrawnCaught; //0x73714
+        u32 SpinyLobsterCaught; //0x73718
+        u32 LobsterCaught; //0x7371C
+        u32 SnowCrabCaught; //0x73720
+        u32 HorsehairCrabCaught; //0x73724
+        u32 RedKingCrabCaught; //0x73728
+        u32 SpiderCrabCaught; //0x7372C
+        u32 OctopusCaught; //0x73730
+        u32 SpottedGardenEelCaught; //0x73734
+        u32 ChamberedNautilusCaught; //0x73738
+        u32 HorseshoeCrabCaught; //0x7373C
+        u32 GiantIsopodCaught; //0x73740
+        u32 WaterEggCaught; //0x73744 //The other eggs are not listed as a stat, idk why
+    };
+
+    struct ACNL_Census_Player_Stats { //Size: 0x1448
+        u32 Checksum; //0x7250C
         ACNL_Cenus_Data_Type BellsEarned; //0x72510
         ACNL_Cenus_Data_Type ABDBalance; //0x72524
         ACNL_Cenus_Data_Type BellsSpent; //0x72538
@@ -2405,10 +2634,27 @@ namespace CTRPluginFramework {
         ACNL_Cenus_Data_Type MEOWCouponsSpent; //0x72B28
         /*0x62C*/ACNL_Cenus_Data_Type Unused; //0x72B3C //NON_PLAYER_SPECIFIC //KOKT82
         
-        /*0x1180*/ //0x73690 //that one seems to be set in the game, meaning there are more???
-        /*0x118C*/ //0x7369C
+        /*
+        These are only used for initiatives
+        They are NOT present in the Census Menu
+        */
+        Insect_Caught InsectsCaught; //0x72B50
 
-        u8 UnknownData[3588];
+        u32 Unknown3[288]; //0x72C70
+        
+        Fish_Caught FishCaught; //0x730F0
+
+        u32 Unknown4[288]; //0x73210
+
+        u32 EmptyCanCaught; //0x73690
+        u32 BootCaught; //0x73694
+        u32 OldTireCaught; //0x73698
+
+        u32 Unknown5[12]; //0x7369C
+
+        SeaCreatures_Caught SeaCreaturesCaught; //0x736CC
+
+        u32 Unknown6[131]; //0x73748
     };
 
     struct UnknownStorageBox { //Size: 0x6
@@ -2463,22 +2709,36 @@ namespace CTRPluginFramework {
         u8 UnknownData[3044];
     };
 
-    struct ACNL_Player_StorageBox { //Size: 0x1618C
-        u32 Checksum;
-        Player_Letters PlayerMailBoxLetters[4];
-        Player_Secret_Storage PlayerSecretStorages[4];
-        ACNL_Letter LetterPool[80];
-        u8 Unknown[0xC90]; //0x88D50 int sub_2B8890() Maybe MEOW Coupons? One method checks them (u64 MeowCoupons Count)
-        UnknownStorageBox SharedData[4];
-        u8 Unknown13[2112];
+    struct Player_Secret_Storage { //Size: 0x5A0
+        Item StorageItems[360];
+    };
+
+    struct Future_Letter { //Size: 0x288
+        ACNL_Letter LetterForFutureSelf;
+        Nanoseconds ReceiveDate; //ctor sets 0x7FFFFFFFFFFFFFFF (max positive U64)
+    };
+
+    struct Player_Letters { //Size: 0x1B88
+        ACNL_Letter letters[10]; //0x73958 MailBox
+        Future_Letter futureLetter; //0x75258
+    };
+
+    struct ACNL_Player_StorageBox { //Size: 0x16FC8
+        u32 Checksum; //0x73954
+        Player_Letters PlayerMailBoxLetters[4]; //0x73958
+        Player_Secret_Storage PlayerSecretStorages[4]; //0x7A778
+        ACNL_Letter LetterPool[80]; //0x7BDF8
+        u8 Unknown[0xC90]; //0x885F8 int sub_2B8890() Maybe MEOW Coupons? One method checks them (u64 MeowCoupons Count)
+        UnknownStorageBox SharedData[4]; //0x89288
+        u8 Unknown13[2112]; //0x892A0
     };
 
     struct ACNL_Player_SharedData { //Size: 0x181FF //Starts at 0x71900
         ACNL_Player_SharedData_Unknown0 Unknown0; //0x71900
         ACNL_Player_SharedData_Unknown1 Unknown1; //0x71924
-        ACNL_Census_Player_Stats PlayerStats;
-        ACNL_Player_StorageBox StorageBox;
-        u8 Unknown14[32];
+        ACNL_Census_Player_Stats PlayerStats; //0x7250C
+        ACNL_Player_StorageBox StorageBox; //0x73954
+        u8 Unknown14[32]; //0x89AE0
     };
 
     struct SecureValueHeader {
