@@ -1324,6 +1324,12 @@ namespace CTRPluginFramework {
         Player_Outfit PlayerOutfit;
     };
 
+    struct ACNL_Date { //Size: 0x4
+        u16 Year; //0x0
+        u8 Month; //0x2
+        u8 Day; //0x3
+    };
+
     struct ACNL_Player { //Size: 0xA480 //UnknownNotSetYetX = Not set by player ctor
         u32 Checksum1; //0xA0 //Checksum of the first 0x6b84 of player data
         Player_Appearance PlayerAppearance; //0xA4
@@ -1471,12 +1477,6 @@ namespace CTRPluginFramework {
         u8 Minute;
         u8 Second;
         u16 Millisecond;
-    };
-
-    struct ACNL_Date { //Size: 0x4
-        u16 Year; //0x0
-        u8 Month; //0x2
-        u8 Day; //0x3
     };
 
     struct VillagerFutureHome { //Size: 0xF2
