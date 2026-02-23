@@ -71,13 +71,15 @@ namespace CTRPluginFramework {
 	
 //Touch Warp
 	void tch_warp(MenuEntry *entry) {
-		float *pCoords = PlayerClass::GetInstance()->GetCoordinates();
+		u8 pIndex = Game::GetOnlinePlayerIndex();
+		
+		float *pCoords = PlayerClass::GetInstance(pIndex)->GetCoordinates();
 		if(pCoords == nullptr) {
 			return;
 		}
 
-		if (*PlayerClass::GetInstance()->GetAnimation() == 0x4F || 
-			*PlayerClass::GetInstance()->GetAnimation() == 0x52) {
+		if (*PlayerClass::GetInstance(pIndex)->GetAnimation() == 0x4F || 
+			*PlayerClass::GetInstance(pIndex)->GetAnimation() == 0x52) {
 			return; // Prevent teleporting while shoveling
 		}
 		
