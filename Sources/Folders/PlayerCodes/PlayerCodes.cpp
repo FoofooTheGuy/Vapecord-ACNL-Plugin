@@ -7,8 +7,15 @@
 #include "Helpers/Animation.hpp"
 #include "Helpers/AnimData.hpp"
 #include "Helpers/Dropper.hpp"
+#include "Helpers/GameLoopHook.hpp"
+#include "Helpers/Wrapper.hpp"
+#include "Helpers/IDList.hpp"
+#include "RuntimeContext.hpp"
 #include "Color.h"
 #include "Files.h"
+
+#include <array>
+#include <optional>
 
 u32 BGR_HairVal = 0;
 u32 BGR_EyeVal = 0;
@@ -281,6 +288,164 @@ namespace CTRPluginFramework {
 			}
 		}
     }
+
+//Thanks to Jay for original code, and thanks to Gokiro for finding out
+//that the function needs to be called from the game's thread
+	void FishThrower(MenuEntry *entry) {
+		static Address getFacingPosition(0x76330C);
+		static Address toInsectFishID(0x6d9ba8);
+		static Address bsShowMgrInitFishFromPacket(0x6da6e0);
+		static Address bsShowMgrInitFish(0x6da7fc);
+		static Address bsInsectFieldMgrInstance(0x950534);
+		static Address playerReleaseFish(0x5c2dac);
+		static Address spoofPacket(0x628B54);
+		static Address sendPacket(0x625488);
+
+		class FishThrow {
+		public:
+			static std::optional<FishThrow>& GetInstance() {
+				static std::optional<FishThrow> instance {};
+				return instance;
+			}
+
+			void OpenOptions() {
+				auto* lang = Language::getInstance();
+				const std::vector<std::string> options = {
+					lang->get(TextID::FISH_THROWER_OPTION_ITEM),
+					lang->get(TextID::FISH_THROWER_OPTION_RANDOM) + ": " + (random ? lang->get(TextID::STATE_ON) : lang->get(TextID::STATE_OFF)),
+					lang->get(TextID::FISH_THROWER_OPTION_DISTANCE) + Utils::Format(": %.1f", distance),
+					lang->get(TextID::FISH_THROWER_OPTION_PUT_IN_HAND) + ": " + (putInHand ? lang->get(TextID::STATE_ON) : lang->get(TextID::STATE_OFF)),
+				};
+
+				Keyboard KB(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), options);
+				if (int choice = KB.Open(); choice == 0) {
+					u32 id = item;
+					if (Wrap::KB<u32>(lang->get(TextID::ENTER_ID), true, 8, id, id, TextItemChange)) {
+						item = id;
+					}
+				}
+				else if (choice == 1) {
+					random = !random;
+				}
+				else if (choice == 2) {
+					Wrap::KB<float>("", false, 3, distance, distance);
+				}
+				else if (choice == 3) {
+					putInHand = !putInHand;
+				}
+			}
+
+			void Update(MenuEntry *entry) {
+				auto& hotkey = entry->Hotkeys[0];
+
+				if (hotkey.IsPressed()) {
+					keyDownTime = Ticks(svcGetSystemTick());
+				}
+
+				if (keyDownTime.AsTicks() != 0) {
+					bool hasPassed = (Ticks(svcGetSystemTick()) - keyDownTime) >= Seconds(0.25f);
+					if (hotkey.IsDown()) {
+						if (hasPassed) {
+							if (!RuntimeContext::getInstance()->isTurbo()) {
+								keyDownTime = Ticks(0);
+							}
+							GameLoopHook::GetInstance()->Add([] {
+								if (auto& instance = GetInstance()) {
+									instance->GameHook();
+								}
+								return true;
+							});
+						}
+					}
+					else {
+						if (!hasPassed) {
+							OpenOptions();
+						}
+						keyDownTime = Ticks(0);
+					}
+				}
+			}
+
+		private:
+			void GameHook() {
+				auto* player = PlayerClass::GetInstance();
+				if (!player->IsLoaded()) {
+					return;
+				}
+
+				std::array<float, 3> pos;
+				getFacingPosition.Call<void>(player->Offset(), pos.data(), *(u16*)(player->Offset(0x2e)), false, distance);
+
+				const Item useItem = random ? Item(Utils::Random(0x22e1, 0x234b)) : item;
+				const auto isFish = [useItem] { return useItem.ID >= 0x22e1 && useItem.ID <= 0x234b; };
+
+				//items in hand are not visible for others when indoors or when using anything other than fish
+				if (putInHand) {
+
+					//prevent crash
+					if (Player::IsIndoors() && useItem.ID < 0x2000) {
+						return;
+					}
+
+					const u8 currentPlayer = Game::GetOnlinePlayerIndex();
+					const u8 realPlayer = Game::GetActualPlayerIndex();
+					if (currentPlayer != realPlayer) {
+						struct PACKED ShowPacket {
+							ShowPacket() = default;
+							ShowPacket(const Item& item, const std::array<float, 3>& pos) :
+								cmd(1),
+								id(toInsectFishID.Call<u32>(&item)),
+								x(static_cast<u32>(pos[0]) * 0.25f),
+								z(static_cast<u32>(pos[2]) * 0.25f) {
+							}
+
+							u8 cmd : 2; //0: stop showing fish; 1: start showing fish
+							u32 id : 7;
+							u32 x : 10;
+							u32 z : 10;
+						};
+						static_assert(sizeof(ShowPacket) == 4);
+
+						const ShowPacket pkt(useItem, pos);
+						bsShowMgrInitFishFromPacket.Call<void>(currentPlayer, &pkt);
+
+						u32 oldValue;
+						Process::Patch(spoofPacket.addr, 0xE3A01000 + currentPlayer, &oldValue);
+						sendPacket.Call<void>(0x3d, 4, &pkt, sizeof(pkt));
+						Process::Patch(spoofPacket.addr, oldValue);
+					}
+					else {
+						bsShowMgrInitFish.Call<void>(&useItem, &pos);
+					}
+				}
+				else {
+
+					//prevent crash
+					if (!isFish() && *(void**)bsInsectFieldMgrInstance.addr == nullptr) {
+						return;
+					}
+
+					playerReleaseFish.Call<bool>(&useItem, pos.data(), 0);
+				}
+			}
+
+			Time keyDownTime;
+			Item item {0x2324, 0};
+			float distance = 100.0f;
+			bool putInHand = false;
+			bool random = false;
+		};
+
+		if (entry->WasJustActivated()) {
+			FishThrow::GetInstance().emplace();
+		}
+		if (entry->IsActivated()) {
+			FishThrow::GetInstance()->Update(entry);
+		}
+		else {
+			FishThrow::GetInstance().reset();
+		}
+	}
 
 	c_RGBA* playerIcon[4] = { nullptr, nullptr, nullptr, nullptr };
 

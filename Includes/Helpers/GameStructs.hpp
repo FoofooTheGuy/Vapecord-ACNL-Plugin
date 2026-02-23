@@ -1136,7 +1136,7 @@ namespace CTRPluginFramework {
         AxeCollector,
         FertileLand,
         FashionForward2,
-        SmallTalk
+        SmallTalk2
     };
 
     /*

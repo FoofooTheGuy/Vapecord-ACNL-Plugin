@@ -78,6 +78,7 @@ namespace CTRPluginFramework {
 	void debug(MenuEntry *entry);
 	void hatz(MenuEntry *entry);
 	void Faint(MenuEntry *entry);
+	void FishThrower(MenuEntry* entry);
 	void map(MenuEntry *entry);
 	void NeverBedHead(MenuEntry *entry);
 	void SaveColor(MenuEntry *entry);
@@ -220,7 +221,6 @@ namespace CTRPluginFramework {
 	void unlockCroRegion(MenuEntry *entry);
 	void acnh(MenuEntry *entry);
 	void player_dumper(MenuEntry *entry);
-	void FishThrower(MenuEntry *entry);
 	void lightswitch(MenuEntry *entry);
 
 //NPC Codes

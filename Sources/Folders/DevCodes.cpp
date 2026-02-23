@@ -1881,38 +1881,4 @@ namespace CTRPluginFramework {
 			Process::Write32(Patch.addr, 0x05960028);
 		}
 	}
-
-	void FishThrower(MenuEntry *entry) {				
-		static u8 playerID = 0;
-		static bool random = false;
-		Item FishID(0x22E1, 0);
-
-		static Address throwfish(0x5C2DAC);
-
-		if(Controller::IsKeysPressed(Key::L + Key::DPadRight)) {
-			if(playerID == 3) playerID = 0;		
-			else playerID++;
-
-			OSDExtras::Notify(Utils::Format("Player %02X selected!", playerID));
-		}
-
-		if(Controller::IsKeysPressed(Key::L + Key::DPadLeft)) {
-			random = !random;
-			OSDExtras::Notify("Random Mode: " << (random ? (Color::Green << "ON") : (Color::Red << "OFF")));
-		}
-
-		if(Controller::IsKeysDown(Key::R)) {
-			if(random) {
-				FishID.ID = Utils::Random(0x22E1, 0x234A);
-				if(Game::GetItemCategory(FishID) != Item_Category::Fish) 
-					return;
-			}
-
-			if(PlayerClass::GetInstance(playerID)->IsLoaded())
-				throwfish.Call<void>(&FishID, PlayerClass::GetInstance(playerID)->GetCoordinates(), 1);
-		}
-
-		if(Controller::IsKeysDown(Key::R + Key::DPadUp)) 
-			Wrap::KB<u16>("Set Fish ID:", true, 4, FishID.ID, FishID.ID);
-	}
 }

@@ -146,6 +146,9 @@ namespace CTRPluginFramework {
 		PLAYC->Append(EntryWithHotkey(new MenuEntryExtras(TextID::FAINT, Faint, TextID::FAINT_NOTE), {
 			HotkeyExtras(Key::R | Key::A, TextID::FAINT)
 		})),
+		PLAYC->Append(EntryWithHotkey(new MenuEntryExtras(TextID::FISH_THROWER, FishThrower, TextID::FISH_THROWER_NOTE), {
+			HotkeyExtras(Key::B | Key::DPadLeft, TextID::FISH_THROWER_KEY1),
+		})),
 		PLAYC->Append(new MenuEntryExtras(TextID::PLAYERS_ON_MAP, map, TextID::PLAYERS_ON_MAP_NOTE)),
 
 		PLAYC->Append(new MenuEntryExtras(TextID::NEVER_BEDHEAD, NeverBedHead, TextID::NEVER_BEDHEAD_NOTE)),
@@ -473,7 +476,6 @@ namespace CTRPluginFramework {
 		DEVC->Append(new MenuEntryExtras(TextID::UNLOCK_CRO_REGION, unlockCroRegion, TextID::UNLOCK_CRO_REGION_NOTE)),
 		DEVC->Append(new MenuEntryExtras(TextID::ACNH_CHEAT, acnh, TextID::NONE)),
 		DEVC->Append(new MenuEntryExtras(TextID::PLAYER_DUMPER, nullptr, player_dumper, TextID::NONE)),
-		DEVC->Append(new MenuEntryExtras(TextID::FISH_THROWER, FishThrower, TextID::NONE)),
 		DEVC->Append(new MenuEntryExtras(TextID::WAND_ABILITY, wandability, TextID::WAND_ABILITY_NOTE)),
 		DEVC->Append(new MenuEntryExtras(TextID::LIGHT_SWITCH_TOGGLER, lightswitch, TextID::LIGHT_SWITCH_TOGGLER_NOTE)),
 		DEVC->Append(new MenuEntryExtras(TextID::EXPRESSION_MOD, FacialExpressionMod, SetFacialExpression, TextID::EXPRESSION_MOD_NOTE)),
