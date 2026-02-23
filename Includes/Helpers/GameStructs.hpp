@@ -1034,7 +1034,7 @@ namespace CTRPluginFramework {
         1, 1, 5
     };
 
-    enum Initiative : u8 {
+    enum class Initiative : u8 {
         None = 0,
         FashionForward,
         CouponKickoff,
@@ -1135,7 +1135,7 @@ namespace CTRPluginFramework {
         SlingshotSniper,
         AxeCollector,
         FertileLand,
-        FashionForward,
+        FashionForward2,
         SmallTalk
     };
 
@@ -1414,10 +1414,11 @@ namespace CTRPluginFramework {
         UnknownStruct6 UnkBuffer6; //0x8E24
         UnknownStruct7 UnkBuffer7; //0x8E9A
         UnknownStruct8 UnkBuffer8; //0x8EA8
-        ///////
-        u8 UnknownNotSetYet[0xA6]; //0x8EB4
-        Item RequestExterirorToRealtor; //0x8F0A //when in a different town, go to toom nook and request the exterior
-        /////
+
+        u8 UnknownNotSetYet[0x56]; //0x8EB4
+        Item RequestExteriorToRealtor; //0x8F0A //when in a different town, go to toom nook and request the exterior
+        Item UnknownItem; //0x8F0E
+        u8 UnknownPadding[0x4C]; //0x8F12
 
         u8 PlayerFFFF_Filler[0x16]; //0x8F5E //Always contains 0x16 0xFF bytes. ctor sets this.
         u8 UnknownNotSetYet2[0xC]; //0x8F74
@@ -1428,9 +1429,7 @@ namespace CTRPluginFramework {
         u8 UnknownNotSetYet4[0xA]; //0x8FC0
         u16 Unk_u16_1; //0x8FCA //Set to 0x7DB in player ctor
         u16 Unk_u16_2; //0x8FCC //Set to 0x7DB in player ctor
-        u16 Unk_u16_3; //0x8FCE //Set to 0 in player ctor
-        u8 Unk_u8_1; //0x8FD0 //Set to 0 in player ctor
-        u8 Unk_u8_2; //0x8FD1 //Set to 0 in player ctor
+        ACNL_Date UnknownDate; //0x8FCE //Does get set when Katrina tells lucky item
         u8 UnknownNotSetYet5[0x45]; //0x8FD2
         u8 UnkBuffer10[0x21]; //0x9017 //ctor unsets every bit except in last byte in buffer, it only unsets bits 0 to 5
         u8 Padding_17; //0x9038
@@ -2215,7 +2214,14 @@ namespace CTRPluginFramework {
         Item UnkItems10[3];
         u8 Unknown79[0x146]; //0x6FD32
         SnowmanData Snowmans[4]; //0x6FE78
+
+        /*
+        31F96E28
+        31F96E2C
+        31F96E30
+        */
         u8 Unknown80[0xE]; //0x6FEA8
+
         u8 IslandGrassType; //0x6FEB6 //[0-2]; 0: Triangle | 1: Circle | 2: Square;
         u8 Padding7; //0x6FEB7
         u16 IslandAcres[4*4]; //0x6FEB8; 16 acres in total; 4 colunms, 4 rows. Game reads Acre IDs as u16;
@@ -2316,48 +2322,14 @@ namespace CTRPluginFramework {
     KOKT63???
     KOKT66???
 
-
-
     enum Initiative : u8 {
         FashionForward,
         CouponKickoff,
 
-        OutsideOptions,
-        ShipIt,
-        FortuneSeeker,
-        StrikeItRich,
-        LuckyItem,
-        Beekeeper,
-        InvestInYourself,
-        LetItSnowman,
-        
-        InGoodGracie,
-        CurbAppeal,
-        SouvenirSales,
-        ShellingOut,
-        BaristaBooster,
-        KeeeHaMo_ata,
-        DreamSharing,
-        PaybackTime,
-        TurnipProfit,
-        CashForClutter,
-        LocalFruit,
-        BugBoost,
-        FossilBoss,
-        JokesOnYou,
-        TropicalShop,
-        PyrotechnicPro,
-        GoodFit,
-        LocalMusic,
-        SmallTalk,
-        IslandImport,
-        RockOn,
-        ResettiOutreach,
-        Mushroom,
-        SnagASnowflake,
-        TropicalGarden,
-        GreenThumb,
-        FlowerPower,
+        LuckyItem (More research)
+        InGoodGracie (More research, go through the fashion check)
+        DreamSharing, (needs service back up)
+
         HappiestHomes,
         SlingshotSniper,
         AxeCollector,
@@ -2638,11 +2610,11 @@ namespace CTRPluginFramework {
         These are only used for initiatives
         They are NOT present in the Census Menu
         */
-        Insect_Caught InsectsCaught; //0x72B50
+        Insect_Caught InsectsCaughtData; //0x72B50
 
         u32 Unknown3[288]; //0x72C70
         
-        Fish_Caught FishCaught; //0x730F0
+        Fish_Caught FishCaughtData; //0x730F0
 
         u32 Unknown4[288]; //0x73210
 
@@ -2652,7 +2624,7 @@ namespace CTRPluginFramework {
 
         u32 Unknown5[12]; //0x7369C
 
-        SeaCreatures_Caught SeaCreaturesCaught; //0x736CC
+        SeaCreatures_Caught SeaCreaturesCaughtData; //0x736CC
 
         u32 Unknown6[131]; //0x73748
     };
