@@ -6,6 +6,7 @@
 #include "Helpers/Game.hpp"
 #include "Helpers/Player.hpp"
 #include "Helpers/IDList.hpp"
+#include "Helpers/GameLoopHook.hpp"
 
 namespace CTRPluginFramework {
     u8 ConvertItemIdToInsectId(u8 itemId) {
@@ -193,23 +194,6 @@ namespace CTRPluginFramework {
         OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::INSECT_DESPAWNED).c_str(), count), Color::Green);
     }
 
-	static bool spawnInsectEnabled = false;
-
-	void LoopHookMethod(u32 u0) {
-		if (spawnInsectEnabled) {
-			if (Controller::IsKeysPressed(Key::R + Key::DPadUp)) {
-				SpawnInsect();
-			}
-            if (Controller::IsKeysPressed(Key::R + Key::DPadDown)) {
-				DespawnAllInsects();
-			}
-		}
-
-		const HookContext &curr = HookContext::GetCurrent();
-		static Address func = Address::decodeARMBranch(curr.targetAddress, curr.overwrittenInstr);
-		func.Call<void>(u0);
-	}
-
 	void SetInsectIdEntry(MenuEntry *entry) {
         const std::vector<std::string> options = {
             Language::getInstance()->get(TextID::INSECT_SET_ID),
@@ -245,20 +229,20 @@ namespace CTRPluginFramework {
         }
 	}
 
-	void SpawnInsectEntry(MenuEntry *entry) {
-		static Address loopToHookOnto(0x54DB00);
-		static Hook hook;
-
-		spawnInsectEnabled = entry->IsActivated();
-
-		if (entry->WasJustActivated()) {
-			hook.Initialize((u32)loopToHookOnto.addr, (u32)LoopHookMethod);
-			hook.SetFlags(USE_LR_TO_RETURN);
-			hook.Enable();
-		} else if (!spawnInsectEnabled) {
-			hook.Disable();
-		}
-	}
+    void SpawnInsectEntry(MenuEntry *entry) {
+        if (Controller::IsKeysPressed(Key::R + Key::DPadUp)) {
+            GameLoopHook::GetInstance()->Add([] {
+                SpawnInsect();
+                return true;
+            });
+    	}
+        if (Controller::IsKeysPressed(Key::R + Key::DPadDown)) {
+            GameLoopHook::GetInstance()->Add([] {
+                DespawnAllInsects();
+                return true;
+            });
+        }
+    }
 
     /*
     insects will still flee if tree is shaken or tree is hit in any way! TODO
