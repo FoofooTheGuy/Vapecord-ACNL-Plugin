@@ -14,28 +14,32 @@ CTRPFLIB	?=	$(DEVKITPRO)/libctrpf
 TARGET		:= 	Vapecord_Public
 
 BUILD		:= 	Build
-INCLUDES	:= 	Includes \
-				Includes/Helpers \
-				Includes/LibCtrpfExtras \
-				Includes/Address \
-				Includes/Item \
-				Includes/Pretendo \
-				Includes/House \
-				Includes/Plugin \
+INCLUDES	:= 	include \
+				include/core \
+				include/platform/ctrpf \
+				include/core/game_api \
+				include/core/game_api/House \
+				include/core/hooks \
+				include/core/checks \
+				include/core/infrastructure \
+				include/core/Pretendo \
 				
-SOURCES 	:= 	Sources \
-                Sources/Folders \
-				Sources/Folders/SeedingCodes \
-				Sources/Folders/ExtraCodes \
-				Sources/Folders/PlayerCodes \
-				Sources/Folders/DefaultCodes \
-				Sources/Folders/EnvironmentCodes \
-				Sources/Helpers \
-				Sources/LibCtrpfExtras \
-				Sources/Plugin \
-				Sources/Item \
-				Sources/Pretendo \
-				Sources/House \
+SOURCES 	:= 	src \
+                src/features \
+				src/features/SeedingCodes \
+				src/features/ExtraCodes \
+				src/features/PlayerCodes \
+				src/features/DefaultCodes \
+				src/features/EnvironmentCodes \
+				src/core \
+				src/core/game_api \
+				src/core/game_api/House \
+				src/core/hooks \
+				src/core/checks \
+				src/core/infrastructure \
+				src/platform/ctrpf \
+				src/core/Pretendo \
+				src/core/Plugin \
 
 PSF 		:= 	$(notdir $(TOPDIR)).plgInfo
 

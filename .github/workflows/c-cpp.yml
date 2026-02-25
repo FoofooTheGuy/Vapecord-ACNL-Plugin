@@ -31,7 +31,7 @@ jobs:
         make
 
     - name: Run Language Python Script
-      run: python3 LanguageBinCreator/json_to_bin.py
+      run: python3 tools/localization/json_to_bin.py
 
     - name: Build Plugin
       run: make DEVMODE=0
@@ -41,7 +41,7 @@ jobs:
         mkdir -p package/Vapecord/Data/
         cp -r assets/Vapecord/Data/* package/Vapecord/Data/
 
-        mv LanguageBinCreator/language.bin package/Vapecord/Data/language.bin
+        mv tools/localization/language.bin package/Vapecord/Data/language.bin
         
         for folder in 0004000000198e00 0004000000198d00 00040000004C5700 0004000000199000 0004000000086500 0004000000086400 0004000000086300 0004000000086200 0004000000198f00; do
             mkdir -p package/luma/plugins/$folder/snd
@@ -62,16 +62,16 @@ jobs:
         path: Vapecord_Public.elf
 
     - name: Check For Unused Text
-      run: python3 CheckForUnusedText.py
+      run: python3 tools/validation/CheckForUnusedText.py
 
     - name: Check If Addresses Are Ported
-      run: python3 CheckIfAddressesArePorted.py
+      run: python3 tools/validation/CheckIfAddressesArePorted.py
 
     - name: Check If Text Is Translated
-      run: python3 CheckIfTextIsTranslated.py
+      run: python3 tools/validation/CheckIfTextIsTranslated.py
 
     - name: Check For Unused Addresses
-      run: python3 CheckForUnusedAddresses.py
+      run: python3 tools/validation/CheckForUnusedAddresses.py
 
 
 

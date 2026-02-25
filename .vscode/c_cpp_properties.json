@@ -14,7 +14,7 @@
                 "C:/devkitPro/libctru/include",
                 "C:/devkitPro/libctrpf/include",
                 "C:/devkitPro/portlibs/3ds/bin",
-                "${workspaceFolder}/includes"
+                "${workspaceFolder}/include"
             ],
             "defines": ["ARM11", "_3DS"],
             "compilerPath": "C:/devkitPro/devkitARM/bin/arm-none-eabi-g++.exe",

@@ -18,6 +18,6 @@ sendpost.txt
 .vscode/settings.json
 libctrpf/Library/lib/libctrpf.a
 libctrpf/Library/lib/libctrpfd.a
-LanguageBinCreator/language.bin
+tools/localization/language.bin
 build.bat
 build.sh
