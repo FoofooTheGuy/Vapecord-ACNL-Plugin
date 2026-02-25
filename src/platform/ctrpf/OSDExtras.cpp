@@ -13,7 +13,6 @@ namespace CTRPluginFramework {
         RecursiveLock_Unlock(&RecLock);
     }
 
-
     bool OSDExtras::TryLock(void) {
         return (RecursiveLock_TryLock(&RecLock));
     }
@@ -57,7 +56,8 @@ namespace CTRPluginFramework {
 
         int count = 0;
 
-        for (OSDMessage *message : Notifications) {
+        for (auto it = Notifications.rbegin(); it != Notifications.rend(); ++it) {
+            OSDMessage *message = *it;
             posX = endX - message->width;
 
             screen.DrawRect(posX - spacingX, posY, message->width + (spacingX * 2), lineHeight, message->background, true);
@@ -71,7 +71,7 @@ namespace CTRPluginFramework {
             message->drawn = true;
 
             count++;
-            if (count >= 15) {
+            if (count >= 12) {
                 break;
             }
         }
@@ -130,8 +130,8 @@ namespace CTRPluginFramework {
             return -1;
         }
 
-        for (auto it = lines.rbegin(); it != lines.rend(); ++it) {
-            Notifications.push_back(new OSDMessage(*it, foreground, background));
+        for (const auto &line : lines) {
+            Notifications.push_back(new OSDMessage(line, foreground, background));
         }
 
         Unlock();
