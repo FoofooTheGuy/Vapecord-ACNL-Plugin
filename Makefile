@@ -31,15 +31,16 @@ SOURCES 	:= 	src \
 				src/features/PlayerCodes \
 				src/features/DefaultCodes \
 				src/features/EnvironmentCodes \
+				src/features/MiniGame1 \
 				src/core \
 				src/core/game_api \
 				src/core/game_api/House \
 				src/core/hooks \
 				src/core/checks \
 				src/core/infrastructure \
-				src/platform/ctrpf \
 				src/core/Pretendo \
-				src/core/Plugin \
+				src/platform/ctrpf \
+				src/platform \
 
 PSF 		:= 	$(notdir $(TOPDIR)).plgInfo
 
