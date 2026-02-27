@@ -2,6 +2,8 @@
 
 #include <CTRPluginFramework.hpp>
 
+#include <string>
+
 #define majorV 3
 #define minorV 1
 #define revisV 0
@@ -9,12 +11,26 @@
 #define APP_VERSION (majorV * 100 + minorV * 10 + revisV)
 
 namespace CTRPluginFramework {
-	bool WriteLanguage(const std::string& langCode);
-	bool ReadLanguage(std::string &outLang);
-	void CheckForLanguageFile(void);
+	namespace Config {
+		struct PluginConfig {
+			std::string languageCode;
+			std::string pluginVersion;
+		};
 
-	void DeleteLanguage(void);
-	void SetupLanguage(bool SetInMenu);
-	void cheatsVisibility(bool SetInMenu);
-	void resetSettings(bool SetInMenu);
+		std::string GetPluginVersionString();
+
+		bool ReadConfig(PluginConfig &outConfig);
+		bool WriteConfig(const PluginConfig &config);
+		bool EnsureConfigFile();
+		bool IsConfigOutdated();
+		bool UpdateConfig();
+
+		void HandleConfigMigration();
+
+		bool SetLanguage(const std::string &langCode);
+		bool GetLanguage(std::string &outLang);
+
+		void DeleteLanguage(void);
+		void SetupLanguage(bool SetInMenu);
+	};
 }

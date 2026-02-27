@@ -20,7 +20,7 @@ namespace CTRPluginFramework {
 
 		switch (choice) {
 			case 0:
-				SetupLanguage(true);
+				Config::SetupLanguage(true);
 				break;
 			case 1:
 				EditColors();

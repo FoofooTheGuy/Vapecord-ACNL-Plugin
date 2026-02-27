@@ -2,13 +2,12 @@
 #include "Color.h"
 #include "Files.h"
 #include "core/infrastructure/Language.hpp"
-#include "core/infrastructure/Address.hpp"
 #include "platform/ctrpf/PluginMenuExtras.hpp"
 
 namespace CTRPluginFramework {	
-    void SetupLanguage(bool SetInMenu) {
+    void Config::SetupLanguage(bool SetInMenu) {
 		std::string language = "";
-		ReadLanguage(language);
+		GetLanguage(language);
 
 		if (!File::Exists(PATH_LANGUAGE_BIN)) {
 			MessageBox(Utils::Format("Error 577\nThe language.bin is missing. The Plugin can not work without it!\nGet more info and help on the Discord Server: %s\nGame will be closed now!", DISCORDINV)).SetClear(ClearScreen::Top)();
@@ -49,7 +48,7 @@ namespace CTRPluginFramework {
             	language = languages[sel].shortName;
 			}
 
-			if (!WriteLanguage(language)) { //write language mode to file
+			if (!SetLanguage(language)) { //write language mode to file
 				MessageBox(Utils::Format("Error 608\nCouldn't save chosen language.\nGet more info and help on the Discord Server: %s", DISCORDINV)).SetClear(ClearScreen::Top)();
 			} 
 			languageExists = true;
@@ -67,74 +66,4 @@ namespace CTRPluginFramework {
 			MessageBox("Successfully set new language!").SetClear(ClearScreen::Top)();
 		}
     }
-
-	void DeleteLanguage(void) {
-		File::Remove(Utils::Format(CONFIGNAME, Address::regionName.c_str()));
-	}
-
-	bool WriteLanguage(const std::string& langCode) {
-		File file;
-		if (File::Open(file, Utils::Format(CONFIGNAME, Address::regionName.c_str()), File::CREATE | File::WRITE) != File::SUCCESS) {
-			return false;
-		}
-
-		u8 len = static_cast<u8>(langCode.size());
-		if (file.Write(&len, sizeof(len)) != File::SUCCESS) {
-			file.Close();
-			return false;
-		}
-
-		if (file.Write(langCode.data(), len) != File::SUCCESS) {
-			file.Close();
-			return false;
-		}
-
-		file.Close();
-		return true;
-	}
-
-	bool ReadLanguage(std::string &outLang) {
-		File file;
-		if (File::Open(file, Utils::Format(CONFIGNAME, Address::regionName.c_str()), File::READ) != File::SUCCESS) {
-			return false;
-		}
-
-		u8 len = 0;
-		if (file.Read(&len, sizeof(len)) != File::SUCCESS) {
-			file.Close();
-			return false;
-		}
-
-		if (len == 0) {
-			file.Close();
-			return false;
-		}
-
-		outLang.resize(len);
-		if (file.Read(&outLang[0], len) != File::SUCCESS) {
-			file.Close();
-			return false;
-		}
-
-		file.Close();
-		return true;
-	}
-
-	void CheckForLanguageFile(void) {
-		if(!Directory::IsExists(V_STANDARD)) {
-			Directory::Create(V_STANDARD);
-		}
-
-		if(!Directory::IsExists(V_DATA)) {
-			Directory::Create(V_DATA);
-		}
-
-		if(!Directory::IsExists(Utils::Format(V_DIRECTORY, Address::regionName.c_str()))) {
-			Directory::Create(Utils::Format(V_DIRECTORY, Address::regionName.c_str()));
-		}
-
-		if(!File::Exists(Utils::Format(CONFIGNAME, Address::regionName.c_str()))) {
-			File::Create(Utils::Format(CONFIGNAME, Address::regionName.c_str()));
-		}
-	} 
 }

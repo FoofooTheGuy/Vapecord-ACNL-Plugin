@@ -18,7 +18,7 @@
 #define PATH_CRASH		    "E:/Vapecord/%s/CrashDump"
 #define PATH_COLOR		    "E:/Vapecord/%s/color.bin"
 #define PATH_CBOARD		    "E:/Vapecord/%s/clipboard.txt"
-#define CONFIGNAME		    "E:/Vapecord/%s/set_language.bin"
+#define PATH_PLUGIN_CONFIG  "E:/Vapecord/%s/config.ini"
 
 #define V_STANDARD          "E:/Vapecord"
 #define V_DIRECTORY	        "E:/Vapecord/%s"

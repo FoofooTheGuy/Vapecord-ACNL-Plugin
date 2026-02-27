@@ -18,8 +18,6 @@ namespace CTRPluginFramework {
 		ERROR_UN, //Unexcpected error
 	};
 
-	u32 decodeARMBranch(const u32 src, const u32 val);
-
 	extern Directory restoreDIR;
 
 	namespace Wrap {

@@ -136,13 +136,6 @@ namespace CTRPluginFramework {
 		}
 	}
 
-	/*
-	RV: 0x32DF77CC
-
-	Default: 0x3022D9A0
-
-	Item at 0x305AB784
-	*/
 	void CatalogGetItem(u32 invData, u32 u0, u32 u1) {
 		static Address getCurrentCatalogItem(0x692FD0);
 

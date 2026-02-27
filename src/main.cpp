@@ -118,7 +118,7 @@ Translators: みるえもん & みなと(Japanese), im a book(spanish), Fedecras
 		EnableAllChecks();
 		EnableAllPatches();
 
-		CheckForLanguageFile();
+		Config::EnsureConfigFile();
 
 		SleepTime();
 
@@ -126,9 +126,10 @@ Translators: みるえもん & みなと(Japanese), im a book(spanish), Fedecras
 	//keeps internet connection when menu is opened
 		//InitKeepConnection();
 
-		SetupLanguage(false);
+		Config::SetupLanguage(false);
 	//Load MenuFolders and Entrys (located in MenuCreate.cpp)
 		InitMenu(menu);
+		Config::HandleConfigMigration();
 
 	//Load Callbacks
 		menu->OnOpening = SetSeederInfos;
