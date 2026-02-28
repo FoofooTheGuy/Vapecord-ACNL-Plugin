@@ -9,7 +9,6 @@
 #include "core/checks/IDChecks.hpp"
 #include "core/RuntimeContext.hpp"
 #include "core/infrastructure/CROEditing.hpp"
-#include "platform/ctrpf/OSDExtras.hpp"
 #include "Color.h"
 
 namespace CTRPluginFramework {
@@ -107,16 +106,16 @@ namespace CTRPluginFramework {
 			default: break;
 			case 0: {
 				if(Game::CreateLockedSpot(0x12, x, y, Game::GetRoom(), true) == 0xFFFFFFFF) {
-					OSDExtras::Notify(TextID::SPOT_STATE_TOO_MANY);		
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::SPOT_STATE_TOO_MANY));		
 				}	
 				else {
-					OSDExtras::Notify(TextID::SPOT_STATE_LOCK);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::SPOT_STATE_LOCK));
 				}
 			} break;
 
 			case 1: {
 				Game::ClearLockedSpot(x, y, Game::GetRoom(), 4);
-				OSDExtras::Notify(TextID::SPOT_STATE_UNLOCK);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SPOT_STATE_UNLOCK));
 			} break;
 
 			case 2: {
@@ -130,7 +129,7 @@ namespace CTRPluginFramework {
 					
 					Sleep(Milliseconds(40));
 				}
-				OSDExtras::Notify(TextID::SPOT_STATE_MAP_LOCK);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SPOT_STATE_MAP_LOCK));
 			} break;
 
 			case 3: {
@@ -158,7 +157,7 @@ namespace CTRPluginFramework {
 						res = false;
 					}
 				}
-				OSDExtras::Notify(TextID::SPOT_STATE_MAP_UNLOCK);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SPOT_STATE_MAP_UNLOCK));
 			} break;
 		}
 
@@ -189,17 +188,17 @@ namespace CTRPluginFramework {
 		}
 		
 		if(!ItemToReplace.isValid()) {
-			OSDExtras::Notify(TextID::INVALID_ITEM, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::INVALID_ITEM), Color::Red);
 			return;
 		}
 
 		int res = Dropper::Search_Replace(300, { ItemToSearch }, ItemToReplace, 0x3D, true, Language::getInstance()->get(TextID::SEARCH_REPLACE_ITEMS_REPLACED), true);
 		if(res == -1) {
-			OSDExtras::Notify(TextID::SAVE_PLAYER_NO, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 			return;
 		}
 		else if(res == -2) {
-			OSDExtras::Notify(TextID::ONLY_OUTDOORS, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::ONLY_OUTDOORS), Color::Red);
 			return;
 		}
 	}
@@ -222,7 +221,7 @@ namespace CTRPluginFramework {
 			Player::StealDesign(i);
 		}
 
-		OSDExtras::Notify(TextID::PATTERN_STOLEN, Color::Orange);
+		OSD::NotifySysFont(Language::getInstance()->get(TextID::PATTERN_STOLEN), Color::Orange);
 
 		entry->Disable();
 	}

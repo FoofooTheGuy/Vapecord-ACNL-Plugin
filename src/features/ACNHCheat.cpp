@@ -21,24 +21,24 @@ namespace CTRPluginFramework {
 	*/
 
     u32 itembury = 0;
-	
+
 	/*bool IfFlagOrTree(void) {
 	//If item is a tree, write item model and name correctly and return 1 so its digable
 		if((*(u16 *)itembury >= 0x0007 && *(u16 *)itembury <= 0x007B)) {
 			Process::Write32(0x67A2F4, *(u32 *)itembury);
-			
+
 			Process::Write32(i + 0x1F5CC, 0x000E000E);
 			Process::Write32(i + 0x1F5D0, 0x00040000);
 			Process::Write32(i + 0x1F5D4, 0xCD030100);
 			Process::WriteString(i + 0x1F5D8, IDChecks::GetSeedName(*(u32 *)itembury), StringFormat::Utf16);
-			
+
 		//doesnt work yet, should write tree to inv :/
 			GameHelper::SetItem(&(*(u32 *)itembury));
 			FruitCount--;
 			return 1;
 		}
 	}*/
-	
+
 	int RandomCrystall(void) {
 		FruitCount--;
 		return Utils::Random(0, 5); //returns random crystal
@@ -53,17 +53,16 @@ namespace CTRPluginFramework {
         }
         return *(bool *)(ItemIDAddress + 2) >> 0xF;
     }
-	
-	bool FruitDisplay(const Screen &screen) {	
+
+	bool FruitDisplay(const Screen &screen) {
 		if(!PlayerClass::GetInstance()->IsLoaded())
 			return 0;
-		
-		if(screen.IsTop) {	
-			ScreenExtras extras(screen);
-			extras.DrawSysfontWithBackground(Utils::Format("Fruit: %d|10", FruitCount), 0, 0, Color::Black, Color(0xF0E68CAF));
-		}	
+
+		if(screen.IsTop) {
+			screen.DrawSysfontWithBackground(Utils::Format("Fruit: %d|10", FruitCount), 0, 0, Color::Black, Color(0xF0E68CAF));
+		}
 		return 1;
-	}	
+	}
 
     static bool WasEnabled = false;
 
@@ -71,23 +70,23 @@ namespace CTRPluginFramework {
 	void acnh(MenuEntry *entry) {
 		/*static Hook hookTree;
 		static Hook hookTreeBury;
-		
+
 		if(!PlayerClass::GetInstance()->IsLoaded())
 			return;
-		
+
 		//if anim is bury check if tree
-		if(*PlayerClass::GetInstance()->GetAnimation() == 0x53 && (*(u16 *)itembury >= 7 && *(u16 *)itembury <= 0x7B)) 
+		if(*PlayerClass::GetInstance()->GetAnimation() == 0x53 && (*(u16 *)itembury >= 7 && *(u16 *)itembury <= 0x7B))
 			Process::Write32(0x9B5268, *(u16 *)itembury);
-		
-		if(FruitCount != 0) {			
+
+		if(FruitCount != 0) {
 			//enables patch so item model gets showed
 			Process::Write32(0x676214, 0xE3A01050);
 		}
-		else {	
+		else {
 			//enables patch so item model gets showed
 			Process::Write32(0x676214, 0xE3A0104F);
 		}
-		
+
 		if(!entry->IsActivated()) {
 			//enables patch so item model gets showed
 			Process::Write32(0x676214, 0xE3A0104F);

@@ -29,7 +29,7 @@ namespace CTRPluginFramework {
 
         u32 dataOffset = *(u32 *)dataPointer.addr;
         if (dataOffset == 0) {
-            OSDExtras::Notify(TextID::INSECT_DATA_NOT_LOADED, Color::Red);
+            OSD::NotifySysFont(Language::getInstance()->get(TextID::INSECT_DATA_NOT_LOADED), Color::Red);
             return;
         }
 
@@ -90,7 +90,7 @@ namespace CTRPluginFramework {
 		u32 dataOffset = *(u32 *)dataPointer.addr;
 
 		if (dataOffset == 0) {
-            OSDExtras::Notify(TextID::INSECT_DATA_NOT_LOADED, Color::Red);
+            OSD::NotifySysFont(Language::getInstance()->get(TextID::INSECT_DATA_NOT_LOADED), Color::Red);
 			return;
 		}
 
@@ -103,7 +103,7 @@ namespace CTRPluginFramework {
 		}
 
 		if (insectIdLocal > 0x50) {
-			OSDExtras::Notify(TextID::INSECT_INVALID_ID, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::INSECT_INVALID_ID), Color::Red);
 			return;
 		}
 
@@ -115,13 +115,13 @@ namespace CTRPluginFramework {
         */
         if (insectIdLocal == 0x10 || insectIdLocal == 0x11 || insectIdLocal == 0x1D || insectIdLocal == 0x29) {
             Item insectItem = ConvertInsectIdToItemId(insectIdLocal);
-            OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::INSECT_CANT_SPAWN).c_str(), insectItem.GetName().c_str()), Color::Red);
+            OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::INSECT_CANT_SPAWN).c_str(), insectItem.GetName().c_str()), Color::Red);
 			return;
         }
 
 		u32 *table = (u32 *)functionTable.addr;
 		if (!table) {
-            OSDExtras::Notify(TextID::INSECT_DATA_NOT_LOADED, Color::Red);
+            OSD::NotifySysFont(Language::getInstance()->get(TextID::INSECT_DATA_NOT_LOADED), Color::Red);
 			return;
 		}
 		Address dataFunction(table[insectIdLocal]);
@@ -138,7 +138,7 @@ namespace CTRPluginFramework {
 
 		float *pCoords = PlayerClass::GetInstance()->GetCoordinates();
 		if (!pCoords) {
-            OSDExtras::Notify(TextID::SAVE_PLAYER_NO, Color::Red);
+            OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
             return;
 		}
 
@@ -148,12 +148,12 @@ namespace CTRPluginFramework {
 
 		spawnInsect.Call<void>(dataOffset, insectIdLocal, coords, u0);
 
-        //OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::INSECT_SPAWNED).c_str(), *(u32 *)(*(u32 *)(dataOffset + 0x1C))));
+        //OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::INSECT_SPAWNED).c_str(), *(u32 *)(*(u32 *)(dataOffset + 0x1C))));
 
         //u32 insectData = *(u32 *)(*(u32 *)(dataOffset + 0x1C));
         //u8 insectIdLocal = *(u8 *)(insectData + 8);
         //Item insectItem = ConvertInsectIdToItemId(insectIdLocal);
-        //OSDExtras::Notify(Utils::Format("Spawned %s (%08X)", insectItem.GetName().c_str(), insectData), Color::Green);
+        //OSD::NotifySysFont(Utils::Format("Spawned %s (%08X)", insectItem.GetName().c_str(), insectData), Color::Green);
 	}
     
     void DespawnAllInsects() {
@@ -161,7 +161,7 @@ namespace CTRPluginFramework {
 
 		u32 dataOffset = *(u32 *)dataPointer.addr;
         if (dataOffset == 0) {
-            OSDExtras::Notify(TextID::INSECT_DATA_NOT_LOADED, Color::Red);
+            OSD::NotifySysFont(Language::getInstance()->get(TextID::INSECT_DATA_NOT_LOADED), Color::Red);
             return;
         }
 
@@ -191,7 +191,7 @@ namespace CTRPluginFramework {
             count++;
         }
 
-        OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::INSECT_DESPAWNED).c_str(), count), Color::Green);
+        OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::INSECT_DESPAWNED).c_str(), count), Color::Green);
     }
 
 	void SetInsectIdEntry(MenuEntry *entry) {

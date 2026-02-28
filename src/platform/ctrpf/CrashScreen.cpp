@@ -4,7 +4,6 @@
 #include "core/infrastructure/Address.hpp"
 #include "Files.h"
 #include "core/Config.hpp"
-#include "platform/ctrpf/ColorExtras.hpp"
 
 namespace CTRPluginFramework {
     void DrawQrCode(const Screen& screen, u32 posX, u32 posY, const u8* qrcode) {
@@ -42,7 +41,7 @@ namespace CTRPluginFramework {
 
 		for(MenuEntry *entry : Entrys) {
 			if(entry->IsActivated()) {
-				str += ColorExtras::RemoveColor(entry->Name()) + "\n";
+				str += Color::RemoveColorPrefix(entry->Name()) + "\n";
 			}
 		}
 
@@ -52,7 +51,7 @@ namespace CTRPluginFramework {
 				Entrys = subfolder->GetEntryList();
 				for(MenuEntry *entry : Entrys) {
 					if(entry->IsActivated()) {
-						str += (ColorExtras::RemoveColor(folder->Name()) + " -> " + ColorExtras::RemoveColor(subfolder->Name()) + " -> " + ColorExtras::RemoveColor(entry->Name())) + "\n";
+						str += (Color::RemoveColorPrefix(folder->Name()) + " -> " + Color::RemoveColorPrefix(subfolder->Name()) + " -> " + Color::RemoveColorPrefix(entry->Name())) + "\n";
 					}
 				}
 			}
@@ -60,7 +59,7 @@ namespace CTRPluginFramework {
 			Entrys = folder->GetEntryList();
 			for(MenuEntry *entry : Entrys) {
 				if(entry->IsActivated()) {
-					str += (ColorExtras::RemoveColor(folder->Name()) + " -> " + ColorExtras::RemoveColor(entry->Name())) + "\n";
+					str += (Color::RemoveColorPrefix(folder->Name()) + " -> " + Color::RemoveColorPrefix(entry->Name())) + "\n";
 				}
 			}
 		}

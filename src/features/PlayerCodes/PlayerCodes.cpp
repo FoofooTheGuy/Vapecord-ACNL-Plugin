@@ -24,26 +24,26 @@ extern "C" void SetPlayerIconCoordinates(void);
 
 namespace CTRPluginFramework {
 	std::vector<std::string> strings1 = { "", "", "", "", "", "" };
-	
-	void GetPlayerInfoData(void) {	
+
+	void GetPlayerInfoData(void) {
 		u8 pIndex = Game::GetOnlinePlayerIndex();
 		if(!PlayerClass::GetInstance(pIndex)->IsLoaded() || !Player::GetSaveData(pIndex)) {
 			return;
 		}
-		
+
 	//gets coordinates
 		float *pCoords = PlayerClass::GetInstance(pIndex)->GetCoordinates();
 		if(!pCoords) {
 			return;
 		}
-		
-	//Gets world coords	
+
+	//Gets world coords
 		if(!MapEditorActive) {
 			PlayerClass::GetInstance(pIndex)->GetWorldCoords(&selectedX, &selectedY);
 		}
-		
+
 	//gets item standing on
-		Item *pItem = Game::GetItemAtWorldCoords(selectedX, selectedY);	
+		Item *pItem = Game::GetItemAtWorldCoords(selectedX, selectedY);
 		if(!pItem) {
 			return;
 		}
@@ -58,7 +58,7 @@ namespace CTRPluginFramework {
 		}
 
 		u8 menuID = Inventory::GetCurrent();
-		
+
 		strings1[0] = (Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_WORLD_COORDS).c_str(), (u8)(selectedX & 0xFF), (u8)(selectedY & 0xFF)));
 		strings1[1] = (Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_ANIMATION).c_str(), *PlayerClass::GetInstance(pIndex)->GetAnimation(), *PlayerClass::GetInstance(pIndex)->GetSnake()));
 		strings1[2] = (Language::getInstance()->get(TextID::PLAYER_INFO_ITEM_STANDING) << " " << (pItem->ID != 0 ? Utils::Format("%08X", *(u32 *)pItem) : Language::getInstance()->get(TextID::PLAYER_INFO_ITEM_NA)) << (Game::GetLockedSpotIndex(selectedX, selectedY) != 0xFFFFFFFF ? Language::getInstance()->get(TextID::PLAYER_INFO_ITEM_LOCKED) : ""));
@@ -72,22 +72,20 @@ namespace CTRPluginFramework {
 		if(!PlayerClass::GetInstance(pIndex)->IsLoaded()) {
 			return 0;
 		}
-			
+
 		if(!screen.IsTop) {
 			return 0;
 		}
-		
+
 		static constexpr u8 YPositions1[7] = { 16, 32, 48, 64, 80, 96, 112 };
 
 		Color darkGrey(40, 40, 40, 175);
 
-		ScreenExtras extras(screen);
-		
 	//gets player
-		extras.DrawSysfontWithBackground(Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_PLAYER).c_str(), pIndex), 0, 0, Player::GetColor(pIndex), darkGrey);
-		
+		screen.DrawSysfontWithBackground(Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_PLAYER).c_str(), pIndex), 0, 0, Player::GetColor(pIndex), darkGrey);
+
 		for (int i = 0; i < 6; ++i) {
-			extras.DrawSysfontWithBackground(strings1.at(i), 0, YPositions1[i], Color::White, darkGrey);
+			screen.DrawSysfontWithBackground(strings1.at(i), 0, YPositions1[i], Color::White, darkGrey);
 		}
 
 		return 1;
@@ -95,14 +93,14 @@ namespace CTRPluginFramework {
 //enable debug OSD
 	void debug(MenuEntry *entry) {
 		PluginMenu *menu = PluginMenu::GetRunningInstance();
-		
+
 		if(entry->WasJustActivated()) {
 			*menu += GetPlayerInfoData;
-			OSD::Run(debugOSD); 
+			OSD::Run(debugOSD);
 		}
 		else if(!entry->IsActivated()) {
 			*menu -= GetPlayerInfoData;
-			OSD::Stop(debugOSD); 
+			OSD::Stop(debugOSD);
 		}
 	}
 
@@ -118,14 +116,14 @@ namespace CTRPluginFramework {
 			MessageBox("Only works offline!").SetClear(ClearScreen::Both)();
 			return;
 		}
-		
+
 		std::vector<std::string> pV = {
 			Color::Silver << "-Empty-",
 			Color::Silver << "-Empty-",
 			Color::Silver << "-Empty-",
 			Color::Silver << "-Empty-",
 		};
-		
+
 		for(int i = 0; i <= 3; ++i) {
 			u32 pO = Player::GetSpecificSave(i);
 			if(*(u16 *)(pO + 0x55A6) != 0) {
@@ -134,9 +132,9 @@ namespace CTRPluginFramework {
 				pV[i] = Player::GetColor(i) << pS;
 			}
 		}
-		
+
 		Keyboard pKB(Language::getInstance()->get("KEY_SELECT_PLAYER"), pV);
-		
+
 		int pChoice = pKB.Open();
 		if((pChoice >= 0) && (pV[pChoice] != Color::Silver << "-Empty-"))
 			Player::Load(pChoice);
@@ -165,11 +163,11 @@ namespace CTRPluginFramework {
 		x = (byteshift[2] << 16) + (byteshift[1] << 8) + byteshift[0];
 	}
 
-	u32 RainbowBGR() { 
+	u32 RainbowBGR() {
 		u8 ShiftB = Utils::Random(0, 255);
 		u8 ShiftG = Utils::Random(0, 255);
-		u8 ShiftR = Utils::Random(0, 255); 	
-			
+		u8 ShiftR = Utils::Random(0, 255);
+
 		return (ShiftB << 16 | ShiftG << 8 | ShiftR);
     }
 
@@ -216,13 +214,13 @@ namespace CTRPluginFramework {
 			} break;
 
 			case 2: {
-				if(!File::Exists(Utils::Format(PATH_COLOR, Address::regionName.c_str()))) 
+				if(!File::Exists(Utils::Format(PATH_COLOR, Address::regionName.c_str())))
 					File::Create(Utils::Format(PATH_COLOR, Address::regionName.c_str()));
 
 				App_Colors NewColor = App_Colors{ rval1, rval2 };
 
 				File f_color(Utils::Format(PATH_COLOR, Address::regionName.c_str()), File::WRITE);
-				f_color.Write(&NewColor, 8);	
+				f_color.Write(&NewColor, 8);
 				f_color.Flush();
                 f_color.Close();
 
@@ -244,7 +242,7 @@ namespace CTRPluginFramework {
 
 				rval1 = OldColor.Hair_BGR;
 				rval2 = OldColor.Eye_BGR;
-				OSDExtras::Notify(TextID::COLOR_MOD_PLAYER_LOADED, Color::Orange);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::COLOR_MOD_PLAYER_LOADED), Color::Orange);
 			}
 
 			static const Address address(0x4A33C8);
@@ -266,9 +264,9 @@ namespace CTRPluginFramework {
 			hook.Disable();
 		}
 	}
-	
+
 //Wear Helmet And Accessory /*Credits to Levi*/
-	void hatz(MenuEntry *entry) { 
+	void hatz(MenuEntry *entry) {
 		static Address hatwear(0x68C630);
 
 		if(entry->WasJustActivated()) {
@@ -279,8 +277,8 @@ namespace CTRPluginFramework {
 		}
 	}
 
-//Faint	
-	void Faint(MenuEntry *entry) { 
+//Faint
+	void Faint(MenuEntry *entry) {
         if(Controller::IsKeysPressed(entry->Hotkeys[0].GetKeys())) {
 			u32 x, y;
 			if(PlayerClass::GetInstance(Game::GetOnlinePlayerIndex())->GetWorldCoords(&x, &y)) {
@@ -469,8 +467,8 @@ namespace CTRPluginFramework {
 		}
 	}
 
-//OSD For Show Players On The Map	
-	bool players(const Screen &screen) { 
+//OSD For Show Players On The Map
+	bool players(const Screen &screen) {
 		if(screen.IsTop || !Game::IsMapOpened()) {
 			return 0;
 		}
@@ -481,7 +479,7 @@ namespace CTRPluginFramework {
 			if(PlayerClass::GetInstance(i)->IsLoaded()) {
 				PlayerClass::GetInstance(i)->PlayerClass::CalculateMapCoordinates(XPos, YPos);
 
-				if(playerIcon[i] != nullptr) {	
+				if(playerIcon[i] != nullptr) {
 					int Pixels = 0, XResult = 9 + XPos, YResult = 15 + YPos;
 
 					for(int X = XPos; X < XResult; ++X) {
@@ -503,7 +501,7 @@ namespace CTRPluginFramework {
 
 		return 1;
 	}
-	
+
 //Show Players On The Map
 	void map(MenuEntry *entry) {
 		PluginMenu *menu = PluginMenu::GetRunningInstance();
@@ -526,7 +524,7 @@ namespace CTRPluginFramework {
 			}
 
 			*menu += LoadPlayerIcons;
-			OSD::Run(players); 
+			OSD::Run(players);
 		}
 
 		else if(!entry->IsActivated()) {
@@ -538,7 +536,7 @@ namespace CTRPluginFramework {
 				playerIcon[i] = nullptr;
 			}
 
-			OSD::Stop(players); 
+			OSD::Stop(players);
 		}
 	}
 

@@ -76,7 +76,7 @@ namespace CTRPluginFramework {
 		
 		Dropper::RestorePattern();
 		DropPatternON = false;
-		OSDExtras::Notify(TextID::DROP_PATTERN_RESTORED, Color::Orange);
+		OSD::NotifySysFont(Language::getInstance()->get(TextID::DROP_PATTERN_RESTORED), Color::Orange);
 	}	
 
 }

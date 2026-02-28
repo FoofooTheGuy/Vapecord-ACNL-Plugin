@@ -393,7 +393,7 @@ namespace CTRPluginFramework {
 		const PACKED_AmiiboInfo& amiibo = amiiboVec[res];
 
 		town->CampgroundCaravan[caravan] = amiibo.VID;
-		OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::CARAVAN_SET_CARAVAN).c_str(), amiibo.Name.c_str(), caravan));
+		OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CARAVAN_SET_CARAVAN).c_str(), amiibo.Name.c_str(), caravan));
 	}
 
 	void SetCampingVillager(MenuEntry *entry) {
@@ -457,7 +457,7 @@ namespace CTRPluginFramework {
 			u16 VID[]{ amiibo.VID };
 
 			SetNPCFunc.Call<void>(&NPC::GetSaveData()->townID1, VID, null, &Town::GetSaveData()->TownData1); 
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::CAMPING_VILLAGER_SET).c_str(), amiibo.Name.c_str()), Color::Green);
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CAMPING_VILLAGER_SET).c_str(), amiibo.Name.c_str()), Color::Green);
 
 			if(Game::IsGameInRoom(0)) {
 				Game::ReloadRoom();
@@ -472,7 +472,7 @@ namespace CTRPluginFramework {
 			}
 
 			DeleteNPCFunc.Call<void>(&NPC::GetSaveData()->townID1);
-			OSDExtras::Notify(TextID::CAMPING_VILLAGER_REMOVED, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::CAMPING_VILLAGER_REMOVED), Color::Red);
 
 			if(Game::IsGameInRoom(0)) {
 				Game::ReloadRoom();
@@ -1312,17 +1312,17 @@ namespace CTRPluginFramework {
 
 	bool IsAcreOkay(u8& AcreID) {
 		if(!IDChecks::IsInRange(AcreID, 0, 0xD6)) {
-			OSDExtras::Notify(TextID::ACRE_EDITOR_INVALID, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::ACRE_EDITOR_INVALID), Color::Red);
 			return false;
 		}
 
 		if(IDChecks::IsHalfAcre(AcreID)) {
-			OSDExtras::Notify(TextID::ACRE_EDITOR_HALF_ACRE_ERROR, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::ACRE_EDITOR_HALF_ACRE_ERROR), Color::Red);
 			return false;
 		}
 
 		if(!SetAcre(AcreID)) {
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::ACRE_EDITOR_PATH_MISSING).c_str(), Utils::Format(PATH_ACRE, AcreID)), Color::Red);
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::ACRE_EDITOR_PATH_MISSING).c_str(), Utils::Format(PATH_ACRE, AcreID)), Color::Red);
 			return 1;
 		}
 
@@ -1353,7 +1353,7 @@ namespace CTRPluginFramework {
 				}
 
 				if(!SetAcre(AcreID)) {
-					OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::ACRE_EDITOR_PATH_MISSING).c_str(), Utils::Format(PATH_ACRE, AcreID)), Color::Red);
+					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::ACRE_EDITOR_PATH_MISSING).c_str(), Utils::Format(PATH_ACRE, AcreID)), Color::Red);
 					break;
 				}
 			}
@@ -1365,7 +1365,7 @@ namespace CTRPluginFramework {
 				}
 
 				if(!SetAcre(AcreID)) {
-					OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::ACRE_EDITOR_PATH_MISSING).c_str(), Utils::Format(PATH_ACRE, AcreID)), Color::Red);
+					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::ACRE_EDITOR_PATH_MISSING).c_str(), Utils::Format(PATH_ACRE, AcreID)), Color::Red);
 					break;
 				}
 			}
@@ -1400,7 +1400,7 @@ namespace CTRPluginFramework {
 
 		town->TownAcres[offset] = AcreID;
 
-		OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::ACRE_EDITOR_ACRE_2).c_str(), acre, AcreID));
+		OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::ACRE_EDITOR_ACRE_2).c_str(), acre, AcreID));
 
 		u32 pInstance = PlayerClass::GetInstance()->Offset();
 		u32 aInstance = Animation::GetAnimationInstance(pInstance, 0, 0, 0);
@@ -1410,7 +1410,7 @@ namespace CTRPluginFramework {
 		data.Congrats_2A();
 		data.ExecuteAnimation(0x2A);
 
-		OSDExtras::Notify(TextID::ACRE_EDITOR_SAVE_QUIT);
+		OSD::NotifySysFont(Language::getInstance()->get(TextID::ACRE_EDITOR_SAVE_QUIT));
 	}
 
 //Map Editor

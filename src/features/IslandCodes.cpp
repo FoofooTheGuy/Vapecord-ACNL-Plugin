@@ -270,7 +270,7 @@ namespace CTRPluginFramework {
 			}
 		}
 		
-		OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::ISLAND_RESTORE_PLACED_COUNT).c_str(), count));
+		OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::ISLAND_RESTORE_PLACED_COUNT).c_str(), count));
 
 	//OFF
 		if(!bypassing) {
@@ -329,7 +329,7 @@ namespace CTRPluginFramework {
 					u32 fileData[arrSize];
 					std::vector<Item> IslandItems;
 					if (!fileData) {
-						OSDExtras::Notify(TextID::ISLAND_SAVE_FAILED_ALLOCATE);
+						OSD::NotifySysFont(Language::getInstance()->get(TextID::ISLAND_SAVE_FAILED_ALLOCATE));
 						return;
 					}
 					

@@ -1,6 +1,5 @@
 #include <CTRPluginFramework.hpp>
 #include "core/game_api/Chat.hpp"
-#include "platform/ctrpf/OSDExtras.hpp"
 
 namespace CTRPluginFramework {
 	u32 Chat::GetPlayerMessageData() {
@@ -52,7 +51,7 @@ namespace CTRPluginFramework {
 			Sleep(Seconds(2));
 			Animation::ExecuteAnimationWrapper(GetPlayerIndex(), 6, {0, 0}, 0, 0, 0, 0, x, y, true);
 
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::CHAT_ANIMATION).c_str(), animID)); 
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_ANIMATION).c_str(), animID)); 
 		}
 	}
 
@@ -63,7 +62,7 @@ namespace CTRPluginFramework {
 			Sleep(Seconds(2));
 			Animation::ExecuteAnimationWrapper(GetPlayerIndex(), 6, {0, 0}, 0, 0, 0, 0, x, y, true);
 
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::CHAT_EMOTION).c_str(), emotionID));
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_EMOTION).c_str(), emotionID));
 		}
 	}
 
@@ -74,7 +73,7 @@ namespace CTRPluginFramework {
 			Sleep(Seconds(2));
 			Animation::ExecuteAnimationWrapper(GetPlayerIndex(), 6, {0, 0}, 0, 0, 0, 0, x, y, true);
 
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::CHAT_SNAKE).c_str(), snakeID)); 
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_SNAKE).c_str(), snakeID)); 
 		}
 	}
 
@@ -85,7 +84,7 @@ namespace CTRPluginFramework {
 			Sleep(Milliseconds(100));
 			Animation::ExecuteAnimationWrapper(GetPlayerIndex(), 6, {0, 0}, 0, 0, 0, 0, x, y, true);
 
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::CHAT_MUSIC).c_str(), musicID)); 
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_MUSIC).c_str(), musicID)); 
 		}
 	}
 
@@ -94,7 +93,7 @@ namespace CTRPluginFramework {
 		if(PlayerClass::GetInstance()->GetWorldCoords(&x, &y)) {	
 			Dropper::PlaceItemWrapper(0xA, ReplaceEverything, &itemID, &itemID, x, y, 0, 0, 0, 0, 0, 0x56, 0xA5, false);
 
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::CHAT_ITEM).c_str(), *(u32*)&itemID));
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_ITEM).c_str(), *(u32*)&itemID));
 		}	
 	}
 
@@ -134,7 +133,7 @@ namespace CTRPluginFramework {
 				AnimationCommand();
 			}
 			else {
-				OSDExtras::Notify(TextID::CHAT_INVALID_ANIMATION, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_INVALID_ANIMATION), Color::Red);
                 return;
             }
 		}
@@ -145,7 +144,7 @@ namespace CTRPluginFramework {
 				EmotionCommand();
 			}
 			else {
-				OSDExtras::Notify(TextID::CHAT_INVALID_EMOTION, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_INVALID_EMOTION), Color::Red);
                 return;
             }
 		}
@@ -156,7 +155,7 @@ namespace CTRPluginFramework {
 				SnakeCommand();
 			}
 			else {
-				OSDExtras::Notify(TextID::CHAT_INVALID_SNAKE, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_INVALID_SNAKE), Color::Red);
                 return;
             }
 		}
@@ -167,7 +166,7 @@ namespace CTRPluginFramework {
 				MusicCommand();
 			}
 			else {
-				OSDExtras::Notify(TextID::CHAT_INVALID_MUSIC, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_INVALID_MUSIC), Color::Red);
                 return;
             }
 		}
@@ -181,7 +180,7 @@ namespace CTRPluginFramework {
 				ItemCommand();
 			}
 			else {
-				OSDExtras::Notify(TextID::INVALID_ITEM, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::INVALID_ITEM), Color::Red);
 				return;
 			}
 		}
@@ -190,13 +189,13 @@ namespace CTRPluginFramework {
 			UtilsExtras::Trim(ItemName);
 			ItemNamePack match;
 			if (!Item::searchByKeyword(ItemName, match)) {
-				OSDExtras::Notify(TextID::CHAT_NO_ITEM_FOUND, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_NO_ITEM_FOUND), Color::Red);
 				return;
 			}
 
 			itemID = Item(match.ID); //sets item
 			if(!itemID.isValid()) { //should always be true if orig file is used
-				OSDExtras::Notify(TextID::INVALID_ITEM, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::INVALID_ITEM), Color::Red);
 				return;
 			}
 

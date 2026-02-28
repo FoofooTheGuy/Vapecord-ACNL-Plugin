@@ -78,21 +78,21 @@ namespace CTRPluginFramework {
 			if(pChoice >= 0) {
 				if(pV[pChoice] != Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY)) {
 					TogglePlayerSelect(pChoice);
-					OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_ENABLED).c_str(), pChoice));
+					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_ENABLED).c_str(), pChoice));
 				}
 				else {
-					OSDExtras::Notify(TextID::PLAYER_SELECT_PLAYER_NOT_EXISTS, Color::Red);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::PLAYER_SELECT_PLAYER_NOT_EXISTS), Color::Red);
 				}
 			}
 		}
 		
 		else if(entry->Hotkeys[1].IsPressed()) {
 			if(IsPlayerSelectEnabled) {
-				OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_DISABLED).c_str(), *(u8 *)(Address(0x75F010).addr + 0x10)));
+				OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_DISABLED).c_str(), *(u8 *)(Address(0x75F010).addr + 0x10)));
 				TogglePlayerSelect(4);
 				return;
 			}
-			OSDExtras::Notify(TextID::PLAYER_SELECT_NOT_SELECTED, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::PLAYER_SELECT_NOT_SELECTED), Color::Red);
 		}
 
 		if(!entry->IsActivated()) {
@@ -183,32 +183,32 @@ namespace CTRPluginFramework {
 			switch(mode) {
 				default: break;
 				case 0:
-					OSDExtras::Notify(TextID::ANIM_MOD_ANIM_MODE, Color::Red);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::ANIM_MOD_ANIM_MODE), Color::Red);
 					mode++;
 					setmode = 1;
 				break;
 				case 1:
-					OSDExtras::Notify(TextID::ANIM_MOD_TOOL_MODE, Color::Orange);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::ANIM_MOD_TOOL_MODE), Color::Orange);
 					mode++;
 					setmode = 2;
 				break;
 				case 2:
-					OSDExtras::Notify(TextID::ANIM_MOD_SNAKE_MODE, Color::Lime);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::ANIM_MOD_SNAKE_MODE), Color::Lime);
 					mode++;
 					setmode = 3;
 				break;
 				case 3:
-					OSDExtras::Notify(TextID::ANIM_MOD_EMOTION_MODE, Color::Cyan);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::ANIM_MOD_EMOTION_MODE), Color::Cyan);
 					mode++;
 					setmode = 4;
 				break;
 				case 4:
-					OSDExtras::Notify(TextID::ANIM_MOD_SOUND_MODE, Color::Magenta);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::ANIM_MOD_SOUND_MODE), Color::Magenta);
 					mode++;
 					setmode = 5;
 				break;
 				case 5:
-					OSDExtras::Notify(TextID::ANIM_MOD_APPEARANCE_MODE, Color::Yellow);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::ANIM_MOD_APPEARANCE_MODE), Color::Yellow);
 					mode = mode - 5;
 					setmode = 6;
 				break;
@@ -244,7 +244,7 @@ namespace CTRPluginFramework {
 		
 		else if(entry->Hotkeys[2].IsPressed()) {
 			speedmode = !speedmode;
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::ANIM_MOD_SPEED_MODE).c_str(), (speedmode ? Color::Green << Language::getInstance()->get(TextID::STATE_ON) : Color::Red << Language::getInstance()->get(TextID::STATE_OFF))));			
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::ANIM_MOD_SPEED_MODE).c_str(), (speedmode ? Color::Green << Language::getInstance()->get(TextID::STATE_ON) : Color::Red << Language::getInstance()->get(TextID::STATE_OFF))));			
 		}
 		
 		if(entry->Hotkeys[3].IsPressed()) {
@@ -330,13 +330,13 @@ namespace CTRPluginFramework {
 				slo1.WriteFloat(8.0);
 				slo1.WriteFloat(6.0);
 
-				OSDExtras::Notify(Language::getInstance()->get(TextID::SLOW_MO_ANIM) + " " << Color::Green << Language::getInstance()->get(TextID::STATE_ON));
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SLOW_MO_ANIM) + " " << Color::Green << Language::getInstance()->get(TextID::STATE_ON));
 			} else {
 				slo1.Unpatch();
 				slo2.Unpatch();
 				slo3.Unpatch();
 
-				OSDExtras::Notify(Language::getInstance()->get(TextID::SLOW_MO_ANIM) + " " << Color::Red << Language::getInstance()->get(TextID::STATE_OFF));
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SLOW_MO_ANIM) + " " << Color::Red << Language::getInstance()->get(TextID::STATE_OFF));
 			}
 		}
 

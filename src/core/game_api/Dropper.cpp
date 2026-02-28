@@ -12,7 +12,6 @@
 
 #include "core/infrastructure/Language.hpp"
 #include "core/infrastructure/TextID.hpp"
-#include "platform/ctrpf/OSDExtras.hpp"
 
 namespace CTRPluginFramework {
 	const s_DropType DropTypes[8] = {
@@ -112,7 +111,7 @@ Restores Drop Pattern if drop radius changer has been used to prevent any crashe
 		}		
 		
 		if(DisplayMSG) {
-			OSDExtras::Notify(Utils::Format("%d %s", count, msg.c_str()));
+			OSD::NotifySysFont(Utils::Format("%d %s", count, msg.c_str()));
 		}
 
 	//OFF
@@ -163,7 +162,7 @@ Restores Drop Pattern if drop radius changer has been used to prevent any crashe
 			return 0;
 
 		if(!ItemToPlace->isValid()) {
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::DROPPER_INVALID_ITEM).c_str(), *(u32 *)ItemToPlace));
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::DROPPER_INVALID_ITEM).c_str(), *(u32 *)ItemToPlace));
 			return 0;
 		}
 

@@ -29,8 +29,8 @@ namespace CTRPluginFramework {
 				return ExHandler::ERROR_DRD; //error dumping file
 			}
 
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::WRAPPER_ADDRESS).c_str(), dump->Address));
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::WRAPPER_LENGHT).c_str(), dump->Lenght));
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::WRAPPER_ADDRESS).c_str(), dump->Address));
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::WRAPPER_LENGHT).c_str(), dump->Lenght));
 
 			dump = va_arg(dumps, WrapLoc*); //go to next argument		
 		}

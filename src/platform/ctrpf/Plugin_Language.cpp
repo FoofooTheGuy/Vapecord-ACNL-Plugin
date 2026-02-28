@@ -2,9 +2,8 @@
 #include "Color.h"
 #include "Files.h"
 #include "core/infrastructure/Language.hpp"
-#include "platform/ctrpf/PluginMenuExtras.hpp"
 
-namespace CTRPluginFramework {	
+namespace CTRPluginFramework {
     void Config::SetupLanguage(bool SetInMenu) {
 		std::string language = "";
 		GetLanguage(language);
@@ -50,7 +49,7 @@ namespace CTRPluginFramework {
 
 			if (!SetLanguage(language)) { //write language mode to file
 				MessageBox(Utils::Format("Error 608\nCouldn't save chosen language.\nGet more info and help on the Discord Server: %s", DISCORDINV)).SetClear(ClearScreen::Top)();
-			} 
+			}
 			languageExists = true;
         }
 
@@ -62,7 +61,7 @@ namespace CTRPluginFramework {
 		}
 
 		if (SetInMenu) {
-			PluginMenuExtras::Update();
+			PluginMenu::UpdateLocalizedEntries();
 			MessageBox("Successfully set new language!").SetClear(ClearScreen::Top)();
 		}
     }

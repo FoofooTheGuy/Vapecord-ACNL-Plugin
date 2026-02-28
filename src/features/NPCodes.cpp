@@ -6,7 +6,6 @@
 #include "core/game_api/PlayerClass.hpp"
 #include "core/game_api/Dropper.hpp"
 #include "core/RuntimeContext.hpp"
-#include "platform/ctrpf/ScreenExtras.hpp"
 
 namespace CTRPluginFramework {
     static u32 CurrAddress = 0;
@@ -25,12 +24,11 @@ namespace CTRPluginFramework {
 		Color darkGrey(40, 40, 40, 175);
 
 		if(screen.IsTop) {
-			ScreenExtras extras(screen);
-			extras.DrawSysfontWithBackground(Utils::Format("X | %f", coord[0]), 0, 0, Color::White, darkGrey);
-			extras.DrawSysfontWithBackground(Utils::Format("Y | %f", coord[1]), 0, 16, Color::White, darkGrey);
-			extras.DrawSysfontWithBackground(Utils::Format("Z | %f", coord[2]), 0, 32, Color::White, darkGrey);
-			extras.DrawSysfontWithBackground(Utils::Format("R | %04X", rotation), 0, 48, Color::White, darkGrey);
-			extras.DrawSysfontWithBackground(Utils::Format("A | %08X", CurrAddress), 0, 64, Color::White, darkGrey);
+			screen.DrawSysfontWithBackground(Utils::Format("X | %f", coord[0]), 0, 0, Color::White, darkGrey);
+			screen.DrawSysfontWithBackground(Utils::Format("Y | %f", coord[1]), 0, 16, Color::White, darkGrey);
+			screen.DrawSysfontWithBackground(Utils::Format("Z | %f", coord[2]), 0, 32, Color::White, darkGrey);
+			screen.DrawSysfontWithBackground(Utils::Format("R | %04X", rotation), 0, 48, Color::White, darkGrey);
+			screen.DrawSysfontWithBackground(Utils::Format("A | %08X", CurrAddress), 0, 64, Color::White, darkGrey);
 			return 1;
 		}
 
@@ -62,11 +60,11 @@ namespace CTRPluginFramework {
 		}
 
 		const std::vector<std::string> option = {
-			Language::getInstance()->get(TextID::NPC_FUNC_NORMAL), 
-			Language::getInstance()->get(TextID::NPC_RACE_SPECIAL), 
+			Language::getInstance()->get(TextID::NPC_FUNC_NORMAL),
+			Language::getInstance()->get(TextID::NPC_RACE_SPECIAL),
 			Language::getInstance()->get(TextID::NPC_FUNC_PLAYER)
 		};
-		
+
 		std::vector<NPCdata> npc[3];
 		std::vector<std::string> vec;
 
@@ -101,7 +99,7 @@ namespace CTRPluginFramework {
 
 		CurrAddress = npc[res][res2].data;
 
-		OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::NPC_FUNC_SELECTED).c_str(), npc[res][res2].name.c_str()));
+		OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::NPC_FUNC_SELECTED).c_str(), npc[res][res2].name.c_str()));
 
 	#if DEVMODE
 		PluginMenu *menu = PluginMenu::GetRunningInstance();
@@ -113,12 +111,12 @@ namespace CTRPluginFramework {
 	static u16 npcID = 0;
 
 	void NPCSetAnim(MenuEntry *entry) {
-		const std::vector<std::string> vec = { 
-			Language::getInstance()->get(TextID::NPC_ANIM_ANIMATION), 
-			Language::getInstance()->get(TextID::NPC_ANIM_SNAKE), 
-			Language::getInstance()->get(TextID::NPC_ANIM_EMOTION), 
+		const std::vector<std::string> vec = {
+			Language::getInstance()->get(TextID::NPC_ANIM_ANIMATION),
+			Language::getInstance()->get(TextID::NPC_ANIM_SNAKE),
+			Language::getInstance()->get(TextID::NPC_ANIM_EMOTION),
 			Language::getInstance()->get(TextID::NPC_ANIM_ITEM)
-		};	
+		};
 
 		Keyboard KB(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), vec);
 
@@ -148,7 +146,7 @@ namespace CTRPluginFramework {
 			u32 null[]{ 0 };
 			switch(mode) {
 				case 0:
-					func1.Call<void>(CurrAddress + 0x78, npcID, 0, data1, null, null, 0, data2); //Animation	
+					func1.Call<void>(CurrAddress + 0x78, npcID, 0, data1, null, null, 0, data2); //Animation
 				break;
 				case 1:
 					func2.Call<void>(CurrAddress + 0x78, 0, npcID, 0, 0); //Snake
@@ -202,7 +200,7 @@ namespace CTRPluginFramework {
 			pCoords[0] = coords[0];
 			pCoords[1] = coords[1];
 			pCoords[2] = coords[2];
-			OSDExtras::Notify(TextID::NPC_TELEPORTED_TO_YOU, Color(0x00FA9AFF));
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::NPC_TELEPORTED_TO_YOU), Color(0x00FA9AFF));
 		}
 	}
 
@@ -218,7 +216,7 @@ namespace CTRPluginFramework {
 		u8 uVar91D = 0;
 
 		float *coord = addr1.Call<float *>();
-		
+
 		float fVar1 = coord[1];
 		fVar914 = coord[0];
 

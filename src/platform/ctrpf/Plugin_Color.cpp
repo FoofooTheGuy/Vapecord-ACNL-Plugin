@@ -1,12 +1,38 @@
 #include <CTRPluginFramework.hpp>
-#include "platform/ctrpf/MenuFolderExtras.hpp"
-#include "platform/ctrpf/PluginMenuExtras.hpp"
-#include "platform/ctrpf/ColorExtras.hpp"
+#include "platform/ctrpf/Plugin_Color.hpp"
+#include "platform/ctrpf/FolderTypes.hpp"
+#include "platform/ctrpf/FolderTypeTextMap.hpp"
+#include "Files.h"
 #include "core/infrastructure/Address.hpp"
+#include "core/infrastructure/Language.hpp"
+#include "core/infrastructure/TextID.hpp"
 #include "core/game_api/Game.hpp"
 
 namespace CTRPluginFramework {
     static const std::string loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+
+	static std::string GetFolderName(FolderType type) {
+		return Language::getInstance()->get(GetFolderTextId(type));
+	}
+
+	static Color GetFolderColor(FolderType type) {
+		if (type >= FolderType::Save && type <= FolderType::Misc) {
+			if (CustomColorsExist()) {
+				std::vector<ColorEntry> customColors = GetCustomColors();
+				for (const ColorEntry& entry : customColors) {
+					if (entry.folderType == type)
+						return Color(entry.r, entry.g, entry.b);
+				}
+			}
+		}
+
+		for (const ColorEntry& entry : defaultColors) {
+			if (entry.folderType == type)
+				return Color(entry.r, entry.g, entry.b);
+		}
+
+		return Color::White;
+	}
 
 	void ColorChangeKeyboard(Keyboard& keyboard, KeyboardEvent& event) {
 		std::string& input = keyboard.GetInput();
@@ -21,7 +47,7 @@ namespace CTRPluginFramework {
 
 		Color color(r, g, b);
 
-		keyboard.GetMessage() = color << loremIpsum + "\n\n" + ColorExtras::RemoveColor(Language::getInstance()->get(TextID::COLOR_FORMAT_RGB));
+		keyboard.GetMessage() = color << loremIpsum + "\n\n" + Color::RemoveColorPrefix(Language::getInstance()->get(TextID::COLOR_FORMAT_RGB));
 	}
 
 	void EditColors() {
@@ -30,12 +56,12 @@ namespace CTRPluginFramework {
 		for (int i = static_cast<int>(FolderType::Save); i < static_cast<int>(FolderType::Misc) + 1; ++i) {
 			FolderType folder = static_cast<FolderType>(i);
 
-			Color color = MenuFolderExtras::GetFolderColor(folder);
+			Color color = GetFolderColor(folder);
 
-			folders.push_back(color << MenuFolderExtras::GetFolderName(folder));
+			folders.push_back(color << GetFolderName(folder));
 
 			std::string colorStr = Utils::Format("R:%d G:%d B:%d", color.r, color.g, color.b);
-			foldersStr += color << MenuFolderExtras::GetFolderName(folder) + " : " + colorStr + "\n";
+			foldersStr += color << GetFolderName(folder) + " : " + colorStr + "\n";
 		}
 
 		Keyboard keyboard(foldersStr, folders);
@@ -45,7 +71,7 @@ namespace CTRPluginFramework {
 		}
 
 		FolderType selectedFolder = static_cast<FolderType>(choice);
-		Color currentFolderColor = MenuFolderExtras::GetFolderColor(selectedFolder);
+		Color currentFolderColor = GetFolderColor(selectedFolder);
 
 		Keyboard setColorKB;
 		setColorKB.DisplayTopScreen = true;
@@ -81,7 +107,7 @@ namespace CTRPluginFramework {
 		}
 		WriteCustomColors(colors);
 
-		PluginMenuExtras::Update();
+		PluginMenu::UpdateLocalizedEntries();
 
         MessageBox(Language::getInstance()->get(TextID::COLOR_CHANGE_SUCCESS)).SetClear(ClearScreen::Top)();
 	}

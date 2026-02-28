@@ -77,7 +77,7 @@ namespace CTRPluginFramework {
 
 		if(entry->Hotkeys[0].IsPressed()) {
 			if(!player) {
-				OSDExtras::Notify(TextID::SAVE_PLAYER_NO, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
 
@@ -89,7 +89,7 @@ namespace CTRPluginFramework {
 		
 		else if(entry->Hotkeys[1].IsPressed()) {
 			if(!player) {
-				OSDExtras::Notify(TextID::SAVE_PLAYER_NO, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
 
@@ -103,7 +103,7 @@ namespace CTRPluginFramework {
 		
 		else if(entry->Hotkeys[2].IsPressed()) {
 			if(!player) {
-				OSDExtras::Notify(TextID::SAVE_PLAYER_NO, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
 
@@ -112,7 +112,7 @@ namespace CTRPluginFramework {
 				Item *item = Game::GetItemAtWorldCoords(x, y);
 				if(item) {
 					Inventory::WriteSlot(0, *item);
-					OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::INVENTORY_T2I_SET).c_str(), *(u32 *)item));
+					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::INVENTORY_T2I_SET).c_str(), *(u32 *)item));
 				}
 			}
 		}
@@ -144,10 +144,10 @@ namespace CTRPluginFramework {
 
 		if(Game::SetItem(&CurrentItem)) {
 			std::string itemName = CurrentItem.GetName();
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::INVENTORY_CATALOG_SET_ITEM).c_str(), itemName.c_str(), CurrentItem.ID));
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::INVENTORY_CATALOG_SET_ITEM).c_str(), itemName.c_str(), CurrentItem.ID));
 		}
 		else {
-			OSDExtras::Notify(TextID::INVENTORY_SEARCH_INV_FULL, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::INVENTORY_SEARCH_INV_FULL), Color::Red);
 		}
 
 		static Address argData(0x8499E4);
@@ -179,7 +179,7 @@ namespace CTRPluginFramework {
 
 		if(entry->Hotkeys[0].IsPressed()) {
 			if(!PlayerClass::GetInstance()->IsLoaded()) {
-				OSDExtras::Notify(TextID::SAVE_PLAYER_NO, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
 			
@@ -215,17 +215,17 @@ namespace CTRPluginFramework {
 		}
 		
 		if(!PlayerClass::GetInstance()->IsLoaded()) {
-			OSDExtras::Notify(TextID::SAVE_PLAYER_NO, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 			return;
 		}
 		
 		if(!GameKeyboard::IsOpen()) {
-			OSDExtras::Notify(TextID::CHAT_TEXT_2_I_OPEN_KEYBOARD, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_TEXT_2_I_OPEN_KEYBOARD), Color::Red);
 			return;
 		}
 
 		if(GameKeyboard::IsEmpty()) {
-			OSDExtras::Notify(TextID::CHAT_TEXT_2_I_KEYBOARD_EMPTY, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_TEXT_2_I_KEYBOARD_EMPTY), Color::Red);
 			return;
 		}
 		
@@ -233,30 +233,30 @@ namespace CTRPluginFramework {
 		Item itemID;
 
 		if(!GameKeyboard::Copy(chatStr, 0, 0x16)) {
-			OSDExtras::Notify(TextID::CHAT_TEXT_2_I_COPY_ERROR, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_TEXT_2_I_COPY_ERROR), Color::Red);
 			return;
 		}
 
 		if(!GameKeyboard::ConvertToItemID(chatStr, itemID)) {
-			OSDExtras::Notify(TextID::CHAT_TEXT_2_I_INVALID, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_TEXT_2_I_INVALID), Color::Red);
 			return;
 		}
 		
 		u8 slot = 0;
 		if(!Inventory::GetNextItem({0x7FFE, 0}, slot)) {
-			OSDExtras::Notify(TextID::INVENTORY_SEARCH_INV_FULL, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::INVENTORY_SEARCH_INV_FULL), Color::Red);
 			return;
 		}
 			
 		if(!itemID.isValid(false)) {
-			OSDExtras::Notify(TextID::INVENTORY_SEARCH_INVALID, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::INVENTORY_SEARCH_INVALID), Color::Red);
 			return;
 		}
 		
 		Inventory::WriteSlot(slot, itemID);
 
 		std::string itemName = itemID.GetName();
-		OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::CHAT_TEXT_2_I_SPAWNED).c_str(), itemName.c_str(), itemID));
+		OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_TEXT_2_I_SPAWNED).c_str(), itemName.c_str(), itemID));
 	}
 //Clear Inventory
 	void ClearInventory(MenuEntry *entry) {
@@ -358,7 +358,7 @@ namespace CTRPluginFramework {
 	void Hook_MenuPatch(u32 r0, u32 r1, u32 r3) {
 		u8 roomId = Player::GetRoom(4);
 		if (roomId == 0xA1 || roomId == 0xA2 || (roomId >= 0x92 && roomId <= 0x97)) {
-			OSDExtras::Notify(TextID::MENU_CHANGER_INVALID_ROOM, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::MENU_CHANGER_INVALID_ROOM), Color::Red);
 
 			const HookContext &curr = HookContext::GetCurrent();
 			static Address func = Address::decodeARMBranch(curr.targetAddress, curr.overwrittenInstr);

@@ -6,7 +6,7 @@
 #include "core/infrastructure/Address.hpp"
 #include "core/infrastructure/Language.hpp"
 #include "core/infrastructure/TextID.hpp"
-#include "platform/ctrpf/OSDExtras.hpp"
+#include "platform/ctrpf/FolderTypes.hpp"
 
 extern CTRPluginFramework::Item PickupSeederItemID;
 
@@ -26,9 +26,9 @@ namespace CTRPluginFramework {
 	void caravanchange(MenuEntry *entry);
 	void SetCampingVillager(MenuEntry *entry);
 	void CompleteMuseum(MenuEntry *entry);
-	void Permit100(MenuEntry *entry);	
+	void Permit100(MenuEntry *entry);
 	void MapEditor(MenuEntry *entry);
-	
+
 //Movement Codes Folder
 	void noPush(MenuEntry *entry);
 	void coordspeed(MenuEntry *entry);
@@ -44,7 +44,7 @@ namespace CTRPluginFramework {
 	void menuSpeedMod(MenuEntry *entry);
 	void roomWarp(MenuEntry *entry);
 	void shovelknockback(MenuEntry *entry);
-	
+
 //Inventory Codes Folder
 	void itemsearch(MenuEntry *entry);
 	void t2i(MenuEntry *entry);
@@ -56,7 +56,7 @@ namespace CTRPluginFramework {
 	void getset(MenuEntry *entry);
 	void SettingsButton(MenuEntry *entry);
 	void chatt2i(MenuEntry *entry);
-	
+
 //Player Codes Folder
 	//Player Save Codes
 	void NameChanger(MenuEntry* entry);
@@ -73,7 +73,7 @@ namespace CTRPluginFramework {
 	void randomoutfit(MenuEntry *entry);
 	void playerbackup(MenuEntry *entry);
 	void unlockqrmachine(MenuEntry *entry);
-	
+
 	void neckentry(MenuEntry *entry);
 	void debug(MenuEntry *entry);
 	void hatz(MenuEntry *entry);
@@ -83,7 +83,7 @@ namespace CTRPluginFramework {
 	void NeverBedHead(MenuEntry *entry);
 	void SaveColor(MenuEntry *entry);
 	void App_ColorMod(MenuEntry *entry);
-	
+
 //Animation Codes Folder
 	void playerSelector(MenuEntry *entry);
 	void execAnim(MenuEntry *entry);
@@ -92,7 +92,7 @@ namespace CTRPluginFramework {
 	void slmoanms(MenuEntry *entry);
 	void doonall(MenuEntry *entry);
 	void anticheat(MenuEntry *entry);
-	
+
 //Seeding Codes
 	bool SetSeederInfos(void);
 	//Seed Codes
@@ -108,13 +108,13 @@ namespace CTRPluginFramework {
 	void instantDrop(MenuEntry *entry);
 	void autoDrop(MenuEntry *entry);
 	void touchDrop(MenuEntry *entry);
-	void ShowInvSlotID(MenuEntry *entry);	
+	void ShowInvSlotID(MenuEntry *entry);
 	//Tree Codes
 	void fruitStays(MenuEntry *entry);
 	void shakechop(MenuEntry *entry);
 	void fruititemmod(MenuEntry *entry);
 	void instantchop(MenuEntry *entry);
-	
+
 //Money Codes
 	void wallet(MenuEntry *entry);
 	void bank(MenuEntry *entry);
@@ -122,7 +122,7 @@ namespace CTRPluginFramework {
 	void badges(MenuEntry *entry);
 	void medals(MenuEntry *entry);
 	void turnips(MenuEntry *entry);
-	
+
 //Island Codes
 	void UnlockIsland(MenuEntry *entry);
 	void bonusOre(MenuEntry *entry);
@@ -136,7 +136,7 @@ namespace CTRPluginFramework {
 	void menuBuildingMod(MenuEntry *entry);
 	void FreeKappn(MenuEntry *entry);
 	void IslandSaver(MenuEntry *entry);
-	
+
 //Fun Codes
 	void sizecodes(MenuEntry *entry);
 	void tposeentry(MenuEntry *entry);
@@ -170,7 +170,7 @@ namespace CTRPluginFramework {
 	void KeepGrassState(MenuEntry *entry);
 	void BuriedInspector(MenuEntry *entry);
 	void ItemsDontDissappearOnInvalidPositions(MenuEntry *entry);
-	
+
 //Extra Codes
 	//Chat Codes
 	void bubblesDisappear(MenuEntry *entry);
@@ -183,17 +183,17 @@ namespace CTRPluginFramework {
 	void AmiiboSpoofer(MenuEntry *entry);
 	void ShopsAlwaysOpen(MenuEntry *entry);
 	void shopunlocks(MenuEntry *entry);
-	void nonesave(MenuEntry *entry);	
+	void nonesave(MenuEntry *entry);
 	void bypass(MenuEntry *entry);
-	void noTrap(MenuEntry *entry);	
+	void noTrap(MenuEntry *entry);
 	void SetSpotState(MenuEntry *entry);
 	void SearchReplace(MenuEntry *entry);
 	void RemoveItemsCheat(MenuEntry *entry);
-	void editpattern(MenuEntry *entry);	
+	void editpattern(MenuEntry *entry);
 	void AmiiboSpoof(MenuEntry *entry);
 	void TTKeyboard(MenuEntry *entry);
 	void TimeTravel(MenuEntry *entry);
-	
+
 //Misc Codes
 	void tooltype(MenuEntry *entry);
 	void mgtype(MenuEntry *entry);
@@ -211,11 +211,11 @@ namespace CTRPluginFramework {
 	void speedentry(MenuEntry *entry);
 	void fastisabelle(MenuEntry *entry);
 
-//Dev Codes	
+//Dev Codes
 	void customdump(MenuEntry *entry);
 	void FunctionsCaller(MenuEntry *entry);
 	void FunctionsCallerSettings(MenuEntry *entry);
-	
+
 	void displaySaveFlagDifference(MenuEntry *entry);
 	void falldownfishing(MenuEntry *entry);
 	void unlockCroRegion(MenuEntry *entry);
@@ -268,8 +268,9 @@ namespace CTRPluginFramework {
 	void FruitStackingCheck(MenuEntry *entry);
 
 	void pluginSettingsEntry(MenuEntry *entry);
-	
+
 //Helper functions
   //Located in cheats.cpp
 	void SendPlayerData(Time time);
+	bool TryGetFolderInfo(MenuFolder *folder, FolderType &folderType, SubFolder &subFolder);
 }

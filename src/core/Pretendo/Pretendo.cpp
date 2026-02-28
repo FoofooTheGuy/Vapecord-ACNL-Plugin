@@ -21,7 +21,6 @@
 #include "core/Pretendo/Pretendo.hpp"
 #include "core/Pretendo/PatternManager.hpp"
 #include "core/Pretendo/rt.h"
-#include "platform/ctrpf/OSDExtras.hpp"
 
 namespace CTRPluginFramework {
     // Pretendo GameHelper functions and variables
@@ -33,7 +32,7 @@ namespace CTRPluginFramework {
 
     void acnlPacket0x81Handler(u8 arg0, void* buffer, u32 size, u32 arg3, u32 arg4) {
         if (size > 0x1AC) {
-            OSDExtras::Notify("Detected attempt of ACNL exploit");
+            OSD::NotifySysFont("Detected attempt of ACNL exploit");
             size = 0x1AC;
         }
 

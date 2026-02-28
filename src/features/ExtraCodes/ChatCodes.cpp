@@ -56,7 +56,7 @@ namespace CTRPluginFramework {
 			f_board.Close();
 
 			if(GameKeyboard::Write(Holder)) {
-				OSDExtras::Notify(Language::getInstance()->get(TextID::CHATCOPYPASTE_PASTE) << " " << Holder, Color(0x0091FFFF));
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CHATCOPYPASTE_PASTE) << " " << Holder, Color(0x0091FFFF));
 			}
 		}
 
@@ -76,7 +76,7 @@ namespace CTRPluginFramework {
 				f_board.Flush();
 				f_board.Close();
 
-				OSDExtras::Notify(Language::getInstance()->get(TextID::CHATCOPYPASTE_COPY) << " " << Holder, Color(0xFF0077FF));
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CHATCOPYPASTE_COPY) << " " << Holder, Color(0xFF0077FF));
 			}
 		}
 
@@ -98,13 +98,13 @@ namespace CTRPluginFramework {
 				f_board.Flush();
 				f_board.Close();
 
-				OSDExtras::Notify(Language::getInstance()->get(TextID::CHATCOPYPASTE_CUT) << " " << Holder, Color(0x00FF6FFF));
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CHATCOPYPASTE_CUT) << " " << Holder, Color(0x00FF6FFF));
 			}
 		}
 
 		else if(entry->Hotkeys[3].IsPressed()) {
 			if(GameKeyboard::DeleteSelected()) {
-				OSDExtras::Notify(TextID::CHATCOPYPASTE_DELETE, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CHATCOPYPASTE_DELETE), Color::Red);
 			}
 		}
 	}
@@ -235,7 +235,7 @@ namespace CTRPluginFramework {
 
 						f_board.Flush();
 						f_board.Close();
-						OSDExtras::Notify(TextID::CHAT_BUTTON_COPIED, Color(0xFF0077FF));
+						OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_BUTTON_COPIED), Color(0xFF0077FF));
 					}
 				}
 				break;
@@ -271,7 +271,7 @@ namespace CTRPluginFramework {
 						f_board.Flush();
 						f_board.Close();
 
-						OSDExtras::Notify(TextID::CHAT_BUTTON_CUT, Color(0x00FF6FFF));
+						OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_BUTTON_CUT), Color(0x00FF6FFF));
 					}
 				}
 				break;
@@ -602,9 +602,9 @@ namespace CTRPluginFramework {
 							const auto& playerName = *reinterpret_cast<const std::array<u16, 9>*>(player + 0x55A8);
 							std::array<char, 9 * 4> playerNameUtf8 {};
 							utf16_to_utf8(reinterpret_cast<u8*>(playerNameUtf8.data()), playerName.data(), playerNameUtf8.size());
-							OSDExtras::Notify((Player::GetColor(sender) << std::string(playerNameUtf8.data()) << Color::White) + ": " + result);
+							OSD::NotifySysFont((Player::GetColor(sender) << std::string(playerNameUtf8.data()) << Color::White) + ": " + result);
 						}
-						else OSDExtras::Notify(result);
+						else OSD::NotifySysFont(result);
 					}
 					else {
 						static Address submitChat(0x218104);

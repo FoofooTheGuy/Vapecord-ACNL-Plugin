@@ -10,7 +10,6 @@
 #include "core/RuntimeContext.hpp"
 #include "core/infrastructure/Language.hpp"
 #include "core/infrastructure/TextID.hpp"
-#include "platform/ctrpf/OSDExtras.hpp"
 
 namespace CTRPluginFramework {
 	namespace Game {
@@ -139,22 +138,22 @@ namespace CTRPluginFramework {
 		void MoveBuilding() {
 			ACNL_BuildingData *building = Building::GetSaveData();
 			if(!building) {
-				OSDExtras::Notify(TextID::BUILDING_MOD_SAVE_DATA_NOT_LOADED, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_SAVE_DATA_NOT_LOADED), Color::Red);
 				return;
 			}
 
 			if(!PlayerClass::GetInstance()->IsLoaded()) {
-				OSDExtras::Notify(TextID::SAVE_PLAYER_NO, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
 			
 			if(!IsGameInRoom(0)) {
-				OSDExtras::Notify(TextID::BUILDING_MOD_NOT_IN_TOWN, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NOT_IN_TOWN), Color::Red);
 				return;
 			}
 			
 			if(GetOnlinePlayerCount() != 0) {
-				OSDExtras::Notify(TextID::BUILDING_MOD_NOT_IN_OWN_TOWN, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NOT_IN_OWN_TOWN), Color::Red);
 				return;
 			}
 			
@@ -199,22 +198,22 @@ namespace CTRPluginFramework {
 		void RemoveBuilding() {
 			ACNL_BuildingData *building = Building::GetSaveData();
 			if(!building) {
-				OSDExtras::Notify(TextID::BUILDING_MOD_SAVE_DATA_NOT_LOADED, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_SAVE_DATA_NOT_LOADED), Color::Red);
 				return;
 			}
 
 			if(!PlayerClass::GetInstance()->IsLoaded()) {
-				OSDExtras::Notify(TextID::SAVE_PLAYER_NO, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
 			
 			if(!IsGameInRoom(0)) {
-				OSDExtras::Notify(TextID::BUILDING_MOD_NOT_IN_TOWN, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NOT_IN_TOWN), Color::Red);
 				return;
 			}
 			
 			if(GetOnlinePlayerCount() != 0) {
-				OSDExtras::Notify(TextID::BUILDING_MOD_NOT_IN_OWN_TOWN, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NOT_IN_OWN_TOWN), Color::Red);
 				return;
 			}
 			
@@ -238,7 +237,7 @@ namespace CTRPluginFramework {
 			}
 			
 			if(!IDChecks::BuildingValid(building->Buildings.Building[index.at(val)].ID)) {
-				OSDExtras::Notify(TextID::BUILDING_MOD_CANT_REMOVE, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_CANT_REMOVE), Color::Red);
 				return;
 			}
 
@@ -322,33 +321,33 @@ namespace CTRPluginFramework {
 	//place building
 		void PlaceBuilding(u8 buildingID) {
 			if(!PlayerClass::GetInstance()->IsLoaded()) {
-				OSDExtras::Notify(TextID::SAVE_PLAYER_NO, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
 			
 			if(!IsGameInRoom(0)) {
-				OSDExtras::Notify(TextID::BUILDING_MOD_NOT_IN_TOWN, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NOT_IN_TOWN), Color::Red);
 				return;
 			}
 			
 			if(!IDChecks::BuildingValid(buildingID)) {
-				OSDExtras::Notify(TextID::BUILDING_MOD_INVALID_ID, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_INVALID_ID), Color::Red);
 				return;
 			}
 			
 			if(GetOnlinePlayerCount() != 0) {
-				OSDExtras::Notify(TextID::BUILDING_MOD_NOT_IN_OWN_TOWN, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NOT_IN_OWN_TOWN), Color::Red);
 				return;
 			}
 			
 			if(!IsBuildingSpotFree()) {
-				OSDExtras::Notify(TextID::BUILDING_MOD_NO_SLOT_FREE, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NO_SLOT_FREE), Color::Red);
 				return;
 			}
 
 			if (buildingID == 0xDC || buildingID == 0xDD) { 
 				if (!IsFaceCutOutSpaceFree()) {
-					OSDExtras::Notify(TextID::BUILDING_MOD_NO_DESIGN_STAND_FREE, Color::Red);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NO_DESIGN_STAND_FREE), Color::Red);
 					return;
 				}
 			}
@@ -583,7 +582,7 @@ namespace CTRPluginFramework {
 
 							Controller::Update();
 							if(Controller::IsKeyPressed(Key::B) && allowAbort) {
-								OSDExtras::Notify(TextID::SEARCH_REPLACE_ABORT);
+								OSD::NotifySysFont(Language::getInstance()->get(TextID::SEARCH_REPLACE_ABORT));
 								goto end;
 							}
 						}
@@ -616,7 +615,7 @@ namespace CTRPluginFramework {
 			}
 			
 			if(counting) {
-				OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::SEARCH_REPLACE_REPLACED).c_str(), count));
+				OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::SEARCH_REPLACE_REPLACED).c_str(), count));
 			}
 			
 			return true;

@@ -131,7 +131,7 @@ namespace CTRPluginFramework {
 		if(entry->Hotkeys[0].IsPressed()) {
 			ACNL_Player *player = Player::GetSaveData();
 			if(!player) {
-				OSDExtras::Notify(TextID::SAVE_PLAYER_NO, Color::Red);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
 
@@ -307,12 +307,12 @@ namespace CTRPluginFramework {
             if(Controller::IsKeysPressed(Key::R + Key::Y)) {
 				switch(isOn) {
 					case 0: 
-						OSDExtras::Notify(Language::getInstance()->get(TextID::CAMERA_MOD_PLAYER) << " " << Color::Red << Language::getInstance()->get(TextID::CAMERA_MOD_LOCKED)); 
+						OSD::NotifySysFont(Language::getInstance()->get(TextID::CAMERA_MOD_PLAYER) << " " << Color::Red << Language::getInstance()->get(TextID::CAMERA_MOD_LOCKED)); 
 						Animation::ExecuteAnimationWrapper(4, 0xF, {0, 0}, 0, 0, 0, 0, 0, 0, 0);
 						isOn = true;
 					break;
 					case 1: 
-						OSDExtras::Notify(Language::getInstance()->get(TextID::CAMERA_MOD_PLAYER) << " " << Color::Green << Language::getInstance()->get(TextID::CAMERA_MOD_UNLOCKED));
+						OSD::NotifySysFont(Language::getInstance()->get(TextID::CAMERA_MOD_PLAYER) << " " << Color::Green << Language::getInstance()->get(TextID::CAMERA_MOD_UNLOCKED));
 						Animation::ExecuteAnimationWrapper(4, 6, {0, 0}, 0, 0, 0, 0, 0, 0, 0);
 						isOn = false;
 					break;
@@ -362,7 +362,7 @@ namespace CTRPluginFramework {
         patch:
             if(!isPatched) {
             //disable camera following
-				OSDExtras::Notify(Language::getInstance()->get(TextID::CAMERA_MOD_CAM_FOLLOWING) << " " << Color::Red << Language::getInstance()->get(TextID::STATE_OFF)); 
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CAMERA_MOD_CAM_FOLLOWING) << " " << Color::Red << Language::getInstance()->get(TextID::STATE_OFF)); 
 				cameraAsm.Patch(0xEA000020);
                 isPatched = true;
             }
@@ -370,7 +370,7 @@ namespace CTRPluginFramework {
         unpatch:
             if(isPatched) {
 			//reenable camera followig
-				OSDExtras::Notify(Language::getInstance()->get(TextID::CAMERA_MOD_CAM_FOLLOWING) << " " << Color::Green << Language::getInstance()->get(TextID::STATE_ON)); 
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CAMERA_MOD_CAM_FOLLOWING) << " " << Color::Green << Language::getInstance()->get(TextID::STATE_ON)); 
 				cameraAsm.Unpatch();
                 isPatched = false;
             }

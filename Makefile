@@ -23,7 +23,7 @@ INCLUDES	:= 	include \
 				include/core/checks \
 				include/core/infrastructure \
 				include/core/Pretendo \
-				
+
 SOURCES 	:= 	src \
                 src/features \
 				src/features/SeedingCodes \
@@ -103,7 +103,7 @@ $(BUILD):
 
 #---------------------------------------------------------------------------------
 clean:
-	@echo clean ... 
+	@echo clean ...
 	@rm -fr $(BUILD) $(OUTPUT).3gx $(OUTPUT).elf
 
 re: clean all

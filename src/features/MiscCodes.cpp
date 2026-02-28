@@ -77,9 +77,9 @@ namespace CTRPluginFramework {
 
 		u16 musicID = *(u16 *)(musicData + 8);
 		if ((u8)musicID <= 0xFF) {
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::PLAYING_MUSIC_NOW_PLAYING_STRING).c_str(), IDChecks::GetMusicName(musicID).c_str()), Color(0x00FF00FF));
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYING_MUSIC_NOW_PLAYING_STRING).c_str(), IDChecks::GetMusicName(musicID).c_str()), Color(0x00FF00FF));
 		} else {
-			OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::PLAYING_MUSIC_NOW_PLAYING_ID).c_str(), musicID), Color(0x00FF00FF));
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYING_MUSIC_NOW_PLAYING_ID).c_str(), musicID), Color(0x00FF00FF));
 		}
 
 		const HookContext &curr = HookContext::GetCurrent();
@@ -102,7 +102,7 @@ namespace CTRPluginFramework {
 //reload room
 	void ReloadRoomCheat(MenuEntry *entry) {
 		if(!PlayerClass::GetInstance()->IsLoaded()) {
-			OSDExtras::Notify(TextID::SAVE_PLAYER_NO, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 			return;
 		}
 
@@ -306,7 +306,7 @@ namespace CTRPluginFramework {
 //Fast Isabelle (Fast Text + Game Speed when in the Isabelle greeting room)
 	void fastisabelle(MenuEntry *entry) {
 		if (entry->WasJustActivated() && Game::GetRoom() == 0x63) {
-			OSDExtras::Notify(TextID::FAST_PLAYER_SELECT_INFO, Color::Red);
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::FAST_PLAYER_SELECT_INFO), Color::Red);
 			entry->Disable();
 			return;
 		}

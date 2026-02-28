@@ -2,7 +2,6 @@
 
 #include "Files.h"
 #include "core/infrastructure/Address.hpp"
-#include "platform/ctrpf/OSDExtras.hpp"
 
 namespace CTRPluginFramework {
 	namespace {
@@ -317,7 +316,7 @@ namespace CTRPluginFramework {
 		if (IsConfigOutdated()) {
 			DisableAll();
 			UpdateConfig();
-            OSDExtras::Notify("Plugin configuration was migrated", Color::Purple);
+            OSD::NotifySysFont("Plugin configuration was migrated", Color::Purple);
 		}
 
 		const std::string region = Address::regionName;

@@ -8,7 +8,6 @@
 #include "core/game_api/Game.hpp"
 #include "core/game_api/GameStructs.hpp"
 #include "core/RuntimeContext.hpp"
-#include "platform/ctrpf/MenuFolderExtras.hpp"
 
 extern "C" void PATCH_EverythingSeed(void);
 extern "C" void PATCH_SnakeSpeed(void);
@@ -39,13 +38,18 @@ namespace CTRPluginFramework {
 			: Utils::Format("%08X", ItemIDToReplace));
 
 		for (MenuFolder *folder : menu->GetFolderList()) {
-			auto extraFolder = static_cast<MenuFolderExtras*>(folder);
-			if (extraFolder->GetFolderType() == FolderType::Seeding) {
-				extraFolder->Note() = seederInfo;
+			FolderType folderType;
+			SubFolder subFolderType;
 
-				for (MenuFolder *subFolder : extraFolder->GetFolderList()) {
-					auto extraSubFolder = static_cast<MenuFolderExtras*>(subFolder);
-					extraSubFolder->Note() = seederInfo;
+			if (TryGetFolderInfo(folder, folderType, subFolderType) && folderType == FolderType::Seeding) {
+				folder->Note() = seederInfo;
+
+				for (MenuFolder *subFolder : folder->GetFolderList()) {
+					FolderType subFolderParentType;
+					SubFolder subFolderSubType;
+
+					if (TryGetFolderInfo(subFolder, subFolderParentType, subFolderSubType) && subFolderParentType == FolderType::Seeding)
+						subFolder->Note() = seederInfo;
 				}
 			}
 		}
@@ -83,9 +87,9 @@ namespace CTRPluginFramework {
 			PickupDropID, PickupInvFull, pickmode3, pickmode4,
 			pickmode5, pickmode6, pickmode7, pickmode8, pickmode9
 		};
-		
-		static Address AutoPick[3] = { 
-			PickupAuto1, PickupAuto2, PickupAuto3 
+
+		static Address AutoPick[3] = {
+			PickupAuto1, PickupAuto2, PickupAuto3
 		};
 
 		static Hook speedHook, pickItemHook, closeholeItemHook;
@@ -119,94 +123,94 @@ namespace CTRPluginFramework {
 			pickItemHook.Enable();
 			closeholeItemHook.Enable();
 		}
-		
+
 		if(entry->Hotkeys[0].IsPressed()) {
 			Wrap::KB<u32>(Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&PickupSeederItemID, *(u32 *)&PickupSeederItemID, ItemChange);
-        }	
-		
+        }
+
 	//Switches Seed Item to Remove Item
 		if(entry->Hotkeys[1].IsPressed()) {
 			if(!pickItemHook.IsEnabled()) {
 				pickItemHook.Enable();
 				closeholeItemHook.Enable();
-				OSDExtras::Notify(Color::Magenta << Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_ITEM) << Color::Green << " " + Language::getInstance()->get(TextID::STATE_ON)); //Enabled Seeding
+				OSD::NotifySysFont(Color::Magenta << Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_ITEM) << Color::Green << " " + Language::getInstance()->get(TextID::STATE_ON)); //Enabled Seeding
 			}
 			else {
 				pickItemHook.Disable();
 				closeholeItemHook.Disable();
-				OSDExtras::Notify(Color::Turquoise << Language::getInstance()->get(TextID::PICKUP_SEEDER_REMOVE_ITEM) << Color::Green << " " + Language::getInstance()->get(TextID::STATE_ON)); //Disabled Seeding
+				OSD::NotifySysFont(Color::Turquoise << Language::getInstance()->get(TextID::PICKUP_SEEDER_REMOVE_ITEM) << Color::Green << " " + Language::getInstance()->get(TextID::STATE_ON)); //Disabled Seeding
 			}
         }
-		
+
 	//Pickup Speed Part
 		if(entry->Hotkeys[2].IsPressed()) {
 			if(!speedHook.IsEnabled()) {
 				HoleSpeedPatch.Patch(0xEA000015);
-				speedHook.Enable();	
+				speedHook.Enable();
 			}
 			else {
 				HoleSpeedPatch.Unpatch();
 				speedHook.Disable();
 			}
-			
-			OSDExtras::Notify(Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_SPEED) << (speedHook.IsEnabled() ? Color::Green << " " + Language::getInstance()->get(TextID::STATE_ON) : Color::Red << " " + Language::getInstance()->get(TextID::STATE_OFF)));
+
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_SPEED) << (speedHook.IsEnabled() ? Color::Green << " " + Language::getInstance()->get(TextID::STATE_ON) : Color::Red << " " + Language::getInstance()->get(TextID::STATE_OFF)));
 		}
-		
+
 	//Switches Modes of Pickup
 		if(entry->Hotkeys[3].IsPressed()) {
 			static int Mode = 0, Index = 0;
-			
+
 			switch(Mode) {
 				default: break;
 				case 0:
 					Mode++;
 					Index = 0;
-					OSDExtras::Notify(Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_TYPE) + Language::getInstance()->get(TextID::PICKUP_SEEDER_TYPE_PICKUP), Color::Red);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_TYPE) + Language::getInstance()->get(TextID::PICKUP_SEEDER_TYPE_PICKUP), Color::Red);
 				break;
 				case 1:
 					Mode++;
 					Index = 1;
-					OSDExtras::Notify(Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_TYPE) + Language::getInstance()->get(TextID::PICKUP_SEEDER_TYPE_PLUCK), Color::Orange);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_TYPE) + Language::getInstance()->get(TextID::PICKUP_SEEDER_TYPE_PLUCK), Color::Orange);
 				break;
 				case 2:
 					Mode++;
 					Index = 2;
-					OSDExtras::Notify(Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_TYPE) + Language::getInstance()->get(TextID::PICKUP_SEEDER_TYPE_FLIPDROP), Color::Green);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_TYPE) + Language::getInstance()->get(TextID::PICKUP_SEEDER_TYPE_FLIPDROP), Color::Green);
 				break;
 				case 3:
 					Mode++;
 					Index = 3;
-					OSDExtras::Notify(Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_TYPE) + Language::getInstance()->get(TextID::PICKUP_SEEDER_TYPE_ROCKBREAK), Color::Blue);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_TYPE) + Language::getInstance()->get(TextID::PICKUP_SEEDER_TYPE_ROCKBREAK), Color::Blue);
 				break;
 				case 4:
 					Mode = 0;
 					Index = 4;
-					OSDExtras::Notify(Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_TYPE) + Language::getInstance()->get(TextID::PICKUP_SEEDER_TYPE_DIGHOLE), Color::Purple);
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::PICKUP_SEEDER_SEED_TYPE) + Language::getInstance()->get(TextID::PICKUP_SEEDER_TYPE_DIGHOLE), Color::Purple);
 				break;
 			}
-			
+
 			for(int i = 0; i < 9; ++i) {
 				PickMode[i].Patch(ModePatch[Index][i]);
 			}
-		}	
-		
+		}
+
 	//toggles Auto Pickup
 		if(entry->Hotkeys[4].IsPressed())	{
 			bool IsON = *(u32 *)PickupAuto1.addr != PickupAuto1.origVal;
-			
+
 			for(int i = 0; i < 3; ++i) {
 				AutoPick[i].Patch(AutoPatch[IsON][i]);
 			}
 
-            OSDExtras::Notify(Language::getInstance()->get(TextID::PICKUP_SEEDER_AUTO_PICKUP) << (IsON ? Color::Red << Language::getInstance()->get(TextID::STATE_OFF) : Color::Green << Language::getInstance()->get(TextID::STATE_ON)));
-		}	
-	
+            OSD::NotifySysFont(Language::getInstance()->get(TextID::PICKUP_SEEDER_AUTO_PICKUP) << (IsON ? Color::Red << Language::getInstance()->get(TextID::STATE_OFF) : Color::Green << Language::getInstance()->get(TextID::STATE_ON)));
+		}
+
 		if(!entry->IsActivated()) {
 		//Disables Speed Patch
 			HoleSpeedPatch.Unpatch();
 			speedHook.Disable();
 
-		//Disable Pick Mode	
+		//Disable Pick Mode
 			for(int i = 0; i < 9; ++i) {
 				PickMode[i].Unpatch();
 			}
@@ -216,7 +220,7 @@ namespace CTRPluginFramework {
 				AutoPick[i].Unpatch();
 			}
 
-		//Disable Always Pickup	
+		//Disable Always Pickup
 			AlwaysPickup.Unpatch();
 			PickupAnimID.Unpatch();
 
@@ -230,18 +234,18 @@ namespace CTRPluginFramework {
 		static Address walkseed(0x597F64);
 		static bool set = false;
 
-		if(entry->Hotkeys[0].IsPressed()) {	
+		if(entry->Hotkeys[0].IsPressed()) {
 			if (!set) {
 				walkseed.Patch(0xEA000014);
-				OSDExtras::Notify(Language::getInstance()->get(TextID::WALK_SEEDER_DELETE_ITEMS) << Color::Green << Language::getInstance()->get(TextID::STATE_ON));
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::WALK_SEEDER_DELETE_ITEMS) << Color::Green << Language::getInstance()->get(TextID::STATE_ON));
 				set = true;
-			} 
+			}
 			else {
 				walkseed.Unpatch();
-				OSDExtras::Notify(Language::getInstance()->get(TextID::WALK_SEEDER_DELETE_ITEMS) << Color::Red << Language::getInstance()->get(TextID::STATE_OFF));
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::WALK_SEEDER_DELETE_ITEMS) << Color::Red << Language::getInstance()->get(TextID::STATE_OFF));
 				set = false;
 			}
-		}	
+		}
 
 		if(!entry->IsActivated()) {
 			walkseed.Unpatch();
@@ -251,16 +255,16 @@ namespace CTRPluginFramework {
 //Firework Seeder
 	void fireworkentry(MenuEntry *entry) {
 		static Address firework(0x597870);
-		
+
 		const std::vector<std::string> fireOpt = {
 			Language::getInstance()->get(TextID::VECTOR_FIREWORK_CHANGE_ID),
 			Language::getInstance()->get(TextID::VECTOR_FIREWORK_SPAWN),
 			Language::getInstance()->get(TextID::VECTOR_DISABLE)
 		};
-		
+
 		Item input = {0x7FFE, 0};
 		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), fireOpt);
-		
+
 		switch(optKb.Open()) {
 			default: break;
 			case 0: {
@@ -268,10 +272,10 @@ namespace CTRPluginFramework {
 					firework.Patch(*(u16 *)&input);
 				}
 			} break;
-			case 1: 
-				Inventory::WriteSlot(0, {0x339F, 0}); 
+			case 1:
+				Inventory::WriteSlot(0, {0x339F, 0});
 			break;
-			case 2: 
+			case 2:
 				firework.Unpatch();
 			break;
 		}
@@ -280,13 +284,12 @@ namespace CTRPluginFramework {
 	static MenuEntry *editorEntry;
 
 //OSD for Map Editor
-	bool editorID(const Screen &screen) { 
-		ScreenExtras extras(screen);
+	bool editorID(const Screen &screen) {
 		Color darkGrey(40, 40, 40, 175);
 
 		if(screen.IsTop) {
 			std::string str = Utils::Format(Language::getInstance()->get(TextID::INVENTORY_T2I_SET).c_str(), dropitem);
-			extras.DrawSysfontWithBackground(str, 0, 220, Color::White, darkGrey);
+			screen.DrawSysfontWithBackground(str, 0, 220, Color::White, darkGrey);
 		} else {
 			if (!editorEntry) {
 				return 1;
@@ -294,7 +297,7 @@ namespace CTRPluginFramework {
 
 			for (int i = 0; i < 5; ++i) {
 				Hotkey &hotkey = editorEntry->Hotkeys[5+i];
-				extras.DrawSysfontWithBackground(hotkey.ToString(true), 0, 20 + (16 * i), Color::White, darkGrey);
+				screen.DrawSysfontWithBackground(hotkey.ToString(true), 0, 20 + (16 * i), Color::White, darkGrey);
 			}
 		}
 
@@ -329,30 +332,30 @@ namespace CTRPluginFramework {
 
 			return;
 		}
-		
+
 		static u32 keyPressedTicks = 0, DPadKeyPressedTicks = 0;
 
 		editorEntry = entry;
-			
+
 		if (!MapEditorActive) { //If Map Editor is OFF get Coords
 			PlayerClass::GetInstance()->GetWorldCoords(&selectedX, &selectedY);
 		}
-		
+
 		if (entry->Hotkeys[0].IsPressed()) { //Activate
 			if (!MapEditorActive) { //Map Editor ON
 				PluginMenu *menu = PluginMenu::GetRunningInstance();
 				*menu += ParticleCallBack;
 
 				RuntimeContext::getInstance()->setFov(true);
-				
+
 				if(!RuntimeContext::getInstance()->isSaveMenuDisabled()) { //If No Save is OFF switch it ON
 					Process::Patch(Address(0x1A0980).addr, 0xE1A00000);
 				}
-				
-				OSD::Run(editorID);	
-				
+
+				OSD::Run(editorID);
+
 				Process::Patch(Address(0x1A51C8).addr, 0xE8BD81F0);
-				OSDExtras::Notify(Language::getInstance()->get(TextID::MAP_EDITOR) + " " << Color::Green << Language::getInstance()->get(TextID::STATE_ON));
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::MAP_EDITOR) + " " << Color::Green << Language::getInstance()->get(TextID::STATE_ON));
 				MapEditorActive = true;
 
 				*(float *)(Camera::GetInstance() + 4) = (float)(selectedX * 0x20 + 0x10);
@@ -360,13 +363,13 @@ namespace CTRPluginFramework {
 				*(float *)(Camera::GetInstance() + 0xC) = (float)(selectedY * 0x20 + 0x70);
 				Camera::AddToYRotation(0x700);
 			}
-			
+
 			else { //Map Editor OFF
 				goto OFF;
 			}
 		}
-		
-		if(MapEditorActive) {	
+
+		if(MapEditorActive) {
 			if(entry->Hotkeys[1].IsDown() || entry->Hotkeys[1].IsPressed()) {
 				DPadKeyPressedTicks++;
 				if((DPadKeyPressedTicks < 50 ? (DPadKeyPressedTicks % 8) == 1 : (DPadKeyPressedTicks % 3) == 1) || DPadKeyPressedTicks > 100) {
@@ -374,7 +377,7 @@ namespace CTRPluginFramework {
 					Camera::AddToX(32.0f);
 				}
 			}
-			
+
 			if(entry->Hotkeys[2].IsDown() || entry->Hotkeys[2].IsPressed()) {
 				DPadKeyPressedTicks++;
 				if((DPadKeyPressedTicks < 50 ? (DPadKeyPressedTicks % 8) == 1 : (DPadKeyPressedTicks % 3) == 1) || DPadKeyPressedTicks > 100) {
@@ -382,7 +385,7 @@ namespace CTRPluginFramework {
 					Camera::AddToX(-32.0f);
 				}
 			}
-			
+
 			if(entry->Hotkeys[3].IsDown() || entry->Hotkeys[3].IsPressed()) {
 				DPadKeyPressedTicks++;
 				if((DPadKeyPressedTicks < 50 ? (DPadKeyPressedTicks % 8) == 1 : (DPadKeyPressedTicks % 3) == 1) || DPadKeyPressedTicks > 100) {
@@ -390,7 +393,7 @@ namespace CTRPluginFramework {
 					Camera::AddToZ(32.0f);
 				}
 			}
-			
+
 			if(entry->Hotkeys[4].IsDown() || entry->Hotkeys[4].IsPressed()) {
 				DPadKeyPressedTicks++;
 				if((DPadKeyPressedTicks < 50 ? (DPadKeyPressedTicks % 8) == 1 : (DPadKeyPressedTicks % 3) == 1) || DPadKeyPressedTicks > 100) {
@@ -398,30 +401,30 @@ namespace CTRPluginFramework {
 					Camera::AddToZ(-32.0f);
 				}
 			}
-			
-			if(Controller::IsKeysReleased(entry->Hotkeys[1].GetKeys()) || 
-				Controller::IsKeysReleased(entry->Hotkeys[2].GetKeys()) || 
-					Controller::IsKeysReleased(entry->Hotkeys[3].GetKeys()) || 
+
+			if(Controller::IsKeysReleased(entry->Hotkeys[1].GetKeys()) ||
+				Controller::IsKeysReleased(entry->Hotkeys[2].GetKeys()) ||
+					Controller::IsKeysReleased(entry->Hotkeys[3].GetKeys()) ||
 						Controller::IsKeysReleased(entry->Hotkeys[4].GetKeys())) {
 				DPadKeyPressedTicks = 0;
 			}
-			
+
 			if(entry->Hotkeys[5].IsDown()) { //Cycle Size (R)
 				size++;
 				if(size >= 4) {
 					size = 0;
 				}
-				
-				OSDExtras::Notify(Utils::Format(Language::getInstance()->get(TextID::MAP_EDITOR_SIZE_SET).c_str(), size));
+
+				OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::MAP_EDITOR_SIZE_SET).c_str(), size));
 			}
-			
+
 			if(RuntimeContext::getInstance()->isTurbo() ? entry->Hotkeys[6].IsDown() : entry->Hotkeys[6].IsPressed()) { //Place (A)
 				Item *pItem = Game::GetItemAtWorldCoords(selectedX, selectedY);
-				
+
 				if(!pItem) {
 					return;
 				}
-				
+
 				for(s8 i = -size; i <= size; ++i) {
 					for(s8 j = -size; j <= size; ++j) {
 						Dropper::PlaceItemWrapper(DropType, ItemIDToReplace, &dropitem, &dropitem, (selectedX + j), (selectedY + i), 0, 0, 0, 0, 0, waitAnim, 0xA5);
@@ -431,11 +434,11 @@ namespace CTRPluginFramework {
 
 			if(RuntimeContext::getInstance()->isTurbo() ? entry->Hotkeys[7].IsDown() : entry->Hotkeys[7].IsPressed()) { //Remove (X)
 				Item *pItem = Game::GetItemAtWorldCoords(selectedX, selectedY);
-				
+
 				if(!pItem) {
 					return;
 				}
-				
+
 				for(s8 i = -size; i <= size; ++i) {
 					for(s8 j = -size; j <= size; ++j) {
 						Game::TrampleAtWorldCoords((selectedX + j), (selectedY + i));
@@ -445,35 +448,35 @@ namespace CTRPluginFramework {
 
 			if(entry->Hotkeys[8].IsPressed()) { //Copy (Y)
 				Item *pItem = Game::GetItemAtWorldCoords(selectedX, selectedY);
-				
+
 				if(!pItem) {
 					return;
 				}
-				
+
 				dropitem = *pItem;
 			}
-			
+
 			if(entry->Hotkeys[9].IsPressed()) { //Set Item ID (L)
 				Wrap::KB<u32>(Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&dropitem, *(u32 *)&dropitem, ItemChange);
 			}
 		}
-		
-		if(!entry->IsActivated()) { 
+
+		if(!entry->IsActivated()) {
 		OFF:
 			PluginMenu *menu = PluginMenu::GetRunningInstance();
 			*menu -= ParticleCallBack;
 
 			RuntimeContext::getInstance()->setFov(false);
-			
+
 			if(!RuntimeContext::getInstance()->isSaveMenuDisabled()) {//If No Save is OFF switch it back OFF
 				Process::Patch(Address(0x1A0980).addr, 0xE8900006);
 			}
-			
+
 			OSD::Stop(editorID);
-			
+
 			Process::Patch(Address(0x1A51C8).addr, 0xE2805C01);
-			OSDExtras::Notify(Language::getInstance()->get(TextID::MAP_EDITOR) + " " << Color::Red << Language::getInstance()->get(TextID::STATE_OFF));
-			
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::MAP_EDITOR) + " " << Color::Red << Language::getInstance()->get(TextID::STATE_OFF));
+
 			MapEditorActive = false;
 		}
 	}
@@ -490,7 +493,7 @@ namespace CTRPluginFramework {
 			hook1.Initialize(Address(0x59FC7C).addr + 0x58, (u32)PATCH_EverythingSeed);
 			hook2.Initialize(Address(0x59FC7C).addr + 0x64, (u32)PATCH_EverythingSeed);
 		}
-		
+
 		if(entry->Hotkeys[0].IsDown() && !active) {
 			if(!EverythingSeederItemID.isValid()) {
 				EverythingSeederItemID = {0x2018, 0};
@@ -504,7 +507,7 @@ namespace CTRPluginFramework {
 			hook2.Enable();
 			active = true; //Patch is written
 		}
-		
+
 		if(!entry->Hotkeys[0].IsDown() && active) {
 			hook1.Disable();
 			hook2.Disable();
