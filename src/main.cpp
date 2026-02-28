@@ -15,7 +15,7 @@ R"(Creator: Kwadukathole (Lukas)
 
 Cheat Credits: Nico, Jay, Levi, Slattz, Gokiro, Kominost, Elominator and more
 
-Code Credits: PabloMK7, Jon & DaniElectra (Pretendo) and more
+Code Credits: Foofoo_the_guy, PabloMK7, Jon & DaniElectra (Pretendo) and more
 
 Translators: みるえもん & みなと(Japanese), im a book(spanish), Fedecrash02(italian), Youssef, Arisa, & Lenoch(french), bkfirmen & Toby(german), Soopoolleaf(korean)
 
@@ -23,7 +23,7 @@ Translators: みるえもん & みなと(Japanese), im a book(spanish), Fedecras
 
 	static const std::string GameVersion = "1.5";
 	static const std::string GameVersionUSAWA = "1.0"; //seems to be an exception
-	
+
 	extern int UI_Pos;
 	bool OSD_SplashScreen(const Screen &Splash);
 	void IndoorsSeedItemCheck(void);
@@ -76,7 +76,7 @@ Translators: みるえもん & みなと(Japanese), im a book(spanish), Fedecras
 
 		return true;
 	}
-	
+
 
 	void SleepTime(void) {
 		OSD::Run(OSD_SplashScreen);
