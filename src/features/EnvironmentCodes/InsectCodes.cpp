@@ -2,7 +2,7 @@
 #include "features/cheats.hpp"
 #include "core/infrastructure/Address.hpp"
 #include "core/game_api/PlayerClass.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/game_api/Game.hpp"
 #include "core/game_api/Player.hpp"
 #include "core/checks/IDChecks.hpp"
@@ -155,7 +155,7 @@ namespace CTRPluginFramework {
         //Item insectItem = ConvertInsectIdToItemId(insectIdLocal);
         //OSD::NotifySysFont(Utils::Format("Spawned %s (%08X)", insectItem.GetName().c_str(), insectData), Color::Green);
 	}
-    
+
     void DespawnAllInsects() {
         static Address dataPointer(0x950534);
 
@@ -208,7 +208,7 @@ namespace CTRPluginFramework {
             return;
         }
         if (choice == 0) {
-            if (Wrap::KB<u16>("", true, 4, itemInsectId, itemInsectId, TextItemChange)) {
+            if (PluginUtils::Input::PromptNumber<u16>({ "", true, 4, itemInsectId, TextItemChange }, itemInsectId)) {
                 insectId = ConvertItemIdToInsectId(itemInsectId);
             }
         } else {

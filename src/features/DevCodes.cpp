@@ -1,5 +1,5 @@
 #include "features/cheats.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/game_api/PlayerClass.hpp"
 #include "core/game_api/Animation.hpp"
 #include "core/game_api/Game.hpp"
@@ -24,14 +24,14 @@ extern "C" void PATCH_CustomButtons(void);
 
 namespace CTRPluginFramework {
 //Integer For Custom Dumper
-	static WrapLoc cdump;
+	static MemoryRange cdump;
 	static std::string filetype = "dat";
-//Custom Dumper	
-	void customdump(MenuEntry *entry) {	
+//Custom Dumper
+	void customdump(MenuEntry *entry) {
 		const std::vector<std::string> customdopt = { "Set Custom Dump", "Dump/Restore" };
-		
+
 		const std::vector<std::string> customdopt1 = { "Start Offset", "Dump length", "File Type" };
-		
+
 		const std::vector<std::string> customdopt2 = { "Dump", "Restore", "Delete" };
 
 		Keyboard CKB("text");
@@ -43,25 +43,25 @@ namespace CTRPluginFramework {
 			case 0: {
 				CKB.GetMessage() = ("Set your custom dump offset\nHow to: \n1.Type in the start offset to dump from\n2.Type in the length of the dump\n3. Type in the file type the dump should have\n- Great to test things.\n- If you don't know what you are doing don't\n- restore weird dumps!.");
 				CKB.Populate(customdopt1);
-				
+
 				switch(CKB.Open()) {
 					default: break;
 					case 0:
-						Wrap::KB<u32>("Offset to start the dump.", true, 8, *(u32 *)cdump.Address, *(u32 *)cdump.Address);
+						PluginUtils::Input::PromptNumber<u32>({ "Offset to start the dump.", true, 8, *(u32 *)cdump.address }, *(u32 *)cdump.address);
 					break;
-					
+
 					case 1:
-						Wrap::KB<u32>("The length of the dump.", true, 8, *(u32 *)&cdump.Lenght, *(u32 *)&cdump.Lenght);
+						PluginUtils::Input::PromptNumber<u32>({ "The length of the dump.", true, 8, *(u32 *)&cdump.length }, *(u32 *)&cdump.length);
 					break;
-					
+
 					case 2: {
 						Keyboard KB("The file type of the dump.");
 						KB.SetMaxLength(8);
 						KB.Open(filetype);
-					} break;	
+					} break;
 				}
 			} break;
-			
+
 			case 1: {
 				CKB.GetMessage() = ("Now you can dump the file/or restore it\n(the restore function also needs the same start offset/dump length and file type as the dump!).");
 				CKB.Populate(customdopt2);
@@ -73,16 +73,29 @@ namespace CTRPluginFramework {
 						if(CKB.Open(filename) == -1)
 							return;
 
-						Wrap::Dump(Utils::Format(PATH_CUSTOM, Address::regionName.c_str()), filename, "." + filetype, &cdump, nullptr);
-					} break;	
-					case 1: 
-						Wrap::Restore(Utils::Format(PATH_CUSTOM, Address::regionName.c_str()), "." + filetype, "Select which dump to restore.", nullptr, true, &cdump, nullptr); 
+						PluginUtils::Backup::DumpMemory(
+							Utils::Format(PATH_CUSTOM, Address::regionName.c_str()),
+							filename,
+							"." + filetype,
+							{ cdump }
+						);
+					} break;
+					case 1:
+						PluginUtils::Backup::RestoreMemory(
+							Utils::Format(PATH_CUSTOM, Address::regionName.c_str()),
+							"." + filetype,
+							"Select which dump to restore.",
+							{ cdump }
+						);
 					break;
 					case 2:
-						Wrap::Delete(Utils::Format(PATH_CUSTOM, Address::regionName.c_str()), "." + filetype);
-					break;			
+						PluginUtils::Backup::DeleteBackup(
+							Utils::Format(PATH_CUSTOM, Address::regionName.c_str()),
+							"." + filetype
+						);
+					break;
 				}
-			} break;	
+			} break;
 		}
 	}
 
@@ -91,9 +104,9 @@ namespace CTRPluginFramework {
     void FunctionsCallerSettings(MenuEntry *entry) {
 		std::vector<std::string> cmnOpt =  { "" };
 
-		if(Turbo_Call) 
+		if(Turbo_Call)
 			cmnOpt[0] = Color(pGreen) << Language::getInstance()->get(TextID::VECTOR_ENABLED);
-		else 
+		else
 			cmnOpt[0] = Color(pRed) << Language::getInstance()->get(TextID::VECTOR_DISABLED);
 
 		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION));
@@ -101,7 +114,7 @@ namespace CTRPluginFramework {
 		int op = optKb.Open();
 		if(op == -1)
 			return;
-		
+
 		Turbo_Call = !Turbo_Call;
 		FunctionsCallerSettings(entry);
     }
@@ -113,16 +126,16 @@ namespace CTRPluginFramework {
 		static int size;
 
         if(Controller::IsKeysPressed(Key::R | Key::DPadRight)) {
-            if(Wrap::KB<u32>("Enter address of function:", true, 8, funcaddress, funcaddress, nullptr)) {
+			if(PluginUtils::Input::PromptNumber<u32>({ "Enter address of function:", true, 8, funcaddress, nullptr }, funcaddress)) {
 				Keyboard KB("Enter ID:");
 				KB.SetMaxLength(8);
 				KB.IsHexadecimal(true);
 				for(int i = 0; i < 12; i++) {
-					KB.GetMessage() = "Enter value for param " << std::to_string(i) << ":" << 
-					"\n" << Color(pBlue) << "0x11111111 for player instance" << 
-					"\n" << Color(pRed) << "0x22222222 for animation instance" << 
+					KB.GetMessage() = "Enter value for param " << std::to_string(i) << ":" <<
+					"\n" << Color(pBlue) << "0x11111111 for player instance" <<
+					"\n" << Color(pRed) << "0x22222222 for animation instance" <<
 					"\n" << Color(pGreen) << "0x33333333 for map offset";
-					
+
 					if(KB.Open(p[i]) == -1) {
 						size = i--;
 						OSD::NotifySysFont(Utils::Format("Set Function: %08X with %02d parameters!", funcaddress, size));
@@ -130,7 +143,7 @@ namespace CTRPluginFramework {
 					}
 
 					switch(p[i]) {
-						case 0x11111111: 
+						case 0x11111111:
 							p[i] = PlayerClass::GetInstance()->Offset();
 						break;
 
@@ -142,13 +155,13 @@ namespace CTRPluginFramework {
 							p[i] = *Game::GetCurrentMap();
 						break;
 					}
-				}	
+				}
 			}
         }
 
 		if(Turbo_Call ? Controller::IsKeysDown(Key::R | Key::DPadDown) : Controller::IsKeysPressed(Key::R | Key::DPadDown)) {
 			if(!Process::CheckAddress(funcaddress))
-				return;	
+				return;
 
 			Sleep(Milliseconds(100));
 			Address func(funcaddress);
@@ -177,22 +190,22 @@ namespace CTRPluginFramework {
 			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO))();
 			return;
 		}
-		
+
 		std::vector<std::string> pV = {
 			Color::Silver << "-Empty-",
 			Color::Silver << "-Empty-",
 			Color::Silver << "-Empty-",
 			Color::Silver << "-Empty-",
 		};
-		
+
 		const std::vector<std::string> select = {
 			"Player Dump",
 			"Player Restore",
 			"Delete File"
 		};
 
-		WrapLoc locPlayer;
-		
+		MemoryRange locPlayer;
+
 		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION));
 		optKb.Populate(select);
 		switch(optKb.Open()) {
@@ -208,11 +221,11 @@ namespace CTRPluginFramework {
 						}
 					}
 				}
-		
+
 				Keyboard pKB(Language::getInstance()->get(TextID::KEY_SELECT_PLAYER));
 				pKB.Populate(pV);
 				int pChoice = pKB.Open();
-				
+
 				if((pChoice != -1) && (pV[pChoice] != Color::Silver << "-Empty-")) {
 					std::string filename = "";
 					Keyboard KB("Player Dumper\nSet File Name:");
@@ -221,18 +234,31 @@ namespace CTRPluginFramework {
 
 					player = Player::GetSaveData(pChoice);
 					locPlayer = { (u32 *)player, sizeof(player) };
-					Wrap::Dump(Utils::Format(PATH_PLAYER, Address::regionName.c_str()), filename, ".player", &locPlayer, nullptr);
+					PluginUtils::Backup::DumpMemory(
+						Utils::Format(PATH_PLAYER, Address::regionName.c_str()),
+						filename,
+						".player",
+						{ locPlayer }
+					);
 				}
 			} break;
-			
+
 			case 1:
 				player = Player::GetSaveData();
 				locPlayer = { (u32 *)player, sizeof(player) };
-				Wrap::Restore(Utils::Format(PATH_PLAYER, Address::regionName.c_str()), ".player", "Player Restorer\nSelect File:", nullptr, true, &locPlayer, nullptr); 
+				PluginUtils::Backup::RestoreMemory(
+					Utils::Format(PATH_PLAYER, Address::regionName.c_str()),
+					".player",
+					"Player Restorer\nSelect File:",
+					{ locPlayer }
+				);
 			break;
 
 			case 2:
-				Wrap::Delete(Utils::Format(PATH_PLAYER, Address::regionName.c_str()), ".player");
+				PluginUtils::Backup::DeleteBackup(
+					Utils::Format(PATH_PLAYER, Address::regionName.c_str()),
+					".player"
+				);
 			break;
 		}
 	}
@@ -241,283 +267,283 @@ namespace CTRPluginFramework {
 		switch(index) {
 			default: break;
 			case 0:
-				playerFlag->Unknown1 = set; 
+				playerFlag->Unknown1 = set;
 			break;
 			case 1:
-				playerFlag->Unknown2 = set; 
+				playerFlag->Unknown2 = set;
 			break;
 			case 2:
-				playerFlag->Unknown3 = set; 
+				playerFlag->Unknown3 = set;
 			break;
 			case 3:
-				playerFlag->Unknown4 = set; 
+				playerFlag->Unknown4 = set;
 			break;
 			case 4:
-				playerFlag->PlayerSetNameAndTownName = set; 
+				playerFlag->PlayerSetNameAndTownName = set;
 			break;
 			case 5:
-				playerFlag->ReddIntroduced = set; 
+				playerFlag->ReddIntroduced = set;
 			break;
 			case 6:
-				playerFlag->Unknown7 = set; 
+				playerFlag->Unknown7 = set;
 			break;
 			case 7:
-				playerFlag->Unknown8 = set; 
+				playerFlag->Unknown8 = set;
 			break;
 			case 8:
-				playerFlag->Unknown9 = set; 
+				playerFlag->Unknown9 = set;
 			break;
 			case 9:
-				playerFlag->FinishedFirstDay = set; 
+				playerFlag->FinishedFirstDay = set;
 			break;
 			case 10:
-				playerFlag->Unknown11 = set; 
+				playerFlag->Unknown11 = set;
 			break;
 			case 11:
-				playerFlag->Unknown12 = set; 
+				playerFlag->Unknown12 = set;
 			break;
 			case 12:
-				playerFlag->Unknown13 = set; 
+				playerFlag->Unknown13 = set;
 			break;
 			case 13:
-				playerFlag->Unknown14 = set; 
+				playerFlag->Unknown14 = set;
 			break;
 			case 14:
-				playerFlag->Unknown15 = set; 
+				playerFlag->Unknown15 = set;
 			break;
 			case 15:
-				playerFlag->Unknown16 = set; 
+				playerFlag->Unknown16 = set;
 			break;
 			case 16:
-				playerFlag->Unknown17 = set; 
+				playerFlag->Unknown17 = set;
 			break;
 			case 17:
-				playerFlag->Unknown18 = set; 
+				playerFlag->Unknown18 = set;
 			break;
 			case 18:
-				playerFlag->Unknown19 = set; 
+				playerFlag->Unknown19 = set;
 			break;
 			case 19:
-				playerFlag->Unknown20 = set; 
+				playerFlag->Unknown20 = set;
 			break;
 			case 20:
-				playerFlag->Unknown21 = set; 
+				playerFlag->Unknown21 = set;
 			break;
 			case 21:
-				playerFlag->Unknown22 = set; 
+				playerFlag->Unknown22 = set;
 			break;
 			case 22:
-				playerFlag->Unknown23 = set; 
+				playerFlag->Unknown23 = set;
 			break;
 			case 23:
-				playerFlag->Unknown24 = set; 
+				playerFlag->Unknown24 = set;
 			break;
 			case 24:
-				playerFlag->Unknown25 = set; 
+				playerFlag->Unknown25 = set;
 			break;
 			case 25:
-				playerFlag->Unknown26 = set; 
+				playerFlag->Unknown26 = set;
 			break;
 			case 26:
-				playerFlag->Unknown27 = set; 
+				playerFlag->Unknown27 = set;
 			break;
 			case 27:
-				playerFlag->TomNookIntroduced = set; 
-			break; 
+				playerFlag->TomNookIntroduced = set;
+			break;
 			case 28:
-				playerFlag->BlathersIntroduced = set; 
+				playerFlag->BlathersIntroduced = set;
 			break;
 			case 29:
-				playerFlag->Unknown30 = set; 
+				playerFlag->Unknown30 = set;
 			break;
 			case 30:
-				playerFlag->CelesteIntroduced = set; 
+				playerFlag->CelesteIntroduced = set;
 			break;
 			case 31:
-				playerFlag->CyrusIntroduced = set; 
+				playerFlag->CyrusIntroduced = set;
 			break;
 			case 32:
-				playerFlag->Unknown33 = set; 
+				playerFlag->Unknown33 = set;
 			break;
 			case 33:
-				playerFlag->Unknown34 = set; 
+				playerFlag->Unknown34 = set;
 			break;
 			case 34:
-				playerFlag->Unknown35 = set; 
+				playerFlag->Unknown35 = set;
 			break;
 			case 35:
-				playerFlag->Unknown36 = set; 
+				playerFlag->Unknown36 = set;
 			break;
 			case 36:
-				playerFlag->TomNookDownFirstPayment = set; 
+				playerFlag->TomNookDownFirstPayment = set;
 			break;
 			case 37:
-				playerFlag->ChooseHouseLocation = set; 
+				playerFlag->ChooseHouseLocation = set;
 			break;
 			case 38:
-				playerFlag->MainStreetUnlocked = set; 
+				playerFlag->MainStreetUnlocked = set;
 			break;
 			case 39:
-				playerFlag->HouseLocationChosen = set; 
+				playerFlag->HouseLocationChosen = set;
 			break;
 			case 40:
-				playerFlag->KnowIsabelleName = set; 
+				playerFlag->KnowIsabelleName = set;
 			break;
 			case 41:
-				playerFlag->KnowKappn = set; 
+				playerFlag->KnowKappn = set;
 			break;
 			case 42:
-				playerFlag->Unknown43 = set; 
+				playerFlag->Unknown43 = set;
 			break;
 			case 43:
-				playerFlag->Unknown44 = set; 
+				playerFlag->Unknown44 = set;
 			break;
 			case 44:
-				playerFlag->Unknown45 = set; 
+				playerFlag->Unknown45 = set;
 			break;
 			case 45:
-				playerFlag->Unknown46 = set; 
+				playerFlag->Unknown46 = set;
 			break;
 			case 46:
-				playerFlag->Unknown47 = set; 
+				playerFlag->Unknown47 = set;
 			break;
 			case 47:
-				playerFlag->Unknown48 = set; 
+				playerFlag->Unknown48 = set;
 			break;
 			case 48:
-				playerFlag->Unknown49 = set; 
+				playerFlag->Unknown49 = set;
 			break;
 			case 49:
-				playerFlag->Unknown50 = set; 
+				playerFlag->Unknown50 = set;
 			break;
 			case 50:
-				playerFlag->Unknown51 = set; 
+				playerFlag->Unknown51 = set;
 			break;
 			case 51:
-				playerFlag->Unknown52 = set; 
+				playerFlag->Unknown52 = set;
 			break;
 			case 52:
-				playerFlag->Unknown53 = set; 
+				playerFlag->Unknown53 = set;
 			break;
 			case 53:
-				playerFlag->Unknown54 = set; 
+				playerFlag->Unknown54 = set;
 			break;
 			case 54:
-				playerFlag->Unknown55 = set; 
+				playerFlag->Unknown55 = set;
 			break;
 			case 55:
-				playerFlag->Unknown56 = set; 
+				playerFlag->Unknown56 = set;
 			break;
 			case 56:
-				playerFlag->Unknown57 = set; 
+				playerFlag->Unknown57 = set;
 			break;
 			case 57:
-				playerFlag->Unknown58 = set; 
+				playerFlag->Unknown58 = set;
 			break;
 			case 58:
-				playerFlag->Unknown59 = set; 
+				playerFlag->Unknown59 = set;
 			break;
 			case 59:
-				playerFlag->Unknown60 = set; 
+				playerFlag->Unknown60 = set;
 			break;
 			case 60:
-				playerFlag->Unknown61 = set; 
+				playerFlag->Unknown61 = set;
 			break;
 			case 61:
-				playerFlag->Unknown62 = set; 
+				playerFlag->Unknown62 = set;
 			break;
 			case 62:
-				playerFlag->Unknown63 = set; 
+				playerFlag->Unknown63 = set;
 			break;
 			case 63:
-				playerFlag->Unknown64 = set; 
+				playerFlag->Unknown64 = set;
 			break;
 			case 64:
-				playerFlag->Unknown65 = set; 
+				playerFlag->Unknown65 = set;
 			break;
 			case 65:
-				playerFlag->Unknown66 = set; 
+				playerFlag->Unknown66 = set;
 			break;
 			case 66:
-				playerFlag->Unknown67 = set; 
+				playerFlag->Unknown67 = set;
 			break;
 			case 67:
-				playerFlag->Unknown68 = set; 
+				playerFlag->Unknown68 = set;
 			break;
 			case 68:
-				playerFlag->Unknown69 = set; 
+				playerFlag->Unknown69 = set;
 			break;
 			case 69:
-				playerFlag->Unknown70 = set; 
+				playerFlag->Unknown70 = set;
 			break;
 			case 70:
-				playerFlag->Unknown71 = set; 
+				playerFlag->Unknown71 = set;
 			break;
 			case 71:
-				playerFlag->Unknown72 = set; 
+				playerFlag->Unknown72 = set;
 			break;
 			case 72:
-				playerFlag->Unknown73 = set; 
+				playerFlag->Unknown73 = set;
 			break;
 			case 73:
-				playerFlag->Unknown74 = set; 
+				playerFlag->Unknown74 = set;
 			break;
 			case 74:
-				playerFlag->Unknown75 = set; 
+				playerFlag->Unknown75 = set;
 			break;
 			case 75:
-				playerFlag->Unknown76 = set; 
+				playerFlag->Unknown76 = set;
 			break;
 			case 76:
-				playerFlag->Unknown77 = set; 
+				playerFlag->Unknown77 = set;
 			break;
 			case 77:
-				playerFlag->Unknown78 = set; 
+				playerFlag->Unknown78 = set;
 			break;
 			case 78:
-				playerFlag->Unknown79 = set; 
+				playerFlag->Unknown79 = set;
 			break;
 			case 79:
-				playerFlag->Unknown80 = set; 
+				playerFlag->Unknown80 = set;
 			break;
 			case 80:
-				playerFlag->Unknown81 = set; 
+				playerFlag->Unknown81 = set;
 			break;
 			case 81:
-				playerFlag->ResetPending = set; 
+				playerFlag->ResetPending = set;
 			break;
 			case 82:
-				playerFlag->Unknown83 = set; 
+				playerFlag->Unknown83 = set;
 			break;
 			case 83:
-				playerFlag->Unknown84 = set; 
+				playerFlag->Unknown84 = set;
 			break;
 			case 84:
-				playerFlag->Unknown85 = set; 
+				playerFlag->Unknown85 = set;
 			break;
 			case 85:
-				playerFlag->Unknown86 = set; 
+				playerFlag->Unknown86 = set;
 			break;
 			case 86:
-				playerFlag->Unknown87 = set; 
+				playerFlag->Unknown87 = set;
 			break;
 			case 87:
-				playerFlag->PeteIntroduction = set; 
+				playerFlag->PeteIntroduction = set;
 			break;
 			case 88:
-				playerFlag->Unknown89 = set; 
+				playerFlag->Unknown89 = set;
 			break;
 			case 89:
-				playerFlag->Unknown90 = set; 
+				playerFlag->Unknown90 = set;
 			break;
 			case 90:
-				playerFlag->Unknown91 = set; 
+				playerFlag->Unknown91 = set;
 			break;
 			case 91:
-				playerFlag->ExteriorRenovationsUnlocked = set; 
+				playerFlag->ExteriorRenovationsUnlocked = set;
 			break;
 			case 92:
-				playerFlag->HouseLoanRepayed = set; 
+				playerFlag->HouseLoanRepayed = set;
 			break;
 			case 93:
 				playerFlag->Unknown94 = set; //Unset(?) when Tom Nook speaks with you after your house was built
@@ -526,967 +552,967 @@ namespace CTRPluginFramework {
 				playerFlag->Unknown95 = set; //Unset(?) when Tom Nook speaks with you after your house was built
 			break;
 			case 95:
-				playerFlag->HouseUpgradeFinished = set; 
+				playerFlag->HouseUpgradeFinished = set;
 			break;
 			case 96:
-				playerFlag->Unknown97 = set; 
+				playerFlag->Unknown97 = set;
 			break;
 			case 97:
-				playerFlag->Unknown98 = set; 
+				playerFlag->Unknown98 = set;
 			break;
 			case 98:
-				playerFlag->Unknown99 = set; 
+				playerFlag->Unknown99 = set;
 			break;
 			case 99:
-				playerFlag->Unknown100 = set; 
+				playerFlag->Unknown100 = set;
 			break;
 			case 100:
-				playerFlag->Unknown101 = set; 
+				playerFlag->Unknown101 = set;
 			break;
 			case 101:
-				playerFlag->MuseumExhibitExplained = set; 
+				playerFlag->MuseumExhibitExplained = set;
 			break;
 			case 102:
-				playerFlag->Unknown103 = set; 
+				playerFlag->Unknown103 = set;
 			break;
 			case 103:
-				playerFlag->Unknown104 = set; 
+				playerFlag->Unknown104 = set;
 			break;
 			case 104:
-				playerFlag->PermitApprovalArrived = set; 
+				playerFlag->PermitApprovalArrived = set;
 			break;
 			case 105:
-				playerFlag->MayorJobIntroduction = set; 
+				playerFlag->MayorJobIntroduction = set;
 			break;
 			case 106:
-				playerFlag->PermitApproval = set; 
+				playerFlag->PermitApproval = set;
 			break;
 			case 107:
-				playerFlag->PermitIntroduction = set; 
+				playerFlag->PermitIntroduction = set;
 			break;
 			case 108:
-				playerFlag->CitizenSatisfactionExplained = set; 
+				playerFlag->CitizenSatisfactionExplained = set;
 			break;
 			case 109:
-				playerFlag->TownFlagExplained = set; 
+				playerFlag->TownFlagExplained = set;
 			break;
 			case 110:
-				playerFlag->TownTuneExplained = set; 
+				playerFlag->TownTuneExplained = set;
 			break;
 			case 111:
-				playerFlag->PWPExplained = set; 
+				playerFlag->PWPExplained = set;
 			break;
 			case 112:
-				playerFlag->OrdinanceExplained = set; 
+				playerFlag->OrdinanceExplained = set;
 			break;
 			case 113:
-				playerFlag->Unknown114 = set; 
+				playerFlag->Unknown114 = set;
 			break;
 			case 114:
-				playerFlag->Unknown115 = set; 
+				playerFlag->Unknown115 = set;
 			break;
 			case 115:
-				playerFlag->PermitFinished = set; 
+				playerFlag->PermitFinished = set;
 			break;
 			case 116:
-				playerFlag->Unknown117 = set; 
+				playerFlag->Unknown117 = set;
 			break;
 			case 117:
-				playerFlag->Unknown118 = set; 
+				playerFlag->Unknown118 = set;
 			break;
 			case 118:
-				playerFlag->HasBeeSting = set; 
+				playerFlag->HasBeeSting = set;
 			break;
 			case 119:
-				playerFlag->Unknown120 = set; 
+				playerFlag->Unknown120 = set;
 			break;
 			case 120:
-				playerFlag->EditDesignIntro = set; 
+				playerFlag->EditDesignIntro = set;
 			break;
 			case 121:
-				playerFlag->Unknown122 = set; 
+				playerFlag->Unknown122 = set;
 			break;
 			case 122:
-				playerFlag->Unknown123 = set; 
+				playerFlag->Unknown123 = set;
 			break;
 			case 123:
-				playerFlag->CanTravel = set; 
+				playerFlag->CanTravel = set;
 			break; //i.e. can use train
 			case 124:
-				playerFlag->HasTPCPicture = set; 
+				playerFlag->HasTPCPicture = set;
 			break;
 			case 125:
-				playerFlag->Unknown126 = set; 
+				playerFlag->Unknown126 = set;
 			break;
 			case 126:
-				playerFlag->Unknown127 = set; 
+				playerFlag->Unknown127 = set;
 			break;
 			case 127:
-				playerFlag->Unknown128 = set; 
+				playerFlag->Unknown128 = set;
 			break;
 			case 128:
-				playerFlag->Unknown129 = set; 
+				playerFlag->Unknown129 = set;
 			break;
 			case 129:
-				playerFlag->Unknown130 = set; 
+				playerFlag->Unknown130 = set;
 			break;
 			case 130:
-				playerFlag->Unknown131 = set; 
+				playerFlag->Unknown131 = set;
 			break;
 			case 131:
-				playerFlag->Unknown132 = set; 
+				playerFlag->Unknown132 = set;
 			break;
 			case 132:
-				playerFlag->BefriendSable1 = set; 
+				playerFlag->BefriendSable1 = set;
 			break;
 			case 133:
-				playerFlag->Unknown134 = set; 
+				playerFlag->Unknown134 = set;
 			break;
 			case 134:
-				playerFlag->BefriendSable2 = set; 
+				playerFlag->BefriendSable2 = set;
 			break;
 			case 135:
-				playerFlag->Unknown136 = set; 
+				playerFlag->Unknown136 = set;
 			break;
 			case 136:
-				playerFlag->BefriendSable3 = set; 
+				playerFlag->BefriendSable3 = set;
 			break;
 			case 137:
-				playerFlag->Unknown138 = set; 
+				playerFlag->Unknown138 = set;
 			break;
 			case 138:
 				playerFlag->Unknown139 = set; //Set when Tom Nook speaks with you after your house was built
 			break;
 			case 139:
-				playerFlag->Unknown140 = set; 
+				playerFlag->Unknown140 = set;
 			break;
 			case 140:
-				playerFlag->Unknown141 = set; 
+				playerFlag->Unknown141 = set;
 			break;
 			case 141:
-				playerFlag->Unknown142 = set; 
+				playerFlag->Unknown142 = set;
 			break;
 			case 142:
-				playerFlag->Unknown143 = set; 
+				playerFlag->Unknown143 = set;
 			break;
 			case 143:
-				playerFlag->Unknown144 = set; 
+				playerFlag->Unknown144 = set;
 			break;
 			case 144:
-				playerFlag->Unknown145 = set; 
+				playerFlag->Unknown145 = set;
 			break;
 			case 145:
-				playerFlag->Unknown146 = set; 
+				playerFlag->Unknown146 = set;
 			break;
 			case 146:
-				playerFlag->TalkToLyleForTheFirstTime = set; 
+				playerFlag->TalkToLyleForTheFirstTime = set;
 			break;
 			case 147:
 				playerFlag->Unknown148 = set; //Set when Tom Nook speaks with you after your house was built
 			break;
 			case 148:
-				playerFlag->Unknown149 = set; 
+				playerFlag->Unknown149 = set;
 			break;
 			case 149:
-				playerFlag->Unknown150 = set; 
+				playerFlag->Unknown150 = set;
 			break;
 			case 150:
-				playerFlag->Unknown151 = set; 
+				playerFlag->Unknown151 = set;
 			break;
 			case 151:
-				playerFlag->UnlockedKappn = set; 
+				playerFlag->UnlockedKappn = set;
 			break;
 			case 152:
-				playerFlag->LyleIntroduction = set; 
+				playerFlag->LyleIntroduction = set;
 			break;
 			case 153:
-				playerFlag->Unknown154 = set; 
+				playerFlag->Unknown154 = set;
 			break;
 			case 154:
-				playerFlag->RecievedHHSIntro = set; 
+				playerFlag->RecievedHHSIntro = set;
 			break;
 			case 155:
-				playerFlag->Unknown156 = set; 
+				playerFlag->Unknown156 = set;
 			break;
 			case 156:
-				playerFlag->Unknown157 = set; 
+				playerFlag->Unknown157 = set;
 			break;
 			case 157:
-				playerFlag->Unknown158 = set; 
+				playerFlag->Unknown158 = set;
 			break;
 			case 158:
-				playerFlag->Unknown159 = set; 
+				playerFlag->Unknown159 = set;
 			break;
 			case 159:
-				playerFlag->Unknown160 = set; 
+				playerFlag->Unknown160 = set;
 			break;
 			case 160:
-				playerFlag->Unknown161 = set; 
+				playerFlag->Unknown161 = set;
 			break;
 			case 161:
-				playerFlag->Unknown162 = set; 
+				playerFlag->Unknown162 = set;
 			break;
 			case 162:
-				playerFlag->FinishedShrunkSignatures = set; 
+				playerFlag->FinishedShrunkSignatures = set;
 			break;
 			case 163:
-				playerFlag->Unknown164 = set; 
+				playerFlag->Unknown164 = set;
 			break;
 			case 164:
-				playerFlag->Unknown165 = set; 
+				playerFlag->Unknown165 = set;
 			break;
 			case 165:
-				playerFlag->Unknown166 = set; 
+				playerFlag->Unknown166 = set;
 			break;
 			case 166:
-				playerFlag->Unknown167 = set; 
+				playerFlag->Unknown167 = set;
 			break;
 			case 167:
-				playerFlag->Unknown168 = set; 
+				playerFlag->Unknown168 = set;
 			break;
 			case 168:
-				playerFlag->Unknown169 = set; 
+				playerFlag->Unknown169 = set;
 			break;
 			case 169:
-				playerFlag->Unknown170 = set; 
+				playerFlag->Unknown170 = set;
 			break;
 			case 170:
-				playerFlag->Unknown171 = set; 
+				playerFlag->Unknown171 = set;
 			break;
 			case 171:
-				playerFlag->Unknown172 = set; 
+				playerFlag->Unknown172 = set;
 			break;
 			case 172:
-				playerFlag->IsabelleWallpaperGiftForGettingHouse = set; 
+				playerFlag->IsabelleWallpaperGiftForGettingHouse = set;
 			break;
 			case 173:
-				playerFlag->KickIntroduced = set; 
+				playerFlag->KickIntroduced = set;
 			break;
 			case 174:
-				playerFlag->Unknown175 = set; 
+				playerFlag->Unknown175 = set;
 			break;
 			case 175:
-				playerFlag->Unknown176 = set; 
+				playerFlag->Unknown176 = set;
 			break;
 			case 176:
-				playerFlag->Unknown177 = set; 
+				playerFlag->Unknown177 = set;
 			break;
 			case 177:
-				playerFlag->Unknown178 = set; 
+				playerFlag->Unknown178 = set;
 			break;
 			case 178:
-				playerFlag->Unknown179 = set; 
+				playerFlag->Unknown179 = set;
 			break;
 			case 179:
-				playerFlag->Unknown180 = set; 
+				playerFlag->Unknown180 = set;
 			break;
 			case 180:
-				playerFlag->Unknown181 = set; 
+				playerFlag->Unknown181 = set;
 			break;
 			case 181:
-				playerFlag->Unknown182 = set; 
+				playerFlag->Unknown182 = set;
 			break;
 			case 182:
-				playerFlag->Unknown183 = set; 
+				playerFlag->Unknown183 = set;
 			break;
 			case 183:
-				playerFlag->Unknown184 = set; 
+				playerFlag->Unknown184 = set;
 			break;
 			case 184:
-				playerFlag->Unknown185 = set; 
+				playerFlag->Unknown185 = set;
 			break;
 			case 185:
-				playerFlag->Unknown186 = set; 
+				playerFlag->Unknown186 = set;
 			break;
 			case 186:
-				playerFlag->Unknown187 = set; 
+				playerFlag->Unknown187 = set;
 			break;
 			case 187:
-				playerFlag->Unknown188 = set; 
+				playerFlag->Unknown188 = set;
 			break;
 			case 188:
-				playerFlag->Unknown189 = set; 
+				playerFlag->Unknown189 = set;
 			break;
 			case 189:
-				playerFlag->Unknown190 = set; 
+				playerFlag->Unknown190 = set;
 			break;
 			case 190:
-				playerFlag->Unknown191 = set; 
+				playerFlag->Unknown191 = set;
 			break;
 			case 191:
-				playerFlag->Unknown192 = set; 
+				playerFlag->Unknown192 = set;
 			break;
 			case 192:
-				playerFlag->Unknown193 = set; 
+				playerFlag->Unknown193 = set;
 			break;
 			case 193:
-				playerFlag->Unknown194 = set; 
+				playerFlag->Unknown194 = set;
 			break;
 			case 194:
-				playerFlag->Unknown195 = set; 
+				playerFlag->Unknown195 = set;
 			break;
 			case 195:
-				playerFlag->Unknown196 = set; 
+				playerFlag->Unknown196 = set;
 			break;
 			case 196:
-				playerFlag->Unknown197 = set; 
+				playerFlag->Unknown197 = set;
 			break;
 			case 197:
-				playerFlag->Unknown198 = set; 
+				playerFlag->Unknown198 = set;
 			break;
 			case 198:
-				playerFlag->Unknown199 = set; 
+				playerFlag->Unknown199 = set;
 			break;
 			case 199:
-				playerFlag->Unknown200 = set; 
+				playerFlag->Unknown200 = set;
 			break;
 			case 200:
-				playerFlag->Unknown201 = set; 
+				playerFlag->Unknown201 = set;
 			break;
 			case 201:
-				playerFlag->Unknown202 = set; 
+				playerFlag->Unknown202 = set;
 			break;
 			case 202:
-				playerFlag->Unknown203 = set; 
+				playerFlag->Unknown203 = set;
 			break;
 			case 203:
-				playerFlag->Unknown204 = set; 
+				playerFlag->Unknown204 = set;
 			break;
 			case 204:
-				playerFlag->Unknown205 = set; 
+				playerFlag->Unknown205 = set;
 			break;
 			case 205:
-				playerFlag->Unknown206 = set; 
+				playerFlag->Unknown206 = set;
 			break;
 			case 206:
-				playerFlag->Unknown207 = set; 
+				playerFlag->Unknown207 = set;
 			break;
 			case 207:
-				playerFlag->KnowsPermitRequirements = set; 
+				playerFlag->KnowsPermitRequirements = set;
 			break;
 			case 208:
-				playerFlag->TomNookToldYouFirstPayment = set; 
+				playerFlag->TomNookToldYouFirstPayment = set;
 			break;
 			case 209:
-				playerFlag->Permit_Points1 = set; 
+				playerFlag->Permit_Points1 = set;
 			break;
 			case 210:
-				playerFlag->Permit_Points2 = set; 
+				playerFlag->Permit_Points2 = set;
 			break;
 			case 211:
-				playerFlag->Permit_Points3 = set; 
+				playerFlag->Permit_Points3 = set;
 			break;
 			case 212:
-				playerFlag->Permit_Points4 = set; 
+				playerFlag->Permit_Points4 = set;
 			break;
 			case 213:
-				playerFlag->Permit_Points5 = set; 
+				playerFlag->Permit_Points5 = set;
 			break;
 			case 214:
-				playerFlag->Permit_Points6 = set; 
+				playerFlag->Permit_Points6 = set;
 			break;
 			case 215:
-				playerFlag->Permit_Points7 = set; 
+				playerFlag->Permit_Points7 = set;
 			break;
 			case 216:
-				playerFlag->Permit_Points8 = set; 
+				playerFlag->Permit_Points8 = set;
 			break;
 			case 217:
-				playerFlag->Permit_Points9 = set; 
+				playerFlag->Permit_Points9 = set;
 			break;
 			case 218:
-				playerFlag->Permit_Points10 = set; 
+				playerFlag->Permit_Points10 = set;
 			break;
 			case 219:
-				playerFlag->Unknown220 = set; 
+				playerFlag->Unknown220 = set;
 			break;
 			case 220:
-				playerFlag->Unknown221 = set; 
+				playerFlag->Unknown221 = set;
 			break;
 			case 221:
-				playerFlag->Unknown222 = set; 
+				playerFlag->Unknown222 = set;
 			break;
 			case 222:
-				playerFlag->Unknown223 = set; 
+				playerFlag->Unknown223 = set;
 			break;
 			case 223:
-				playerFlag->Unknown224 = set; 
+				playerFlag->Unknown224 = set;
 			break;
 			case 224:
-				playerFlag->Unknown225 = set; 
+				playerFlag->Unknown225 = set;
 			break;
 			case 225:
-				playerFlag->Unknown226 = set; 
+				playerFlag->Unknown226 = set;
 			break;
 			case 226:
-				playerFlag->Unknown227 = set; 
+				playerFlag->Unknown227 = set;
 			break;
 			case 227:
-				playerFlag->Unknown228 = set; 
+				playerFlag->Unknown228 = set;
 			break;
 			case 228:
-				playerFlag->Unknown229 = set; 
+				playerFlag->Unknown229 = set;
 			break;
 			case 229:
-				playerFlag->Unknown230 = set; 
+				playerFlag->Unknown230 = set;
 			break;
 			case 230:
-				playerFlag->Unknown231 = set; 
+				playerFlag->Unknown231 = set;
 			break;
 			case 231:
-				playerFlag->Unknown232 = set; 
+				playerFlag->Unknown232 = set;
 			break;
 			case 232:
-				playerFlag->Unknown233 = set; 
+				playerFlag->Unknown233 = set;
 			break;
 			case 233:
-				playerFlag->Unknown234 = set; 
+				playerFlag->Unknown234 = set;
 			break;
 			case 234:
-				playerFlag->Unknown235 = set; 
+				playerFlag->Unknown235 = set;
 			break;
 			case 235:
-				playerFlag->Unknown236 = set; 
+				playerFlag->Unknown236 = set;
 			break;
 			case 236:
-				playerFlag->Unknown237 = set; 
+				playerFlag->Unknown237 = set;
 			break;
 			case 237:
-				playerFlag->Unknown238 = set; 
+				playerFlag->Unknown238 = set;
 			break;
 			case 238:
-				playerFlag->Unknown239 = set; 
+				playerFlag->Unknown239 = set;
 			break;
 			case 239:
-				playerFlag->Unknown240 = set; 
+				playerFlag->Unknown240 = set;
 			break;
 			case 240:
-				playerFlag->Unknown241 = set; 
+				playerFlag->Unknown241 = set;
 			break;
 			case 241:
-				playerFlag->Unknown242 = set; 
+				playerFlag->Unknown242 = set;
 			break;
 			case 242:
-				playerFlag->Unknown243 = set; 
+				playerFlag->Unknown243 = set;
 			break;
 			case 243:
-				playerFlag->Unknown244 = set; 
+				playerFlag->Unknown244 = set;
 			break;
 			case 244:
-				playerFlag->Unknown245 = set; 
+				playerFlag->Unknown245 = set;
 			break;
 			case 245:
-				playerFlag->Unknown246 = set; 
+				playerFlag->Unknown246 = set;
 			break;
 			case 246:
-				playerFlag->Unknown247 = set; 
+				playerFlag->Unknown247 = set;
 			break;
 			case 247:
-				playerFlag->Unknown248 = set; 
+				playerFlag->Unknown248 = set;
 			break;
 			case 248:
-				playerFlag->Unknown249 = set; 
+				playerFlag->Unknown249 = set;
 			break;
 			case 249:
-				playerFlag->Unknown250 = set; 
+				playerFlag->Unknown250 = set;
 			break;
 			case 250:
-				playerFlag->HasClubTortimerMembership = set; 
+				playerFlag->HasClubTortimerMembership = set;
 			break;
 			case 251:
-				playerFlag->ClubTortimerFirstAsked = set; 
+				playerFlag->ClubTortimerFirstAsked = set;
 			break;
 			case 252:
-				playerFlag->ClubTortimerRulesExplained = set; 
+				playerFlag->ClubTortimerRulesExplained = set;
 			break;
 			case 253:
-				playerFlag->Unknown254 = set; 
+				playerFlag->Unknown254 = set;
 			break;
 			case 254:
-				playerFlag->Unknown255 = set; 
+				playerFlag->Unknown255 = set;
 			break;
 			case 255:
-				playerFlag->Unknown256 = set; 
+				playerFlag->Unknown256 = set;
 			break;
 			case 256:
-				playerFlag->Unknown257 = set; 
+				playerFlag->Unknown257 = set;
 			break;
 			case 257:
-				playerFlag->Unknown258 = set; 
+				playerFlag->Unknown258 = set;
 			break;
 			case 258:
-				playerFlag->Unknown259 = set; 
+				playerFlag->Unknown259 = set;
 			break;
 			case 259:
-				playerFlag->Unknown260 = set; 
+				playerFlag->Unknown260 = set;
 			break;
 			case 260:
-				playerFlag->Unknown261 = set; 
+				playerFlag->Unknown261 = set;
 			break;
 			case 261:
-				playerFlag->Unknown262 = set; 
+				playerFlag->Unknown262 = set;
 			break;
 			case 262:
-				playerFlag->Unknown263 = set; 
+				playerFlag->Unknown263 = set;
 			break;
 			case 263:
-				playerFlag->Unknown264 = set; 
+				playerFlag->Unknown264 = set;
 			break;
 			case 264:
-				playerFlag->Unknown265 = set; 
+				playerFlag->Unknown265 = set;
 			break;
 			case 265:
-				playerFlag->Unknown266 = set; 
+				playerFlag->Unknown266 = set;
 			break;
 			case 266:
-				playerFlag->Unknown267 = set; 
+				playerFlag->Unknown267 = set;
 			break;
 			case 267:
-				playerFlag->Unknown268 = set; 
+				playerFlag->Unknown268 = set;
 			break;
 			case 268:
-				playerFlag->Unknown269 = set; 
+				playerFlag->Unknown269 = set;
 			break;
 			case 269:
-				playerFlag->Unknown270 = set; 
+				playerFlag->Unknown270 = set;
 			break;
 			case 270:
-				playerFlag->Unknown271 = set; 
+				playerFlag->Unknown271 = set;
 			break;
 			case 271:
-				playerFlag->Unknown272 = set; 
+				playerFlag->Unknown272 = set;
 			break;
 			case 272:
-				playerFlag->Unknown273 = set; 
+				playerFlag->Unknown273 = set;
 			break;
 			case 273:
-				playerFlag->Unknown274 = set; 
+				playerFlag->Unknown274 = set;
 			break;
 			case 274:
-				playerFlag->Unknown275 = set; 
+				playerFlag->Unknown275 = set;
 			break;
 			case 275:
-				playerFlag->Unknown276 = set; 
+				playerFlag->Unknown276 = set;
 			break;
 			case 276:
-				playerFlag->Unknown277 = set; 
+				playerFlag->Unknown277 = set;
 			break;
 			case 277:
-				playerFlag->Unknown278 = set; 
+				playerFlag->Unknown278 = set;
 			break;
 			case 278:
-				playerFlag->Unknown279 = set; 
+				playerFlag->Unknown279 = set;
 			break;
 			case 279:
-				playerFlag->Unknown280 = set; 
+				playerFlag->Unknown280 = set;
 			break;
 			case 280:
-				playerFlag->Unknown281 = set; 
+				playerFlag->Unknown281 = set;
 			break;
 			case 281:
-				playerFlag->Unknown282 = set; 
+				playerFlag->Unknown282 = set;
 			break;
 			case 282:
-				playerFlag->Unknown283 = set; 
+				playerFlag->Unknown283 = set;
 			break;
 			case 283:
-				playerFlag->Unknown284 = set; 
+				playerFlag->Unknown284 = set;
 			break;
 			case 284:
-				playerFlag->Unknown285 = set; 
+				playerFlag->Unknown285 = set;
 			break;
 			case 285:
-				playerFlag->Unknown286 = set; 
+				playerFlag->Unknown286 = set;
 			break;
 			case 286:
-				playerFlag->Unknown287 = set; 
+				playerFlag->Unknown287 = set;
 			break;
 			case 287:
-				playerFlag->Unknown288 = set; 
+				playerFlag->Unknown288 = set;
 			break;
 			case 288:
-				playerFlag->Unknown289 = set; 
+				playerFlag->Unknown289 = set;
 			break;
 			case 289:
-				playerFlag->Unknown290 = set; 
+				playerFlag->Unknown290 = set;
 			break;
 			case 290:
-				playerFlag->Unknown291 = set; 
+				playerFlag->Unknown291 = set;
 			break;
 			case 291:
-				playerFlag->Unknown292 = set; 
+				playerFlag->Unknown292 = set;
 			break;
 			case 292:
-				playerFlag->Unknown293 = set; 
+				playerFlag->Unknown293 = set;
 			break;
 			case 293:
-				playerFlag->Unknown294 = set; 
+				playerFlag->Unknown294 = set;
 			break;
 			case 294:
-				playerFlag->Unknown295 = set; 
+				playerFlag->Unknown295 = set;
 			break;
 			case 295:
-				playerFlag->Unknown296 = set; 
+				playerFlag->Unknown296 = set;
 			break;
 			case 296:
-				playerFlag->Unknown297 = set; 
+				playerFlag->Unknown297 = set;
 			break;
 			case 297:
-				playerFlag->Unknown298 = set; 
+				playerFlag->Unknown298 = set;
 			break;
 			case 298:
-				playerFlag->Unknown299 = set; 
+				playerFlag->Unknown299 = set;
 			break;
 			case 299:
-				playerFlag->Unknown300 = set; 
+				playerFlag->Unknown300 = set;
 			break;
 			case 300:
-				playerFlag->Unknown301 = set; 
+				playerFlag->Unknown301 = set;
 			break;
 			case 301:
-				playerFlag->Unknown302 = set; 
+				playerFlag->Unknown302 = set;
 			break;
 			case 302:
-				playerFlag->Unknown303 = set; 
+				playerFlag->Unknown303 = set;
 			break;
-			case 303:			
-				playerFlag->Unknown304 = set; 
+			case 303:
+				playerFlag->Unknown304 = set;
 			break;
 			case 304:
-				playerFlag->Unknown305 = set; 
+				playerFlag->Unknown305 = set;
 			break;
 			case 305:
-				playerFlag->Unknown306 = set; 
+				playerFlag->Unknown306 = set;
 			break;
 			case 306:
-				playerFlag->Unknown307 = set; 
+				playerFlag->Unknown307 = set;
 			break;
 			case 307:
-				playerFlag->Unknown308 = set; 
+				playerFlag->Unknown308 = set;
 			break;
 			case 308:
-				playerFlag->Unknown309 = set; 
+				playerFlag->Unknown309 = set;
 			break;
 			case 309:
-				playerFlag->Unknown310 = set; 
+				playerFlag->Unknown310 = set;
 			break;
 			case 310:
-				playerFlag->Unknown311 = set; 
+				playerFlag->Unknown311 = set;
 			break;
 			case 311:
-				playerFlag->Unknown312 = set; 
+				playerFlag->Unknown312 = set;
 			break;
 			case 312:
-				playerFlag->Unknown313 = set; 
+				playerFlag->Unknown313 = set;
 			break;
 			case 313:
-				playerFlag->Unknown314 = set; 
+				playerFlag->Unknown314 = set;
 			break;
 			case 314:
-				playerFlag->SecretStorageExplained = set; 
+				playerFlag->SecretStorageExplained = set;
 			break;
 			case 315:
-				playerFlag->Unknown316 = set; 
+				playerFlag->Unknown316 = set;
 			break;
 			case 316:
-				playerFlag->Unknown317 = set; 
+				playerFlag->Unknown317 = set;
 			break;
 			case 317:
-				playerFlag->Unknown318 = set; 
+				playerFlag->Unknown318 = set;
 			break;
 			case 318:
-				playerFlag->BuildingSecretStorage = set; 
+				playerFlag->BuildingSecretStorage = set;
 			break;
 			case 319:
-				playerFlag->UnlockedSecretStorage = set; 
+				playerFlag->UnlockedSecretStorage = set;
 			break;
 			case 320:
-				playerFlag->Unknown321 = set; 
+				playerFlag->Unknown321 = set;
 			break;
 			case 321:
-				playerFlag->Unknown322 = set; 
+				playerFlag->Unknown322 = set;
 			break;
 			case 322:
-				playerFlag->Unknown323 = set; 
+				playerFlag->Unknown323 = set;
 			break;
 			case 323:
-				playerFlag->Unknown324 = set; 
+				playerFlag->Unknown324 = set;
 			break;
 			case 324:
-				playerFlag->Unknown325 = set; 
+				playerFlag->Unknown325 = set;
 			break;
 			case 325:
-				playerFlag->Unknown326 = set; 
+				playerFlag->Unknown326 = set;
 			break;
 			case 326:
-				playerFlag->Unknown327 = set; 
+				playerFlag->Unknown327 = set;
 			break;
 			case 327:
-				playerFlag->Unknown328 = set; 
+				playerFlag->Unknown328 = set;
 			break;
 			case 328:
-				playerFlag->Unknown329 = set; 
+				playerFlag->Unknown329 = set;
 			break;
 			case 329:
-				playerFlag->Unknown330 = set; 
+				playerFlag->Unknown330 = set;
 			break;
 			case 330:
-				playerFlag->Unknown331 = set; 
+				playerFlag->Unknown331 = set;
 			break;
 			case 331:
-				playerFlag->Unknown332 = set; 
+				playerFlag->Unknown332 = set;
 			break;
 			case 332:
-				playerFlag->Unknown333 = set; 
+				playerFlag->Unknown333 = set;
 			break;
 			case 333:
-				playerFlag->Unknown334 = set; 
+				playerFlag->Unknown334 = set;
 			break;
 			case 334:
-				playerFlag->Unknown335 = set; 
+				playerFlag->Unknown335 = set;
 			break;
 			case 335:
-				playerFlag->Unknown336 = set; 
+				playerFlag->Unknown336 = set;
 			break;
 			case 336:
-				playerFlag->Unknown337 = set; 
+				playerFlag->Unknown337 = set;
 			break;
 			case 337:
-				playerFlag->Unknown338 = set; 
+				playerFlag->Unknown338 = set;
 			break;
 			case 338:
-				playerFlag->Unknown339 = set; 
+				playerFlag->Unknown339 = set;
 			break;
 			case 339:
-				playerFlag->Unknown340 = set; 
+				playerFlag->Unknown340 = set;
 			break;
 			case 340:
-				playerFlag->Unknown341 = set; 
+				playerFlag->Unknown341 = set;
 			break;
 			case 341:
-				playerFlag->Unknown342 = set; 
+				playerFlag->Unknown342 = set;
 			break;
 			case 342:
-				playerFlag->Unknown343 = set; 
+				playerFlag->Unknown343 = set;
 			break;
 			case 343:
-				playerFlag->Unknown344 = set; 
+				playerFlag->Unknown344 = set;
 			break;
 			case 344:
-				playerFlag->Unknown345 = set; 
+				playerFlag->Unknown345 = set;
 			break;
 			case 345:
-				playerFlag->Unknown346 = set; 
+				playerFlag->Unknown346 = set;
 			break;
 			case 346:
-				playerFlag->Unknown347 = set; 
+				playerFlag->Unknown347 = set;
 			break;
 			case 347:
-				playerFlag->Unknown348 = set; 
+				playerFlag->Unknown348 = set;
 			break;
 			case 348:
-				playerFlag->Unknown349 = set; 
+				playerFlag->Unknown349 = set;
 			break;
 			case 349:
-				playerFlag->Unknown350 = set; 
+				playerFlag->Unknown350 = set;
 			break;
 			case 350:
-				playerFlag->Unknown351 = set; 
+				playerFlag->Unknown351 = set;
 			break;
 			case 351:
-				playerFlag->Unknown352 = set; 
+				playerFlag->Unknown352 = set;
 			break;
 			case 352:
-				playerFlag->Unknown353 = set; 
+				playerFlag->Unknown353 = set;
 			break;
 			case 353:
-				playerFlag->Unknown354 = set; 
+				playerFlag->Unknown354 = set;
 			break;
 			case 354:
-				playerFlag->Unknown355 = set; 
+				playerFlag->Unknown355 = set;
 			break;
 			case 355:
-				playerFlag->UnlockedHouseEditor = set; 
+				playerFlag->UnlockedHouseEditor = set;
 			break;
 			case 356:
-				playerFlag->Unknown357 = set; 
+				playerFlag->Unknown357 = set;
 			break;
 			case 357:
-				playerFlag->Unknown358 = set; 
+				playerFlag->Unknown358 = set;
 			break;
 			case 358:
-				playerFlag->Unknown359 = set; 
+				playerFlag->Unknown359 = set;
 			break;
 			case 359:
-				playerFlag->RecievedCATIntro = set; 
+				playerFlag->RecievedCATIntro = set;
 			break;
 			case 360:
-				playerFlag->Unknown361 = set; 
+				playerFlag->Unknown361 = set;
 			break;
 			case 361:
-				playerFlag->Unknown362 = set; 
+				playerFlag->Unknown362 = set;
 			break;
 			case 362:
-				playerFlag->Unknown363 = set; 
+				playerFlag->Unknown363 = set;
 			break;
 			case 363:
-				playerFlag->Unknown364 = set; 
+				playerFlag->Unknown364 = set;
 			break;
 			case 364:
-				playerFlag->Unknown365 = set; 
+				playerFlag->Unknown365 = set;
 			break;
 			case 365:
-				playerFlag->Unknown366 = set; 
+				playerFlag->Unknown366 = set;
 			break;
 			case 366:
-				playerFlag->Unknown367 = set; 
+				playerFlag->Unknown367 = set;
 			break;
 			case 367:
-				playerFlag->Unknown368 = set; 
+				playerFlag->Unknown368 = set;
 			break;
 			case 368:
-				playerFlag->Unknown369 = set; 
+				playerFlag->Unknown369 = set;
 			break;
 			case 369:
-				playerFlag->Unknown370 = set; 
+				playerFlag->Unknown370 = set;
 			break;
 			case 370:
-				playerFlag->Unknown371 = set; 
+				playerFlag->Unknown371 = set;
 			break;
 			case 371:
-				playerFlag->Unknown372 = set; 
+				playerFlag->Unknown372 = set;
 			break;
 			case 372:
-				playerFlag->Unknown373 = set; 
+				playerFlag->Unknown373 = set;
 			break;
 			case 373:
-				playerFlag->Unknown374 = set; 
+				playerFlag->Unknown374 = set;
 			break;
 			case 374:
-				playerFlag->Unknown375 = set; 
+				playerFlag->Unknown375 = set;
 			break;
 			case 375:
-				playerFlag->Unknown376 = set; 
+				playerFlag->Unknown376 = set;
 			break;
 			case 376:
-				playerFlag->Unknown377 = set; 
+				playerFlag->Unknown377 = set;
 			break;
 			case 377:
-				playerFlag->Unknown378 = set; 
+				playerFlag->Unknown378 = set;
 			break;
 			case 378:
-				playerFlag->Unknown379 = set; 
+				playerFlag->Unknown379 = set;
 			break;
 			case 379:
-				playerFlag->Unknown380 = set; 
+				playerFlag->Unknown380 = set;
 			break;
 			case 380:
-				playerFlag->Unknown381 = set; 
+				playerFlag->Unknown381 = set;
 			break;
 			case 381:
-				playerFlag->Unknown382 = set; 
+				playerFlag->Unknown382 = set;
 			break;
 			case 382:
-				playerFlag->CanUseCensusMenu = set; 
+				playerFlag->CanUseCensusMenu = set;
 			break;
 			case 383:
-				playerFlag->Unknown384 = set; 
+				playerFlag->Unknown384 = set;
 			break;
 			case 384:
-				playerFlag->Unknown385 = set; 
+				playerFlag->Unknown385 = set;
 			break;
 			case 385:
-				playerFlag->Unknown386 = set; 
+				playerFlag->Unknown386 = set;
 			break;
 			case 386:
-				playerFlag->Unknown387 = set; 
+				playerFlag->Unknown387 = set;
 			break;
 			case 387:
-				playerFlag->Unknown388 = set; 
+				playerFlag->Unknown388 = set;
 			break;
 			case 388:
-				playerFlag->Unknown389 = set; 
+				playerFlag->Unknown389 = set;
 			break;
 			case 389:
-				playerFlag->Unknown390 = set; 
+				playerFlag->Unknown390 = set;
 			break;
 			case 390:
-				playerFlag->Unknown391 = set; 
+				playerFlag->Unknown391 = set;
 			break;
 			case 391:
-				playerFlag->Unknown392 = set; 
+				playerFlag->Unknown392 = set;
 			break;
 			case 392:
-				playerFlag->Unknown393 = set; 
+				playerFlag->Unknown393 = set;
 			break;
 			case 393:
-				playerFlag->Unknown394 = set; 
+				playerFlag->Unknown394 = set;
 			break;
 			case 394:
-				playerFlag->Unknown395 = set; 
+				playerFlag->Unknown395 = set;
 			break;
 			case 395:
-				playerFlag->Unknown396 = set; 
+				playerFlag->Unknown396 = set;
 			break;
 			case 396:
-				playerFlag->Unknown397 = set; 
+				playerFlag->Unknown397 = set;
 			break;
 			case 397:
-				playerFlag->Unknown398 = set; 
+				playerFlag->Unknown398 = set;
 			break;
 			case 398:
-				playerFlag->Unknown399 = set; 
+				playerFlag->Unknown399 = set;
 			break;
 			case 399:
-				playerFlag->Unknown400 = set; 
+				playerFlag->Unknown400 = set;
 			break;
 			case 400:
-				playerFlag->Unknown401 = set; 
+				playerFlag->Unknown401 = set;
 			break;
 			case 401:
-				playerFlag->Unknown402 = set; 
+				playerFlag->Unknown402 = set;
 			break;
 			case 402:
-				playerFlag->Unknown403 = set; 
+				playerFlag->Unknown403 = set;
 			break;
 			case 403:
-				playerFlag->Unknown404 = set; 
+				playerFlag->Unknown404 = set;
 			break;
 			case 404:
-				playerFlag->Unknown405 = set; 
+				playerFlag->Unknown405 = set;
 			break;
 			case 405:
-				playerFlag->Unknown406 = set; 
+				playerFlag->Unknown406 = set;
 			break;
 			case 406:
-				playerFlag->Unknown407 = set; 
+				playerFlag->Unknown407 = set;
 			break;
 			case 407:
-				playerFlag->Unknown408 = set; 
+				playerFlag->Unknown408 = set;
 			break;
 			case 408:
-				playerFlag->Unknown409 = set; 
+				playerFlag->Unknown409 = set;
 			break;
 			case 409:
-				playerFlag->Unknown410 = set; 
+				playerFlag->Unknown410 = set;
 			break;
 			case 410:
-				playerFlag->Unknown411 = set; 
+				playerFlag->Unknown411 = set;
 			break;
 			case 411:
-				playerFlag->Unknown412 = set; 
+				playerFlag->Unknown412 = set;
 			break;
 			case 412:
-				playerFlag->Unknown413 = set; 
+				playerFlag->Unknown413 = set;
 			break;
 			case 413:
-				playerFlag->Unknown414 = set; 
+				playerFlag->Unknown414 = set;
 			break;
 			case 414:
-				playerFlag->Unknown415 = set; 
+				playerFlag->Unknown415 = set;
 			break;
 			case 415:
-				playerFlag->Unknown416 = set; 
+				playerFlag->Unknown416 = set;
 			break;
 		}
 	}
@@ -1704,7 +1730,7 @@ namespace CTRPluginFramework {
 		ACNL_Player *player = Player::GetSaveData();
 		ACNL_TownData *town = Town::GetSaveData();
 
-		if (!town) 
+		if (!town)
 			return;
 
 		TownFlagsSTRUCT tf;
@@ -1713,7 +1739,7 @@ namespace CTRPluginFramework {
 		u8* tsrc = (u8*)toffset;
 
 		for (size_t i = 0; i < 17; i++) {
-			tarr[i] = tsrc[i]; 
+			tarr[i] = tsrc[i];
 		}
 
 		CheckTownFlags(&tf);
@@ -1737,7 +1763,7 @@ namespace CTRPluginFramework {
 			}
 		}
 
-		if(!player) 
+		if(!player)
 			return;
 
 		PlayerFlagsSTRUCT pf;
@@ -1746,7 +1772,7 @@ namespace CTRPluginFramework {
 		u8* src = (u8*)offset;
 
 		for (size_t i = 0; i < 0x34; i++) {
-			arr[i] = src[i]; 
+			arr[i] = src[i];
 		}
 
 		CheckPlayerFlags(&pf);
@@ -1776,7 +1802,7 @@ namespace CTRPluginFramework {
 
 		if((int)pID == -3)
 			return 0;
-		
+
 		u64 fCode = 0;
 		FRD_PrincipalIdToFriendCode(pID, &fCode);
 
@@ -1787,9 +1813,9 @@ namespace CTRPluginFramework {
 
 //Hook
 	bool randomfall(void) {
-		if(Controller::IsKeyDown(Key::A)) 
+		if(Controller::IsKeyDown(Key::A))
 			return 1;
-		
+
 		return 0;
 	}
 //Enable Unused Fall Down
@@ -1802,7 +1828,7 @@ namespace CTRPluginFramework {
 			hook.Enable();
 		}
 
-		if(!entry->IsActivated()) 
+		if(!entry->IsActivated())
 			hook.Disable();
 	}
 
@@ -1818,13 +1844,13 @@ namespace CTRPluginFramework {
 	Function which sets coordinates and all to storage for player
 	68dee8(u32 pinstance)
 	*/
-	
+
 	void unlockCroRegion(MenuEntry *entry) {
 		static std::string str = "";
 		static u32 buffer = 0;
- 
+
 		if(Controller::IsKeysPressed(Key::R + Key::DPadUp)) {
-			if(Wrap::KB<std::string>("Enter Cro Name:", false, 15, str, str)) {
+			if(PluginUtils::Input::PromptNumber<std::string>({ "Enter Cro Name:", false, 15, str }, str)) {
 				if(CRO::GetMemAddress(str.c_str(), buffer)) {
 					if(CRO::WritePermToggle(buffer, true)) {
 						OSD::NotifySysFont(Utils::Format("Unlocked %s | Address: %08X", str.c_str(), buffer));
@@ -1864,7 +1890,7 @@ namespace CTRPluginFramework {
 		}
 
 		if(Controller::IsKeysPressed(Key::L + Key::DPadRight)) {
-			Wrap::KB<u8>("", true, 2, roomID, roomID);
+			PluginUtils::Input::PromptNumber<u8>({ "", true, 2, roomID }, roomID);
 		}
 
 		if(Controller::IsKeysPressed(Key::L + Key::DPadLeft)) {

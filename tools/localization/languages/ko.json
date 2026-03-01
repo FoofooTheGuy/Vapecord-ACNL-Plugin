@@ -160,7 +160,7 @@
     "CHAT_INVALID_MUSIC": "잘못된 음악 ID",
     "CHAT_NO_ITEM_FOUND": "해당 이름의 아이템을 찾을 수 없습니다",
     "WRAPPER_ADDRESS": "주소: %08X",
-    "WRAPPER_LENGHT": "길이: %08X",
+    "WRAPPER_LENGTH": "길이: %08X",
     "NPC_RACE_SPECIAL": "특수 NPC",
     "ITEMSEQ_STANDARD_DROP": "표준 드롭 아이템",
     "ITEMSEQ_ADD": "추가...",

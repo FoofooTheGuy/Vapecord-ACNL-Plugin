@@ -1,7 +1,7 @@
 #include "features/cheats.hpp"
 #include "core/game_api/Player.hpp"
 #include "core/game_api/Game.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/infrastructure/Address.hpp"
 #include "core/game_api/Town.hpp"
 
@@ -14,9 +14,9 @@ namespace CTRPluginFramework {
 			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
 			return;
 		}
-		
+
 		u32 money = 0;
-		if(Wrap::KB<u32>(Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 5, money, 0)) {
+		if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 5, 0 }, money)) {
 			Game::EncryptValue(&player->PocketMoney, money);
 		}
 	}
@@ -28,9 +28,9 @@ namespace CTRPluginFramework {
 			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
 			return;
 		}
-		
+
 		u32 money = 0;
-		if(Wrap::KB<u32>(Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 9, money, 0)) {
+		if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 9, 0 }, money)) {
 			Game::EncryptValue(&player->BankAmount, money);
 		}
 	}
@@ -42,9 +42,9 @@ namespace CTRPluginFramework {
 			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
 			return;
 		}
-		
+
 		u32 coupon = 0;
-		if(Wrap::KB<u32>(Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 4, coupon, 0)) {
+		if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 4, 0 }, coupon)) {
 			Game::EncryptValue(&player->MeowCoupons, coupon);
 		}
 	}
@@ -56,7 +56,7 @@ namespace CTRPluginFramework {
 			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
 			return;
 		}
-		
+
 		const std::vector<std::string> badgesopt = {
 			Color(0xFFD700FF) << Language::getInstance()->get(TextID::VECTOR_BADGE_GOLD),
 			Color(0xC0C0C0FF) << Language::getInstance()->get(TextID::VECTOR_BADGE_SILVER),
@@ -85,13 +85,13 @@ namespace CTRPluginFramework {
 			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
 			return;
 		}
-		
+
 		u32 medal = 0;
-		if(Wrap::KB<u32>(Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 4, medal, 0)) {
+		if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 4, 0 }, medal)) {
 			Game::EncryptValue(&player->MedalAmount, medal);
-		}	
-	}	
-//turnip Mod	
+		}
+	}
+//turnip Mod
 	void turnips(MenuEntry *entry) {
 		ACNL_TownData *town = Town::GetSaveData();
 
@@ -99,9 +99,9 @@ namespace CTRPluginFramework {
 			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
 			return;
 		}
-		
+
 		u32 turnip = 0;
-		if(Wrap::KB<u32>(Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 5, turnip, 0)) {
+		if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 5, 0 }, turnip)) {
 			for(int i = 0; i < 6; ++i) {
 				Game::EncryptValue(&town->TurnipPrices[i], turnip); //AM
 				Game::EncryptValue(&town->TurnipPrices[i + 6], turnip); //PM

@@ -1,5 +1,5 @@
 #include "core/Config.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/game_api/Save.hpp"
 #include "features/cheats.hpp"
 #include "platform/ctrpf/Plugin_Color.hpp"

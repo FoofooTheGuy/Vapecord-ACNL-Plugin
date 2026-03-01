@@ -1,6 +1,6 @@
 #include "core/Config.hpp"
 #include "Files.h"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/infrastructure/Address.hpp"
 #include "core/ItemSequence.hpp"
 #include "core/game_api/Game.hpp"
@@ -17,7 +17,7 @@ Cheat Credits: Nico, Jay, Levi, Slattz, Gokiro, Kominost, Elominator and more
 
 Code Credits: Foofoo_the_guy, PabloMK7, Jon & DaniElectra (Pretendo) and more
 
-Translators: みるえもん & みなと(Japanese), im a book(spanish), Fedecrash02(italian), Youssef, Arisa, & Lenoch(french), bkfirmen & Toby(german), Soopoolleaf(korean)
+Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえもん & みなと(Japanese), im a book(spanish), Fedecrash02(italian), Youssef, Arisa, & Lenoch(french), bkfirmen & Toby(german), Soopoolleaf(korean)
 
 )") + Utils::Format("Discord: %s", DISCORDINV);
 

@@ -1,6 +1,6 @@
 #include "features/cheats.hpp"
 
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/checks/IDChecks.hpp"
 #include "core/game_api/Inventory.hpp"
 #include "core/game_api/PlayerClass.hpp"
@@ -125,7 +125,7 @@ namespace CTRPluginFramework {
 		}
 
 		if(entry->Hotkeys[0].IsPressed()) {
-			Wrap::KB<u32>(Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&PickupSeederItemID, *(u32 *)&PickupSeederItemID, ItemChange);
+			PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&PickupSeederItemID, ItemChange }, *(u32 *)&PickupSeederItemID);
         }
 
 	//Switches Seed Item to Remove Item
@@ -268,7 +268,7 @@ namespace CTRPluginFramework {
 		switch(optKb.Open()) {
 			default: break;
 			case 0: {
-				if(Wrap::KB<u16>(Language::getInstance()->get(TextID::FIREWORK_SEEDER_ENTER_ID), true, 4, *(u16 *)&input, *(u16 *)&input, ItemChange)) {
+				if(PluginUtils::Input::PromptNumber<u16>({ Language::getInstance()->get(TextID::FIREWORK_SEEDER_ENTER_ID), true, 4, *(u16 *)&input, ItemChange }, *(u16 *)&input)) {
 					firework.Patch(*(u16 *)&input);
 				}
 			} break;
@@ -457,7 +457,7 @@ namespace CTRPluginFramework {
 			}
 
 			if(entry->Hotkeys[9].IsPressed()) { //Set Item ID (L)
-				Wrap::KB<u32>(Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&dropitem, *(u32 *)&dropitem, ItemChange);
+				PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&dropitem, ItemChange }, *(u32 *)&dropitem);
 			}
 		}
 
@@ -482,7 +482,7 @@ namespace CTRPluginFramework {
 	}
 
 	void E_Seeder_KB(MenuEntry *entry) {
-		Wrap::KB<u32>(Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&EverythingSeederItemID, *(u32 *)&EverythingSeederItemID, ItemChange);
+		PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&EverythingSeederItemID, ItemChange }, *(u32 *)&EverythingSeederItemID);
 	}
 
 	void everythingseeder(MenuEntry *entry) {

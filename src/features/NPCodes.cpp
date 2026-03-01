@@ -2,7 +2,7 @@
 #include "features/cheats.hpp"
 #include "core/game_api/NPC.hpp"
 #include "core/infrastructure/Address.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/game_api/PlayerClass.hpp"
 #include "core/game_api/Dropper.hpp"
 #include "core/RuntimeContext.hpp"
@@ -125,7 +125,7 @@ namespace CTRPluginFramework {
 			return;
 		}
 
-		if(Wrap::KB<u16>(Utils::Format(Language::getInstance()->get(TextID::NPC_ANIM_SET).c_str(), vec[op].c_str()), true, 4, npcID, npcID)) {
+		if(PluginUtils::Input::PromptNumber<u16>({ Utils::Format(Language::getInstance()->get(TextID::NPC_ANIM_SET).c_str(), vec[op].c_str()), true, 4, npcID }, npcID)) {
 			mode = op;
 		}
 	}

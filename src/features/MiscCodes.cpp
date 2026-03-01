@@ -1,5 +1,5 @@
 #include "features/cheats.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/checks/IDChecks.hpp"
 #include "core/game_api/Game.hpp"
 #include "core/game_api/PlayerClass.hpp"
@@ -21,7 +21,7 @@ namespace CTRPluginFramework {
 //Change Tool Animation
 	void tooltype(MenuEntry *entry) {
 		static Hook hook;
-		if(Wrap::KB<u8>(Language::getInstance()->get(TextID::TOOL_ANIM_ENTER_ANIM), true, 2, toolTypeAnimID, toolTypeAnimID)) {
+		if(PluginUtils::Input::PromptNumber<u8>({ Language::getInstance()->get(TextID::TOOL_ANIM_ENTER_ANIM), true, 2, toolTypeAnimID }, toolTypeAnimID)) {
 			if(toolTypeAnimID == 0) { //if switched OFF
 				hook.Disable();
 				return;
@@ -46,19 +46,19 @@ namespace CTRPluginFramework {
 		};
 
 		bool IsON;
-		
-		for(int i = 0; i < 4; ++i) { 
+
+		for(int i = 0; i < 4; ++i) {
 			IsON = Game::GetGameMode() == i;
 			gametype[i] = (IsON ? Color(pGreen) : Color(pRed)) << gametype[i];
 		}
-		
+
         Keyboard keyboard(Language::getInstance()->get(TextID::GAME_TYPE_CHOOSE), gametype);
 
         int gametchoice = keyboard.Open();
         if(gametchoice < 0)	{
 			return;
 		}
-	
+
 		Game::ChangeGameMode((Game::GameMode)gametchoice);
 		mgtype(entry);
     }
@@ -67,7 +67,7 @@ namespace CTRPluginFramework {
 		/*
 		KK Songs are differently handled
 		This does not work sometimes, example fortune shop, the switching back to the Fortune Shop Melody doesnt get recognized
-		Also after new player build house, then spoke to isabelle, then left the town hall, then after the success melody, the town melody doesnt get recognized
+		Also after new player build house, then spoke to isabelle, then left the town hall, then after the Success melody, the town melody doesnt get recognized
 		Shrunks perfomance doesn't get recognized
 		Switching from nook store to closign soon doesnt get recognized
 		Sapling Ceremony doesnt come up
@@ -109,21 +109,21 @@ namespace CTRPluginFramework {
 		Game::ReloadRoom();
 	}
 
-	//Large FOV	
+	//Large FOV
 	void fovlarge(MenuEntry *entry) {
 		static Address fovlargeMod(0x47E48C);
 
 		static float OnOff = 1.0;
-		
+
 		fovlargeMod.WriteFloat(OnOff);
-		
+
 		if(Game::GetRoom() == 1 || RuntimeContext::getInstance()->isFov()) {
-			OnOff = 1.0; 
+			OnOff = 1.0;
 		}
 		else {
-			OnOff = 0.75; 
+			OnOff = 0.75;
 		}
-		
+
 		if(!entry->IsActivated()) {
 			fovlargeMod.Unpatch();
 		}
@@ -138,7 +138,7 @@ namespace CTRPluginFramework {
 	}
 
 	u32 LightSwitchPatch(void) {
-		static const u8 r_Array[14] = { 
+		static const u8 r_Array[14] = {
 			0x02, //Train Station
 			0x26, //Town Hall
 			0x30, //Police Station
@@ -217,7 +217,7 @@ namespace CTRPluginFramework {
 			moveFurnButtonHook.SetFlags(USE_LR_TO_RETURN);
 			moveFurnButtonHook.Enable();
 		}
-		
+
 		else if(!entry->IsActivated()) {
 			movingFurnitureHook.Disable();
 			pickingUpFurnitureHook.Disable();
@@ -230,7 +230,7 @@ namespace CTRPluginFramework {
 		}
     }
 //Can Walk When Talk /*Made by Jay*/
-	void walktalkentry(MenuEntry *entry) { 
+	void walktalkentry(MenuEntry *entry) {
 		static Address walktalk(0x655390);
 
 		if(entry->WasJustActivated()) {
@@ -240,18 +240,18 @@ namespace CTRPluginFramework {
 			walktalk.Unpatch();
 		}
 	}
-			
-//Beans Particle Changer	
+
+//Beans Particle Changer
 	void BeansParticleChanger(MenuEntry *entry) {
 		static Address beans(0x673E0C);
-        static u16 input = 0; 
-		
+        static u16 input = 0;
+
         if(entry->Hotkeys[0].IsDown()) {
-			if(Wrap::KB<u16>(Language::getInstance()->get(TextID::BEANS_PARTICLE_ENTER_ID), true, 3, input, 0)) {
+			if(PluginUtils::Input::PromptNumber<u16>({ Language::getInstance()->get(TextID::BEANS_PARTICLE_ENTER_ID), true, 3, 0 }, input)) {
 				beans.Patch(input);
 			}
 		}
-		
+
 		if(!entry->IsActivated()) {
 			beans.Unpatch();
 		}
@@ -283,7 +283,7 @@ namespace CTRPluginFramework {
 		if(!gFastTalkEnabled) {
 			fastt.Unpatch();
 			fastt2.Unpatch();
-		}	
+		}
 	}
 
 //Fast Game Speed
@@ -298,7 +298,7 @@ namespace CTRPluginFramework {
 		else {
 			speed.Patch(0xE3E004FF);
 		}
-		
+
 		if(!gSpeedEnabled) {
 			speed.Unpatch();
 		}
@@ -333,7 +333,7 @@ namespace CTRPluginFramework {
 					speedPatchedByIsabelle = true;
 				}
 			}
-			
+
 			if (!gFastTalkEnabled && !fastTalkPatchedByIsabelle) {
 				fastt.Patch(0xEA000000);
 				fastt2.Patch(0xE3500001);
@@ -353,7 +353,7 @@ namespace CTRPluginFramework {
 				speed.Unpatch();
 				speedPatchedByIsabelle = false;
 			}
-			
+
 			if (fastTalkPatchedByIsabelle && !gFastTalkEnabled) {
 				fastt.Unpatch();
 				fastt2.Unpatch();

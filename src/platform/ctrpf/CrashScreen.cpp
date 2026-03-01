@@ -1,6 +1,6 @@
 #include <cstdarg>
 #include "core/QRCodeGen.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/infrastructure/Address.hpp"
 #include "Files.h"
 #include "core/Config.hpp"

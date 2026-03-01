@@ -3,7 +3,7 @@
 #include "core/infrastructure/CROEditing.hpp"
 
 #include "core/checks/IDChecks.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/game_api/PlayerClass.hpp"
 #include "core/ItemSequence.hpp"
 #include "core/game_api/Dropper.hpp"
@@ -27,8 +27,8 @@ namespace CTRPluginFramework {
 		sBuilding b[2];
 		u8 acres[16];
 	};
-	
-	static Island isl { 
+
+	static Island isl {
 		0x69, 0x1F, 0x15, //Building 1
 		0x6A, 0x1D, 0x15, //Building 2
 		0xAE, 0xAF, 0xAF, 0xB0, //Acre ID's
@@ -54,7 +54,7 @@ namespace CTRPluginFramework {
 
 		cmnOpt[0] = (IsON1 ? Color(pGreen) : Color(pRed)) << cmnOpt[0];
 		cmnOpt[1] = (IsON2 ? Color(pGreen) : Color(pRed)) << cmnOpt[1];
-		
+
 		Keyboard KB(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), cmnOpt);
 
 		int op = KB.Open();
@@ -113,19 +113,19 @@ namespace CTRPluginFramework {
 		}
 	}
 //Island Shop
-	void IslandShop(MenuEntry *entry) {	
+	void IslandShop(MenuEntry *entry) {
 		static const Address IslandShopPointer(0x954238);
 		if(*(u32 *)IslandShopPointer.addr == 0) {
 			return;
 		}
-		
+
 		if(Game::GetNextRoom() == 0xA5 && Game::IsGameInRoom(0x65)) {
 			for(int i = 0; i < 4; ++i) {
 				Process::Write32(*(u32 *)IslandShopPointer.addr + 0x10 + (i * 4), ShopItem[i].isValid(false) ? *(u32 *)&ShopItem[i] : 0x2018);
 			}
 		}
 	}
-	
+
 //All Tours
 	void alltour(MenuEntry *entry) {
 		static const Address TourPatch(0x76FCC0);
@@ -141,20 +141,20 @@ namespace CTRPluginFramework {
 			Process::Patch(TourPatch.addr, 0x0A000004);
 			Process::Patch(TourPatch.addr + 0x54, 0x0A000004);
 			Process::Patch(TourPatch.addr + 0xD0, 0x0A000004);
-			Process::Patch(TourPatch.addr + 0x138, 0x0A000004); 
+			Process::Patch(TourPatch.addr + 0x138, 0x0A000004);
 
 			Process::Patch(TourPatch.addr + 0xA8, 0x12800001);
 		}
     }
 
-//Island Acre Mod	
+//Island Acre Mod
 	void acreMod(MenuEntry *entry) {
 		if(*(u32 *)Address(0x953708).addr == 0) {
 			return;
 		}
-		
+
 		u32 IslAcreOffset = *(u32 *)Address(0x953708).addr + 2; //0x953708
-		
+
 		for(u8 i = 0; i < 16; ++i) {
 			Process::Write8(IslAcreOffset + i * 2, isl.acres[i]);
 		}
@@ -171,14 +171,14 @@ namespace CTRPluginFramework {
 			kb.Open(isl.acres[i], isl.acres[i]);
 		}
 	}
-//Island Building Mod	
+//Island Building Mod
 	void buildingMod(MenuEntry *entry) {
 		if(*(u32 *)Address(0x953708).addr == 0) {
 			return;
 		}
-		
+
 		u32 islandBuildings = *(u32 *)Address(0x953708).addr + 0x1022;
-		
+
 		for(u8 i = 0; i < 2; ++i) {
 			Process::Write16(islandBuildings + i * 4, isl.b[i].id);
 			Process::Write8(islandBuildings + 2 + i * 4, isl.b[i].x);
@@ -215,13 +215,13 @@ namespace CTRPluginFramework {
 		  	hook1.SetFlags(USE_LR_TO_RETURN);
 			hook2.SetFlags(USE_LR_TO_RETURN);
 
-			hook1.Enable();	
-			hook2.Enable();	
+			hook1.Enable();
+			hook2.Enable();
 		}
 
 		else if(!entry->IsActivated()) {
-			hook1.Disable();	
-			hook2.Disable();	
+			hook1.Disable();
+			hook2.Disable();
 		}
 	}
 
@@ -258,18 +258,18 @@ namespace CTRPluginFramework {
 				else {
 					res = false;
 				}
-				
+
 				y++;
 			}
 			res = true;
-			
+
 			y = 0x10;
 			x++;
 			if(!Game::GetItemAtWorldCoords(x, y)) {
 				res = false;
 			}
 		}
-		
+
 		OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::ISLAND_RESTORE_PLACED_COUNT).c_str(), count));
 
 	//OFF
@@ -294,8 +294,8 @@ namespace CTRPluginFramework {
 			}
 
 			const std::vector<std::string> options = {
-				Language::getInstance()->get(TextID::ISLAND_SAVER_BACKUP_ISLAND), 
-				Language::getInstance()->get(TextID::ISLAND_SAVER_RESTORE_ISLAND), 
+				Language::getInstance()->get(TextID::ISLAND_SAVER_BACKUP_ISLAND),
+				Language::getInstance()->get(TextID::ISLAND_SAVER_RESTORE_ISLAND),
 				Language::getInstance()->get(TextID::FILE_DELETE)
 			};
 
@@ -305,15 +305,15 @@ namespace CTRPluginFramework {
 				default: break;
 				case 0: {
 					std::vector<u32> dumpVec;
-			
+
 					for (u32 x = 0x10; x <= 0x2F; x++)
 						for (u32 y = 0x10; y <= 0x2F; y++) {
 							Item* atCoords = Game::GetItemAtWorldCoords(x, y);
 							dumpVec.push_back((atCoords->Flags * 0x10000) ^ atCoords->ID);
 						}
-						
-					WrapLoc backupLoc = WrapLoc{ dumpVec.data(), static_cast<int>(dumpVec.size() * sizeof(u32)) };
-					
+
+					MemoryRange backupLoc = MemoryRange{ dumpVec.data(), static_cast<int>(dumpVec.size() * sizeof(u32)) };
+
 					std::string filename = "";
 					Keyboard KB(Language::getInstance()->get(TextID::ISLAND_SAVER_NAME_BACKUP));
 
@@ -321,7 +321,12 @@ namespace CTRPluginFramework {
 						return;
 					}
 
-					Wrap::Dump(Utils::Format(PATH_ISLAND, Address::regionName.c_str()), filename, ".dat", &backupLoc, nullptr);
+					PluginUtils::Backup::DumpMemory(
+						Utils::Format(PATH_ISLAND, Address::regionName.c_str()),
+						filename,
+						".dat",
+						{ backupLoc }
+					);
 				} break;
 
 				case 1: {
@@ -332,11 +337,17 @@ namespace CTRPluginFramework {
 						OSD::NotifySysFont(Language::getInstance()->get(TextID::ISLAND_SAVE_FAILED_ALLOCATE));
 						return;
 					}
-					
+
 					std::string filename = "restoredump";
-					WrapLoc restoreLoc = WrapLoc{ fileData, static_cast<int>(arrSize * sizeof(u32)) };
-					
-					if(Wrap::Restore(Utils::Format(PATH_ISLAND, Address::regionName.c_str()), ".dat", Language::getInstance()->get(TextID::SAVE_RESTORE_SELECT), nullptr, false, &restoreLoc, nullptr) == ExHandler::SUCCESS) {
+					MemoryRange restoreLoc = MemoryRange{ fileData, static_cast<int>(arrSize * sizeof(u32)) };
+
+					if (PluginUtils::Backup::RestoreMemory(
+							Utils::Format(PATH_ISLAND, Address::regionName.c_str()),
+							".dat",
+							Language::getInstance()->get(TextID::SAVE_RESTORE_SELECT),
+							{ restoreLoc },
+							PluginUtils::Backup::RestoreOptions{ nullptr, false }
+						) == OperationResult::Success) {
 						for(size_t i = 0; i < arrSize; i++) {
 							IslandItems.push_back({ static_cast<u16>(fileData[i] & 0xFFFF), static_cast<u16>(fileData[i] >> 16) });
 						}
@@ -344,7 +355,10 @@ namespace CTRPluginFramework {
 					}
 				} break;
 				case 2: {
-					Wrap::Delete(Utils::Format(PATH_ISLAND, Address::regionName.c_str()), ".dat");
+					PluginUtils::Backup::DeleteBackup(
+						Utils::Format(PATH_ISLAND, Address::regionName.c_str()),
+						".dat"
+					);
 				} break;
 			}
 		}

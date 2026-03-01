@@ -2,7 +2,7 @@
 #include "core/game_api/Player.hpp"
 #include "core/game_api/Game.hpp"
 
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/game_api/PlayerClass.hpp"
 #include "core/game_api/Animation.hpp"
 #include "core/game_api/Dropper.hpp"
@@ -32,7 +32,7 @@ namespace CTRPluginFramework {
 		static Address vertplayer(0x567FF4);
 		static Address head(0x568064);
 		static Address corrupt(0x47E3F0);
-		
+
 		const std::vector<std::string> sizeopt = {
 			Language::getInstance()->get(TextID::VECTOR_SIZE_PLAYER),
 			Language::getInstance()->get(TextID::VECTOR_SIZE_BUGFISH),
@@ -46,38 +46,38 @@ namespace CTRPluginFramework {
 			Language::getInstance()->get(TextID::VECTOR_SIZE_CORRUPT),
 			Language::getInstance()->get(TextID::VECTOR_SIZE_RESET)
 		};
-		
+
 		std::vector<std::string> sizesopt = {
 			Language::getInstance()->get(TextID::VECTOR_SIZE_BIGGER),
 			Language::getInstance()->get(TextID::VECTOR_SIZE_DEFAULT),
 			Language::getInstance()->get(TextID::VECTOR_SIZE_SMALLER),
 			Language::getInstance()->get(TextID::SIZE_CODES_CUSTOM)
 		};
-		
-		static Address sizeAddresses[10] = { 
-			player, bug, npc, effect, shadow, 
-			town, horplayer, vertplayer, head, corrupt 
+
+		static Address sizeAddresses[10] = {
+			player, bug, npc, effect, shadow,
+			town, horplayer, vertplayer, head, corrupt
 		};
-		
+
 		static constexpr float sizes[3] = { 2.0, 1.0, 0.5 };
 
 		bool IsON;
 
 		float size = 0.0;
-		
+
 		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), sizeopt);
 
 		int op = optKb.Open();
 		if(op < 0) {
 			return;
 		}
-			
+
 		else if(op <= 9) {
 			for(int i = 0; i < 3; ++i) {
 				IsON = *(float *)sizeAddresses[op].addr == sizes[i];
-				sizesopt[i] = IsON ? (Color(pGreen) << sizesopt[i]) : (Color(pRed) << sizesopt[i]);	
+				sizesopt[i] = IsON ? (Color(pGreen) << sizesopt[i]) : (Color(pRed) << sizesopt[i]);
 			}
-			
+
 			optKb.Populate(sizesopt);
 			int op2 = optKb.Open();
 			if(op2 < 0) {
@@ -102,7 +102,7 @@ namespace CTRPluginFramework {
 		}
     }
 //T-Pose
-	void tposeentry(MenuEntry *entry) { 
+	void tposeentry(MenuEntry *entry) {
 		static Address tpose(0x73C290);
 
 		if(entry->WasJustActivated()) {
@@ -143,7 +143,7 @@ namespace CTRPluginFramework {
 
 			player->PlayerFlags.HasTPCPicture = true;
 		}
-	
+
 		if(entry->Hotkeys[1].IsDown()) {
 			if(entry->Hotkeys[1].IsPressed()) {
 				freeze.Patch(0xE3A000FF);
@@ -151,7 +151,7 @@ namespace CTRPluginFramework {
 
 			OSD::Run(tpcoverlay);
 		}
-		
+
 		if(!entry->Hotkeys[1].IsDown()) {
 			OSD::Stop(tpcoverlay);
 			freeze.Unpatch();
@@ -163,7 +163,7 @@ namespace CTRPluginFramework {
     }
 
 //Max Turbo Presses
-	void maxturbo(MenuEntry *entry) { 
+	void maxturbo(MenuEntry *entry) {
 		u32 maxT = *(u32 *)Address(0x95D3FC).addr - 0x31C;
 
         Sleep(Seconds(0.0085F));
@@ -172,7 +172,7 @@ namespace CTRPluginFramework {
     }
 
 //Multi-presses
-	void asmpresses(MenuEntry *entry) { 
+	void asmpresses(MenuEntry *entry) {
 		static Address press(0x5C5BEC);
 
 		if(entry->WasJustActivated()) {
@@ -182,14 +182,14 @@ namespace CTRPluginFramework {
 			press.Unpatch();
 		}
 	}
-//Ultimate Party Popper	
+//Ultimate Party Popper
 	void partypopper(MenuEntry *entry) {
 		static Address PartySnakeSpeed(0x67F008);
 		static Address party2(0x662D9C);
 		static Address party3(0x67BBC8);
 		static Address PartyItemID(0x671874);
 		static Address PartyEffect(0x671880);
-		
+
 		static u16 PartyEffectID = 0x20A;
 
 		Process::Write8(*(u32 *)Address(0x95D3FC).addr - 0x31C, 0); //Multi Presses
@@ -210,7 +210,7 @@ namespace CTRPluginFramework {
 		}
 
 		if(entry->Hotkeys[0].IsPressed()) {
-			Wrap::KB<u16>(Language::getInstance()->get(TextID::ULTIMATE_PARTY_POPPER_ENTER_EFFECT), true, 3, PartyEffectID, PartyEffectID);
+			PluginUtils::Input::PromptNumber<u16>({ Language::getInstance()->get(TextID::ULTIMATE_PARTY_POPPER_ENTER_EFFECT), true, 3, PartyEffectID }, PartyEffectID);
 		}
 
 		if(player->PlayerAppearance.PlayerOutfit.HeldItem.ID == 0x336A) {
@@ -224,7 +224,7 @@ namespace CTRPluginFramework {
 			hook1.Enable();
 			hook2.Enable();
 		}
-   
+
 		if(!entry->IsActivated() || player->PlayerAppearance.PlayerOutfit.HeldItem.ID != 0x336A) {
 			PartyEffect.Unpatch();
 			PartySnakeSpeed.Unpatch();
@@ -235,7 +235,7 @@ namespace CTRPluginFramework {
 			hook2.Disable();
 		}
 	}
-	
+
 	void cameramod(MenuEntry *entry) {
     //pointers & addresses
 		static Address cameraAsm(0x764504);
@@ -248,7 +248,7 @@ namespace CTRPluginFramework {
 		static bool isOn = false;
 
 		static const u16 OrigVal[2] = { *(u16 *)(Camera::GetInstance() + 0x12C), *(u16 *)(Camera::GetInstance() + 0x12E) };
-		
+
 		static Clock time;
         Time delta = time.Restart();
 
@@ -260,7 +260,7 @@ namespace CTRPluginFramework {
 		if(entry->WasJustActivated()) {
 			camerapan.Patch(0xE3A00000); //disables camera panning
 		}
-	
+
         if(Camera::GetInstance() != 0) {
         //check if you're outside
             if(!Player::IsIndoors()) {
@@ -277,20 +277,20 @@ namespace CTRPluginFramework {
 				rotationAsm.Unpatch();
 				rotationAsm2.Unpatch();
             }
-			
+
             if(Controller::IsKeyDown(Key::R)) {
                 if(Controller::IsKeyDown(Key::CPadUp)) {
 					*(u16 *)(Camera::GetInstance() + 0x12C) += difference;
 				}
-                    
+
                 if(Controller::IsKeyDown(Key::CPadDown)) {
 					*(u16 *)(Camera::GetInstance() + 0x12C) -= difference;
 				}
-                   
+
                 if(Controller::IsKeyDown(Key::CPadLeft)) {
 					*(u16 *)(Camera::GetInstance() + 0x12E) += difference;
 				}
-                    
+
                 if(Controller::IsKeyDown(Key::CPadRight)) {
 					*(u16 *)(Camera::GetInstance() + 0x12E) -= difference;
 				}
@@ -302,16 +302,16 @@ namespace CTRPluginFramework {
 					case 1: goto unpatch;
 				}
 			}
-			
+
 		//lock/unlock player
             if(Controller::IsKeysPressed(Key::R + Key::Y)) {
 				switch(isOn) {
-					case 0: 
-						OSD::NotifySysFont(Language::getInstance()->get(TextID::CAMERA_MOD_PLAYER) << " " << Color::Red << Language::getInstance()->get(TextID::CAMERA_MOD_LOCKED)); 
+					case 0:
+						OSD::NotifySysFont(Language::getInstance()->get(TextID::CAMERA_MOD_PLAYER) << " " << Color::Red << Language::getInstance()->get(TextID::CAMERA_MOD_LOCKED));
 						Animation::ExecuteAnimationWrapper(4, 0xF, {0, 0}, 0, 0, 0, 0, 0, 0, 0);
 						isOn = true;
 					break;
-					case 1: 
+					case 1:
 						OSD::NotifySysFont(Language::getInstance()->get(TextID::CAMERA_MOD_PLAYER) << " " << Color::Green << Language::getInstance()->get(TextID::CAMERA_MOD_UNLOCKED));
 						Animation::ExecuteAnimationWrapper(4, 6, {0, 0}, 0, 0, 0, 0, 0, 0, 0);
 						isOn = false;
@@ -323,7 +323,7 @@ namespace CTRPluginFramework {
 				if(!PlayerClass::GetInstance()->IsLoaded()) {
 					return;
 				}
-					
+
 				if(coord == nullptr) {
 					return;
 				}
@@ -362,7 +362,7 @@ namespace CTRPluginFramework {
         patch:
             if(!isPatched) {
             //disable camera following
-				OSD::NotifySysFont(Language::getInstance()->get(TextID::CAMERA_MOD_CAM_FOLLOWING) << " " << Color::Red << Language::getInstance()->get(TextID::STATE_OFF)); 
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CAMERA_MOD_CAM_FOLLOWING) << " " << Color::Red << Language::getInstance()->get(TextID::STATE_OFF));
 				cameraAsm.Patch(0xEA000020);
                 isPatched = true;
             }
@@ -370,7 +370,7 @@ namespace CTRPluginFramework {
         unpatch:
             if(isPatched) {
 			//reenable camera followig
-				OSD::NotifySysFont(Language::getInstance()->get(TextID::CAMERA_MOD_CAM_FOLLOWING) << " " << Color::Green << Language::getInstance()->get(TextID::STATE_ON)); 
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::CAMERA_MOD_CAM_FOLLOWING) << " " << Color::Green << Language::getInstance()->get(TextID::STATE_ON));
 				cameraAsm.Unpatch();
                 isPatched = false;
             }
@@ -408,10 +408,10 @@ namespace CTRPluginFramework {
 
 	void SetFacialExpression(MenuEntry *entry) {
 		const std::vector<std::string> options = {
-			Language::getInstance()->get(TextID::FACIAL_EXPRESS_EYE), 
+			Language::getInstance()->get(TextID::FACIAL_EXPRESS_EYE),
 			Language::getInstance()->get(TextID::FACIAL_EXPRESS_MOUTH)
 		};
-		
+
 		Keyboard KB(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), options);
 		int res = KB.Open();
 		if(res < 0) {
@@ -445,8 +445,8 @@ namespace CTRPluginFramework {
 		}
 	}
 
-//Growing 1 Trees	
-	static const u16 Growing_Trees[79] { 
+//Growing 1 Trees
+	static const u16 Growing_Trees[79] {
 		0x22, 0x23, 0x24, 0x25, //tree
 		0x27, 0x28, 0x29, 0x2A, //cedar
 		0x2C, 0x2D, 0x2E, 0x2F, //coconut palm tree
@@ -475,7 +475,7 @@ namespace CTRPluginFramework {
 	//549
 	//550
 	//581/583
-	
+
 //wand abilitys
 	void wandability(MenuEntry *entry) {
 	//If A is not pressed return
@@ -497,7 +497,7 @@ namespace CTRPluginFramework {
 		if(!player) {
 			return;
 		}
-		
+
 		switch(player->PlayerAppearance.PlayerOutfit.HeldItem.ID) {
 			default: break;
 		/*If Blue Wand*/
@@ -528,16 +528,16 @@ namespace CTRPluginFramework {
 					return;
 				}
 
-			//Removes Wilted Flower	
+			//Removes Wilted Flower
 				Game::RemoveItems(true, x, y, 1, 1, false, false, false);
-			//Some neat particles for a nice effect | do it 20 times to spam it	
-				for(int i = 0; i <= 20; ++i) 
-					Game::SpawnParticlesAtCoords(0x10B, PlayerClass::GetInstance()->GetCoordinates(x, y));	
+			//Some neat particles for a nice effect | do it 20 times to spam it
+				for(int i = 0; i <= 20; ++i)
+					Game::SpawnParticlesAtCoords(0x10B, PlayerClass::GetInstance()->GetCoordinates(x, y));
 
 				//GameHelper::PlaySound(0);
 
 			//Places Fixed Flower
-				item.ID -= 0x2F; //Jumps to fixed flower 
+				item.ID -= 0x2F; //Jumps to fixed flower
 				Dropper::PlaceItemWrapper(0xC, ReplaceEverything, &item, &item, x, y, 0, 0, 0, 0, 0, 0x5C, 0xA5, false);
 
 				if(!bypassing) {
@@ -557,7 +557,7 @@ namespace CTRPluginFramework {
 				if(!bypassing) {
 					Dropper::DropItemLock(true);
 				}
-					
+
 				u32 x, y;
 			//If no World Coords found | Either Player not loaded or other error
 				if(!PlayerClass::GetInstance()->GetWorldCoords(&x, &y)) {
@@ -571,19 +571,19 @@ namespace CTRPluginFramework {
 
 				Item item = *Game::GetItemAtWorldCoords(x, y);
 
-			//If no growing tree found return	
+			//If no growing tree found return
 				if(!(std::find(std::begin(Growing_Trees), std::end(Growing_Trees), item.ID) != std::end(Growing_Trees))) {
 					return;
 				}
-				
-			//Removes growing tree
-				Game::RemoveItems(true, x, y, 1, 1, false, false, false);	
 
-			//Some neat particles for a nice effect | do it 20 times to spam it	
+			//Removes growing tree
+				Game::RemoveItems(true, x, y, 1, 1, false, false, false);
+
+			//Some neat particles for a nice effect | do it 20 times to spam it
 				for(int i = 0; i <= 20; ++i) {
-					Game::SpawnParticlesAtCoords(0x19A, PlayerClass::GetInstance()->GetCoordinates(x, y));	
+					Game::SpawnParticlesAtCoords(0x19A, PlayerClass::GetInstance()->GetCoordinates(x, y));
 				}
-								
+
 			//Places Grown Tree
 				item.ID += 1; //Jumps to next growth level
 				Dropper::PlaceItemWrapper(0xC, ReplaceEverything, &item, &item, x, y, 0, 0, 0, 0, 0, 0x5C, 0xA5, false);

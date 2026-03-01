@@ -3,7 +3,7 @@
 #include "core/checks/IDChecks.hpp"
 #include "core/game_api/Inventory.hpp"
 #include "core/game_api/PlayerClass.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/game_api/Player.hpp"
 #include "core/game_api/GameKeyboard.hpp"
 #include "core/game_api/Animation.hpp"
@@ -52,19 +52,19 @@ namespace CTRPluginFramework {
 		if(result < 0) {
 			return;
 		}
-		
+
 		Item item(itemEntries[result].ID);
-		
+
 		u8 slot = 0;
 		if(!Inventory::GetNextItem({0x7FFE, 0}, slot)) {
 			MessageBox(Language::getInstance()->get(TextID::INVENTORY_SEARCH_INV_FULL),  Color::Red).SetClear(ClearScreen::Top)();
 			return;
 		}
-		
+
 		if(!item.isValid(false)) {
 			MessageBox(Language::getInstance()->get(TextID::INVENTORY_SEARCH_INVALID),  Color::Red).SetClear(ClearScreen::Top)();
 			return;
-		}	
+		}
 
 		Inventory::WriteSlot(slot, item);
 		MessageBox(Utils::Format(Language::getInstance()->get(TextID::INVENTORY_SEARCH_SET).c_str(), item.ID, slot)).SetClear(ClearScreen::Top)();
@@ -82,25 +82,25 @@ namespace CTRPluginFramework {
 			}
 
 			Inventory::ReadSlot(0, val);
-			if(Wrap::KB<u32>(Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&val, *(u32 *)&val, TextItemChange)) {
+			if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&val, TextItemChange }, *(u32 *)&val)) {
 				Inventory::WriteSlot(0, val);
 			}
 		}
-		
+
 		else if(entry->Hotkeys[1].IsPressed()) {
 			if(!player) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
 
-			if(Wrap::KB<u32>(Language::getInstance()->get(TextID::TEXT_2_ITEM_SET), true, 8, *(u32 *)&val, 0x7FFE, TextItemChange)) {
+			if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::TEXT_2_ITEM_SET), true, 8, 0x7FFE, TextItemChange }, *(u32 *)&val)) {
 				for(u16 i = 0; i < 0x10; ++i) {
 					Item item = {(u16)(val.ID + i), 0};
 					Inventory::WriteSlot(i, item);
 				}
 			}
-		} 
-		
+		}
+
 		else if(entry->Hotkeys[2].IsPressed()) {
 			if(!player) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
@@ -182,26 +182,26 @@ namespace CTRPluginFramework {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
-			
-		//if no menu is opened 
-			if(Game::BaseInvPointer() == 0) {	
+
+		//if no menu is opened
+			if(Game::BaseInvPointer() == 0) {
 				Game::Catalog();
 				return;
-			}	
+			}
 		}
-		
+
 		if(Inventory::GetCurrent() == 0x7C && !isCatalogOpen) {
 			isCatalogOpen = true;
 		}
-		
+
 		if(Inventory::GetCurrent() != 0x7C && isCatalogOpen) {
 			Animation::Idle();
 			isCatalogOpen = false;
 		}
-		
+
 		if(!entry->IsActivated()) {
 			catalogHook.Disable();
-			
+
 			AllItemsBuyable.Unpatch();
 			AllItemsHavePrices.Unpatch();
 
@@ -213,12 +213,12 @@ namespace CTRPluginFramework {
 		if(!entry->Hotkeys[0].IsPressed()) {
 			return;
 		}
-		
+
 		if(!PlayerClass::GetInstance()->IsLoaded()) {
 			OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 			return;
 		}
-		
+
 		if(!GameKeyboard::IsOpen()) {
 			OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_TEXT_2_I_OPEN_KEYBOARD), Color::Red);
 			return;
@@ -228,7 +228,7 @@ namespace CTRPluginFramework {
 			OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_TEXT_2_I_KEYBOARD_EMPTY), Color::Red);
 			return;
 		}
-		
+
 		std::string chatStr = "";
 		Item itemID;
 
@@ -241,18 +241,18 @@ namespace CTRPluginFramework {
 			OSD::NotifySysFont(Language::getInstance()->get(TextID::CHAT_TEXT_2_I_INVALID), Color::Red);
 			return;
 		}
-		
+
 		u8 slot = 0;
 		if(!Inventory::GetNextItem({0x7FFE, 0}, slot)) {
 			OSD::NotifySysFont(Language::getInstance()->get(TextID::INVENTORY_SEARCH_INV_FULL), Color::Red);
 			return;
 		}
-			
+
 		if(!itemID.isValid(false)) {
 			OSD::NotifySysFont(Language::getInstance()->get(TextID::INVENTORY_SEARCH_INVALID), Color::Red);
 			return;
 		}
-		
+
 		Inventory::WriteSlot(slot, itemID);
 
 		std::string itemName = itemID.GetName();
@@ -272,30 +272,30 @@ namespace CTRPluginFramework {
 		}
 	}
 
-//Item Settings	
+//Item Settings
 	void itemsettings(MenuEntry *entry) {
 		static Address showoff(0x19BA78);
 		static Address infinite1(0x19C574);
 		static Address infinite2(0x19C4D0);
 		static Address eat(0x19C1F0);
-		
+
 		std::vector<std::string> itemsettopt = {
 			Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_SHOWOFF),
 			Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_INFINITE),
 			Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_EAT),
 		};
-		
+
 		static Address settings[3] = {
 			showoff, infinite1, eat
 		};
 
 		bool IsON;
-		
-		for(int i = 0; i < 3; ++i) { 
+
+		for(int i = 0; i < 3; ++i) {
 			IsON = *(u32 *)settings[i].addr != settings[i].origVal;
 			itemsettopt[i] = IsON ? (Color(pGreen) << itemsettopt[i]) : (Color(pRed) << itemsettopt[i]);
 		}
-		
+
 		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), itemsettopt);
 
 		int op = optKb.Open();
@@ -338,15 +338,15 @@ namespace CTRPluginFramework {
 
 	static bool IsMenuPatchOpen = false;
 	static u8 CurrentMenu = 0xFF;
-	const u8 Menus[8] = { 
-		0x2E, 0x37, 0x38, 0x3D, 0x79, 0x89, 0x00, 0xFF 
+	const u8 Menus[8] = {
+		0x2E, 0x37, 0x38, 0x3D, 0x79, 0x89, 0x00, 0xFF
 	};
 
 	void Callback_MenuPatch(void) {
 		if(Inventory::GetCurrent() == CurrentMenu && !IsMenuPatchOpen) {
 			IsMenuPatchOpen = true;
 		}
-		
+
 		if(Inventory::GetCurrent() != CurrentMenu && IsMenuPatchOpen) {
 			Animation::Idle();
 			IsMenuPatchOpen = false;
@@ -370,11 +370,11 @@ namespace CTRPluginFramework {
 			*menu += Callback_MenuPatch;
 		}
 	}
-	
+
 //Menu Changer
 	void MenuChanger(MenuEntry *entry) {
 		static Hook hook;
-		
+
 		std::vector<std::string> menuopt = {
 			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_DATETIME),
 			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_BELLPOINT_DEPO),
@@ -387,12 +387,12 @@ namespace CTRPluginFramework {
 		};
 
 		bool IsON;
-		
-		for(int i = 0; i < 6; ++i) { 
+
+		for(int i = 0; i < 6; ++i) {
 			IsON = CurrentMenu == Menus[i];
 			menuopt[i] = (IsON ? Color(pGreen) :  Color(pRed)) << menuopt[i];
 		}
-		
+
 		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), menuopt);
 
 		int dChoice = optKb.Open();
@@ -405,7 +405,7 @@ namespace CTRPluginFramework {
 
 	//If Custom Menu is chosen
 		if(dChoice == 6) {
-			if(Wrap::KB<u8>(Language::getInstance()->get(TextID::SAVE_MENU_CHANGER_ENTER_ID), true, 2, CurrentMenu, 0)) {
+			if(PluginUtils::Input::PromptNumber<u8>({ Language::getInstance()->get(TextID::SAVE_MENU_CHANGER_ENTER_ID), true, 2, 0 }, CurrentMenu)) {
 				if(IDChecks::MenuValid(CurrentMenu)) {
 					hook.Enable();
 				}
@@ -416,7 +416,7 @@ namespace CTRPluginFramework {
 			}
 			return;
 		}
-		
+
 		CurrentMenu = Menus[dChoice];
 		if(CurrentMenu == 0xFF) {
 			hook.Disable();
@@ -438,11 +438,11 @@ namespace CTRPluginFramework {
 		std::vector<bool> isDir;
 		File file;
 
-		if(Wrap::restoreDIR.ListDirectories(f_Dir) == Directory::OPResult::NOT_OPEN) {
+		if(PluginUtils::Backup::restoreDirectory.ListDirectories(f_Dir) == Directory::OPResult::NOT_OPEN) {
 			return;
 		}
 
-		if(Wrap::restoreDIR.ListFiles(f_file, ".inv") == Directory::OPResult::NOT_OPEN)  {
+		if(PluginUtils::Backup::restoreDirectory.ListFiles(f_file, ".inv") == Directory::OPResult::NOT_OPEN)  {
 			return;
 		}
 
@@ -472,7 +472,7 @@ namespace CTRPluginFramework {
 			return;
 		}
 
-		if(Wrap::restoreDIR.OpenFile(file, f_all[index], File::READ) != 0) {
+		if(PluginUtils::Backup::restoreDirectory.OpenFile(file, f_all[index], File::READ) != 0) {
 			return; //error opening file
 		}
 
@@ -501,34 +501,40 @@ namespace CTRPluginFramework {
 		file.Close();
 	}
 //Get Set
-	void getset(MenuEntry *entry) { 
+	void getset(MenuEntry *entry) {
 		ACNL_Player *player = Player::GetSaveData();
 
 		if(!player) {
 			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
 			return;
 		}
-	
+
 		const std::vector<std::string> setopt = {
 			Language::getInstance()->get(TextID::VECTOR_GETSET_FURN),
 			Language::getInstance()->get(TextID::VECTOR_GETSET_CUSTOM),
 		};
-	
+
 		const std::vector<std::string> custinvopt = {
 			Language::getInstance()->get(TextID::VECTOR_GETSET_CUSTOM_BACKUP),
 			Language::getInstance()->get(TextID::VECTOR_GETSET_CUSTOM_RESTORE),
-			Language::getInstance()->get(TextID::FILE_DELETE),  
+			Language::getInstance()->get(TextID::FILE_DELETE),
 		};
 
-		WrapLoc LocInv = { (u32 *)player->Inventory, sizeof(player->Inventory) };
-		WrapLoc LocLock = { (u32 *)player->InventoryItemLocks, sizeof(player->InventoryItemLocks) };
+		MemoryRange LocInv = { (u32 *)player->Inventory, sizeof(player->Inventory) };
+		MemoryRange LocLock = { (u32 *)player->InventoryItemLocks, sizeof(player->InventoryItemLocks) };
 
 		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), setopt);
 
 		switch(optKb.Open()) {
 			default: return;
 			case 0: {
-				Wrap::Restore(PATH_PRESET, ".inv", Language::getInstance()->get(TextID::GET_SET_RESTORE), GetCustomView, false, &LocInv, &LocLock, nullptr); 
+				PluginUtils::Backup::RestoreMemory(
+						PATH_PRESET,
+						".inv",
+						Language::getInstance()->get(TextID::GET_SET_RESTORE),
+						{ LocInv, LocLock },
+						PluginUtils::Backup::RestoreOptions{ GetCustomView, false }
+				);
 				Inventory::ReloadIcons();
 			} return;
 
@@ -544,16 +550,30 @@ namespace CTRPluginFramework {
 							return;
 						}
 
-						Wrap::Dump(Utils::Format(PATH_ITEMSET, Address::regionName.c_str()), filename, ".inv", &LocInv, &LocLock, nullptr);
+						PluginUtils::Backup::DumpMemory(
+							Utils::Format(PATH_ITEMSET, Address::regionName.c_str()),
+							filename,
+							".inv",
+							{ LocInv, LocLock }
+						);
 					} return;
-					
-					case 1: {			
-						Wrap::Restore(Utils::Format(PATH_ITEMSET, Address::regionName.c_str()), ".inv", Language::getInstance()->get(TextID::GET_SET_RESTORE), GetCustomView, true, &LocInv, &LocLock, nullptr); 
+
+					case 1: {
+						PluginUtils::Backup::RestoreMemory(
+							Utils::Format(PATH_ITEMSET, Address::regionName.c_str()),
+							".inv",
+							Language::getInstance()->get(TextID::GET_SET_RESTORE),
+							{ LocInv, LocLock },
+							PluginUtils::Backup::RestoreOptions{ GetCustomView, true }
+						);
 						Inventory::ReloadIcons();
 					} return;
-					
-					case 2: 
-						Wrap::Delete(Utils::Format(PATH_ITEMSET, Address::regionName.c_str()), ".inv");
+
+					case 2:
+						PluginUtils::Backup::DeleteBackup(
+							Utils::Format(PATH_ITEMSET, Address::regionName.c_str()),
+							".inv"
+						);
 					return;
 				}
 			}

@@ -1,7 +1,7 @@
 #include <CTRPluginFramework.hpp>
 #include "features/cheats.hpp"
 #include "core/infrastructure/Address.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include <functional>
 
 namespace CTRPluginFramework {

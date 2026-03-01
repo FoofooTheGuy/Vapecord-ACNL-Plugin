@@ -2,7 +2,7 @@
 #include "core/game_api/AnimData.hpp"
 #include "core/game_api/PlayerClass.hpp"
 #include "core/game_api/Game.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/game_api/Player.hpp"
 #include "core/infrastructure/Address.hpp"
 
@@ -299,7 +299,7 @@ namespace CTRPluginFramework {
 				Process::Patch(Address(0x677504).addr, 0x1A000017); //Undo Patch
 				Process::Patch(Address(0x628B54).addr, 0xE5D11268); //Undo Patch
 		
-				u32 res = Wrap::CalculateBranchInstruction(Address(0x5C3EA0).addr + 0x10, Address(0x305EF0).addr);
+				u32 res = PluginUtils::Branch::CalculateBranchInstruction(Address(0x5C3EA0).addr + 0x10, Address(0x305EF0).addr);
 				Process::Patch(Address(0x5C3EA0).addr + 0x10, 0x2B000000 + res); //Undo Patch
 				Process::Patch(OverWriteInstance.addr, 0xE3A00004); //Undo Patch
 			}

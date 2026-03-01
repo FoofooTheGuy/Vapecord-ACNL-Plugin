@@ -5,7 +5,7 @@
 #include "core/game_api/Player.hpp"
 #include "core/checks/IDChecks.hpp"
 #include "core/game_api/Game.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "Files.h"
 #include "core/hooks/Checks.hpp"
 #include "core/RuntimeContext.hpp"

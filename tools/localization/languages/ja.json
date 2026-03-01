@@ -160,7 +160,7 @@
     "CHAT_INVALID_MUSIC": "無効な音楽ID",
     "CHAT_NO_ITEM_FOUND": "その名前のアイテムは見つかりませんでした",
     "WRAPPER_ADDRESS": "アドレス: %08X",
-    "WRAPPER_LENGHT": "長さ: %08X",
+    "WRAPPER_LENGTH": "長さ: %08X",
     "NPC_RACE_SPECIAL": "特別なNPC",
     "ITEMSEQ_STANDARD_DROP": "標準ドロップアイテム",
     "ITEMSEQ_ADD": "追加...",

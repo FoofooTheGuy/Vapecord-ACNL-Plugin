@@ -4,7 +4,7 @@
 #include "core/game_api/Game.hpp"
 #include "core/game_api/Animation.hpp"
 #include "core/checks/IDChecks.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/game_api/Dropper.hpp"
 #include "Color.h"
 
@@ -14,7 +14,7 @@ u32 WalkParticleID = 0;
 
 namespace CTRPluginFramework {
 //Players can't push you
-	void noPush(MenuEntry *entry) { 
+	void noPush(MenuEntry *entry) {
 		static Address push(0x652288);
 
 		if(entry->WasJustActivated()) {
@@ -52,7 +52,7 @@ namespace CTRPluginFramework {
 				}
 				if(entry->Hotkeys[4].IsDown()) {
 					pCoords[2] -= cspeed; //DPadUp
-				}		
+				}
 			}
 		}
 	}
@@ -67,21 +67,21 @@ namespace CTRPluginFramework {
 			Process::Write32(i, 0x19D5D);
 		}
 	}
-	
+
 //Touch Warp
 	void tch_warp(MenuEntry *entry) {
 		u8 pIndex = Game::GetOnlinePlayerIndex();
-		
+
 		float *pCoords = PlayerClass::GetInstance(pIndex)->GetCoordinates();
 		if(pCoords == nullptr) {
 			return;
 		}
 
-		if (*PlayerClass::GetInstance(pIndex)->GetAnimation() == 0x4F || 
+		if (*PlayerClass::GetInstance(pIndex)->GetAnimation() == 0x4F ||
 			*PlayerClass::GetInstance(pIndex)->GetAnimation() == 0x52) {
 			return; // Prevent teleporting while shoveling
 		}
-		
+
 		if(!Game::IsMapOpened()) {
 			return;
 		}
@@ -94,7 +94,7 @@ namespace CTRPluginFramework {
     }
 
 //Walk Over Things
-	void walkOver(MenuEntry *entry) {		
+	void walkOver(MenuEntry *entry) {
 		static Address walkover1(0x6503FC);
 		static Address walkover2(0x650414);
 		static Address walkover3(0x650578);
@@ -103,17 +103,17 @@ namespace CTRPluginFramework {
 		static Address walkover6(0x6506BC);
 		static Address walkover7(0x6506C0);
 		static Address walkover8(0x6506EC);
-		
-		static Address WalkOver[8] = { 
-			walkover1, walkover2, walkover3, walkover4, 
-			walkover5, walkover6, walkover7, walkover8 
+
+		static Address WalkOver[8] = {
+			walkover1, walkover2, walkover3, walkover4,
+			walkover5, walkover6, walkover7, walkover8
 		};
-		
+
 		static const u32 WalkOverPatch[8] = {
-            0xEA000094, 0xEA000052, 0xEA000001, 0xEA000014, 
+            0xEA000094, 0xEA000052, 0xEA000001, 0xEA000014,
 			0xE1A00000, 0xE1A00000, 0xEA000026, 0xEA000065
         };
-		
+
 		if(entry->Hotkeys[0].IsPressed()) {
 			bool isOFF = *(u32 *)walkover1.addr == walkover1.origVal;
 
@@ -138,25 +138,25 @@ namespace CTRPluginFramework {
 		}
     }
 //Movement Changer
-	void MovementChanger(MenuEntry *entry) {	
+	void MovementChanger(MenuEntry *entry) {
 		static Address Disable25Anim(0x67F748); //Disable going out of water animation
 		static Address AlwaysWalk(0x64E824); //Makes you walk all the time
 		static Address AlwaysSwim(0x64E82C); //Makes you swim all the time
-		static Address DisableYChange(0x56BE7C); //Makes Y-Coord not go down when swimming	
+		static Address DisableYChange(0x56BE7C); //Makes Y-Coord not go down when swimming
 		static Address move4(0x65352C);
 		static Address move5(0x763ABC);
-		
-		static Address MoveChanger[6] = { 
-			Disable25Anim, AlwaysWalk, AlwaysSwim, DisableYChange, move4, move5 
+
+		static Address MoveChanger[6] = {
+			Disable25Anim, AlwaysWalk, AlwaysSwim, DisableYChange, move4, move5
 		};
-		
+
 		static const u32 MoveChangerPatch[3][6] = {
 			{ 0x1A000067, 0x03A00000, 0xE3A00000, 0xED902A00, 0xE1A00004, 0xE3A00001 }, //Walking
             { 0xEA000067, 0x03A00001, 0xE3A00001, 0xE12FFF1E, 0xEA00000D, 0xE3A00000 } //Swimming
         };
-		
+
 		bool isWalking = *(u32 *)Disable25Anim.addr == Disable25Anim.origVal;
-	
+
 		if(entry->Hotkeys[0].IsPressed()) {
 			if(isWalking) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::MOVEMENT_CHANGE_SWIM), Color::Blue);
@@ -164,19 +164,19 @@ namespace CTRPluginFramework {
 		    else {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::MOVEMENT_CHANGE_WALK), Color::Green);
 			}
-			
+
 			for(int i = 0; i < 6; ++i) {
 				MoveChanger[i].Patch(MoveChangerPatch[isWalking][i]);
 			}
         }
-		
+
 		if(!entry->IsActivated()) {
 			for(int i = 0; i < 6; ++i) {
 				MoveChanger[i].Unpatch();
 			}
 		}
     }
-//Walk Particle	
+//Walk Particle
 	void Walkparticle(MenuEntry *entry) {
 		static const Address WalkParticlePatch(0x652694);
 		static Hook hook;
@@ -187,16 +187,16 @@ namespace CTRPluginFramework {
 		}
 
         if(entry->Hotkeys[0].IsPressed()) {
-			if(Wrap::KB<u32>(Language::getInstance()->get(TextID::WALK_PARTICLE_CHANGE_ENTER_ID), true, 3, WalkParticleID, WalkParticleID)) {
+			if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::WALK_PARTICLE_CHANGE_ENTER_ID), true, 3, WalkParticleID }, WalkParticleID)) {
 				hook.Enable();
 			}
 		}
-			
+
 		if(!entry->IsActivated()) {
 			hook.Disable();
 		}
-    }  
-//Player Teleporter	
+    }
+//Player Teleporter
 	void stalk(MenuEntry *entry) {
 		static s8 pos = -1;
 		static bool allforce = false;
@@ -210,10 +210,10 @@ namespace CTRPluginFramework {
 				allforce = true;
 				pos = -1;
 			}
-				
+
 			OSD::NotifySysFont(allforce ? Language::getInstance()->get(TextID::PLAYER_TELEPORT_ALL) : Utils::Format(Language::getInstance()->get(TextID::PLAYER_TELEPORT_PLAYER).c_str(), pos));
 		}
-		
+
 		else if(entry->Hotkeys[1].IsPressed()) {
 			u32 x, y;
 			if(PlayerClass::GetInstance()->GetWorldCoords(&x, &y)) {
@@ -230,25 +230,25 @@ namespace CTRPluginFramework {
 			}
 		}
 	}
-//Player Visibility Changer	
+//Player Visibility Changer
 	void onlineplayermod(MenuEntry *entry) {
 		static Address visi1(0x655E44);
 		static Address visi2(0x67743C);
 		static Address visi3(0x68DC3C);
-		
-		static Address VisiMod[3] = { 
-			visi1, visi2, visi3 
+
+		static Address VisiMod[3] = {
+			visi1, visi2, visi3
 		};
-		
-		static const u32 VisiModPatch[3][3] = { 
+
+		static const u32 VisiModPatch[3][3] = {
             { 0xE3A01017, 0xE3A07006, 0xE1A00000 },
             { 0xE3A01016, 0xE3A07000, 0x1BFF021A },
 			{ 0xE3A01017, 0xE1A07002, 0x1BFF021A }
         };
-		
+
 		if(entry->Hotkeys[0].IsPressed()) {
 			int mode = 0;
-			
+
 			switch(*(u32 *)visi2.addr) {
 				case 0xE1A07002:
 					mode = 0;
@@ -277,7 +277,7 @@ namespace CTRPluginFramework {
     }
 
 	void SpeedCheck(Keyboard& keyboard, KeyboardEvent& event) {
-		std::string& input = keyboard.GetInput();	
+		std::string& input = keyboard.GetInput();
 		float ID = atof(input.c_str());
 		if(ID >= 15.0f) {
 			keyboard.SetError(Color::Red << Language::getInstance()->get(TextID::SPEED_MOD_ERROR));
@@ -287,7 +287,7 @@ namespace CTRPluginFramework {
 
 //Definition for changable Speed of the Player Speed Changer
 	float walkSpeed = 1;
-//Player Speed Changer	
+//Player Speed Changer
 	void speedMod(MenuEntry *entry) {
 		static const Address sp1(0x887880);
 		static const Address sp2(0x887888);
@@ -297,11 +297,11 @@ namespace CTRPluginFramework {
 		static const Address sp6(0x887C68);
 		static const Address sp7(0x94EF34);
 		static const Address sp8(0x8878A4);
-		
+
 		if(!entry->IsActivated()) {
 			walkSpeed = 1;
 		}
-		
+
 		Process::WriteFloat(sp1.addr, walkSpeed);
 		Process::WriteFloat(sp2.addr, walkSpeed);
 		Process::WriteFloat(sp3.addr, walkSpeed);
@@ -321,29 +321,29 @@ namespace CTRPluginFramework {
 		kb.Open(walkSpeed);
 	}
 
-//InputChangeEvent for Room Warper	
+//InputChangeEvent for Room Warper
 	void onRoomChange(Keyboard &k, KeyboardEvent &e) {
-		std::string& input = k.GetInput();	
+		std::string& input = k.GetInput();
 		u8 ID = StringToHex<u8>(input, 0xFF);
 		if(!IDChecks::RoomValid(ID & 0xFF)) {
 			k.SetError(Color::Red << Language::getInstance()->get(TextID::INVALID_ID));
 			return;
 		}
-		
+
 		k.GetMessage() = Language::getInstance()->get(TextID::ROOM_WARPING_ENTER_ID) << "\n\n" << IDChecks::GetRoomName(!input.empty() ? ID : 0);
 	}
 
 //Room Warper
-	void roomWarp(MenuEntry *entry) {	
+	void roomWarp(MenuEntry *entry) {
 		if(entry->Hotkeys[0].IsPressed()) {
 			if(!PlayerClass::GetInstance()->IsLoaded()) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
-			
+
 			u8 val;
-			if(Wrap::KB<u8>(Language::getInstance()->get(TextID::ROOM_WARPING_ENTER_ID), true, 2, val, 0, onRoomChange)) {		
-				s8 res = Game::TeleportToRoom(val, 1, 1, 0);	
+			if(PluginUtils::Input::PromptNumber<u8>({ Language::getInstance()->get(TextID::ROOM_WARPING_ENTER_ID), true, 2, 0, onRoomChange }, val)) {
+				s8 res = Game::TeleportToRoom(val, 1, 1, 0);
 				if(res == 1) {
 					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::ROOM_LOADER_WARPING_TO_ROOM).c_str(), val));
 				}
@@ -369,7 +369,7 @@ namespace CTRPluginFramework {
 			rockHitting.Patch(0xEB000000);
 			itemHitting.Patch(0xEB000000);
 		}
-		
+
 		else if(!entry->IsActivated()) {
 			rockHitting.Unpatch();
 			itemHitting.Unpatch();
@@ -387,8 +387,8 @@ namespace CTRPluginFramework {
 
 //0x31FE4ECC
 //0x61E8BC ArriveAtIsland
-//0x61F258 ArriveAtTown 
-//game uses 61B9F8 
+//0x61F258 ArriveAtTown
+//game uses 61B9F8
 //me uses same 61B9F8
 //force uses 627B88
 

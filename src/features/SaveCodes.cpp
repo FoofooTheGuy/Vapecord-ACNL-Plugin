@@ -1,7 +1,7 @@
 #include "features/cheats.hpp"
 #include "core/game_api/PlayerClass.hpp"
 #include "core/game_api/Town.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/infrastructure/Address.hpp"
 #include "core/game_api/Player.hpp"
 #include "core/game_api/Game.hpp"
@@ -18,7 +18,7 @@
 #include "Files.h"
 
 namespace CTRPluginFramework {
-//Town Name Changer | player specific save code	
+//Town Name Changer | player specific save code
 	void townnamechanger(MenuEntry *entry) {
 		if(!PlayerClass::GetInstance()->IsLoaded()) {
 			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
@@ -39,13 +39,13 @@ namespace CTRPluginFramework {
 //Save Backup and Restore | non player specific save code
 	void savebackup(MenuEntry *entry) {
 		const std::vector<std::string> options = {
-			Language::getInstance()->get(TextID::SAVE_DUMPER), 
-			Language::getInstance()->get(TextID::SAVE_RESTORE),  
-			Language::getInstance()->get(TextID::FILE_DELETE),  
+			Language::getInstance()->get(TextID::SAVE_DUMPER),
+			Language::getInstance()->get(TextID::SAVE_RESTORE),
+			Language::getInstance()->get(TextID::FILE_DELETE),
 		};
 
-		WrapLoc lock = { (u32 *)Address(0x2FB344).Call<u32>(), 0x89B00 };
-		
+		MemoryRange lock = { (u32 *)Address(0x2FB344).Call<u32>(), 0x89B00 };
+
 		Keyboard KB(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), options);
 
 		switch(KB.Open()) {
@@ -58,25 +58,38 @@ namespace CTRPluginFramework {
 					return;
 				}
 
-				Wrap::Dump(Utils::Format(PATH_SAVE, Address::regionName.c_str()), filename, ".dat", &lock, nullptr);		
+				PluginUtils::Backup::DumpMemory(
+					Utils::Format(PATH_SAVE, Address::regionName.c_str()),
+					filename,
+					".dat",
+					{ lock }
+				);
 			} break;
 			case 1: {
-				if(Wrap::Restore(Utils::Format(PATH_SAVE, Address::regionName.c_str()), ".dat", Language::getInstance()->get(TextID::SAVE_RESTORE_SELECT), nullptr, true, &lock, nullptr) == ExHandler::SUCCESS) {
+				if (PluginUtils::Backup::RestoreMemory(
+						Utils::Format(PATH_SAVE, Address::regionName.c_str()),
+						".dat",
+						Language::getInstance()->get(TextID::SAVE_RESTORE_SELECT),
+						{ lock }
+					) == OperationResult::Success) {
 					static Address fixfurno(0x6A6EE0);
 					static Address fixfurno1 = fixfurno.MoveOffset(0x41C);
 
 					fixfurno1.Patch(0xE1A00000);
-					
+
 					fixfurno.Call<void>();
 
 					fixfurno1.Unpatch();
-				} 
+				}
 			} break;
-			case 2: 
-				Wrap::Delete(Utils::Format(PATH_SAVE, Address::regionName.c_str()), ".dat");
+			case 2:
+				PluginUtils::Backup::DeleteBackup(
+					Utils::Format(PATH_SAVE, Address::regionName.c_str()),
+					".dat"
+				);
 			break;
 		}
-	} 
+	}
 
 //Bulletinboard message backup/restore | non player specific save code
 	void bullboard(MenuEntry *entry) {
@@ -88,19 +101,19 @@ namespace CTRPluginFramework {
 		const std::vector<std::string> bullsett = {
 			Language::getInstance()->get(TextID::VECTOR_BULLETINDUMPER_BACKUP),
 			Language::getInstance()->get(TextID::VECTOR_BULLETINDUMPER_RESTORE),
-			Language::getInstance()->get(TextID::FILE_DELETE),  
+			Language::getInstance()->get(TextID::FILE_DELETE),
 		};
-		
+
 		std::vector<std::string> backmessage;
-		
+
 		for(int i = 1; i <= 15; ++i) {
 			backmessage.push_back(Utils::Format(Language::getInstance()->get(TextID::VECTOR_BULLETINDUMPER_MESSAGE).c_str(), i));
 		}
-		
+
 		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), bullsett);
 
-		WrapLoc loc;
-	
+		MemoryRange loc;
+
 		switch(optKb.Open()) {
 			default: break;
 			case 0: {
@@ -116,21 +129,34 @@ namespace CTRPluginFramework {
 					}
 
 					loc = { (u32 *)&town->BBoardMessages[KBChoice], sizeof(ACNL_BulletinBoardMessage) };
-					Wrap::Dump(Utils::Format(PATH_BULLETIN, Address::regionName.c_str()), filename, ".dat", &loc, nullptr);
+					PluginUtils::Backup::DumpMemory(
+						Utils::Format(PATH_BULLETIN, Address::regionName.c_str()),
+						filename,
+						".dat",
+						{ loc }
+					);
 				}
 			} break;
-			
+
 			case 1: {
 				optKb.Populate(backmessage);
 				int KBChoice = optKb.Open();
 				if(KBChoice >= 0) {
 					loc = { (u32 *)&town->BBoardMessages[KBChoice], sizeof(ACNL_BulletinBoardMessage) };
-					Wrap::Restore(Utils::Format(PATH_BULLETIN, Address::regionName.c_str()), ".dat", Language::getInstance()->get(TextID::RESTORE_MESSAGE), nullptr, true, &loc, nullptr); 
+					PluginUtils::Backup::RestoreMemory(
+						Utils::Format(PATH_BULLETIN, Address::regionName.c_str()),
+						".dat",
+						Language::getInstance()->get(TextID::RESTORE_MESSAGE),
+						{ loc }
+					);
 				}
 			} break;
-			
-			case 2: 
-				Wrap::Delete(Utils::Format(PATH_BULLETIN, Address::regionName.c_str()), ".dat");
+
+			case 2:
+				PluginUtils::Backup::DeleteBackup(
+					Utils::Format(PATH_BULLETIN, Address::regionName.c_str()),
+					".dat"
+				);
 			break;
 		}
 	}
@@ -147,13 +173,13 @@ namespace CTRPluginFramework {
 		}
 
 		std::vector<std::string> treesizevec;
-		
+
 		for(int i = 1; i <= 8; ++i) {
 			treesizevec.push_back(Utils::Format(Language::getInstance()->get(TextID::TREESIZE_STATE).c_str(), i));
 		}
-		
+
 		constexpr int played[8] = { 0, 5, 20, 50, 100, 180, 300, 500 };
-		
+
 		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), treesizevec);
 
 		int op = optKb.Open();
@@ -169,7 +195,7 @@ namespace CTRPluginFramework {
 		town->Playtime = sethours;
 		town->DaysPlayed = played[op];
     }
-//Change Native Fruit | non player specific save code	
+//Change Native Fruit | non player specific save code
 	void ChangeNativeFruit(MenuEntry *entry) {
 		ACNL_TownData *town = Town::GetSaveData();
 		if(!town) {
@@ -190,7 +216,7 @@ namespace CTRPluginFramework {
             Language::getInstance()->get(TextID::NATIVE_FRUIT_PERSIMMON),
             Language::getInstance()->get(TextID::NATIVE_FRUIT_BANANA)
         };
-		
+
 		bool IsON;
 
 		for(int i = 0; i < 12; ++i) {
@@ -204,13 +230,13 @@ namespace CTRPluginFramework {
 		if(userChoice < 0) {
 			return;
 		}
-		
+
 		town->TownFruit.ID = 0x2000 + userChoice + 1;
 		ChangeNativeFruit(entry);
 	}
 
-//Unlock All PWP | non player specific save code	
-	void PWPUnlock(MenuEntry *entry) {	
+//Unlock All PWP | non player specific save code
+	void PWPUnlock(MenuEntry *entry) {
 		ACNL_BuildingData *building = Building::GetSaveData();
 		if(!building) {
 			return;
@@ -220,7 +246,7 @@ namespace CTRPluginFramework {
 			Language::getInstance()->get(TextID::VECTOR_ENZY_FILL),
 			Language::getInstance()->get(TextID::VECTOR_ENZY_CLEAR),
 		};
-		
+
 		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), songopt);
 		int res = optKb.Open();
 		if (res < 0) {
@@ -312,7 +338,7 @@ namespace CTRPluginFramework {
         building->UnlockedPWPs.FortuneTellersShop = unlock;
     }
 
-//Grass Type Changer | non player specific save code		
+//Grass Type Changer | non player specific save code
 	void GrassChanger(MenuEntry *entry) {
 		ACNL_TownData *town = Town::GetSaveData();
 		if(!town) {
@@ -323,15 +349,15 @@ namespace CTRPluginFramework {
 			Language::getInstance()->get(TextID::GRASS_CHANGER_TRIANGLE),
             Language::getInstance()->get(TextID::GRASS_CHANGER_CIRCLE),
             Language::getInstance()->get(TextID::GRASS_CHANGER_SQUARE)
-		};	
-		
+		};
+
 		bool IsON;
-		
+
 		for(int i = 0; i < 3; ++i) {
 			IsON = town->TownGrassType == i;
 			grasstypevec[i] = IsON ? (Color(pGreen) << grasstypevec[i]) : (Color(pRed) << grasstypevec[i]);
 		}
-		
+
 		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), grasstypevec);
 
 		int op = optKb.Open();
@@ -407,13 +433,13 @@ namespace CTRPluginFramework {
 			Language::getInstance()->get(TextID::CAMPING_SET_REMOVE)
 		};
 
-		Keyboard keyboard(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), keyVec);	
+		Keyboard keyboard(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), keyVec);
 
 		int res = keyboard.Open();
        	if(res < 0) {
 			return;
 		}
-		
+
 		static Address SetNPCFunc(0x3081A8);
 		static Address DeleteNPCFunc(0x30836C);
 
@@ -456,7 +482,7 @@ namespace CTRPluginFramework {
 			u32 null[]{ 0 };
 			u16 VID[]{ amiibo.VID };
 
-			SetNPCFunc.Call<void>(&NPC::GetSaveData()->townID1, VID, null, &Town::GetSaveData()->TownData1); 
+			SetNPCFunc.Call<void>(&NPC::GetSaveData()->townID1, VID, null, &Town::GetSaveData()->TownData1);
 			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CAMPING_VILLAGER_SET).c_str(), amiibo.Name.c_str()), Color::Green);
 
 			if(Game::IsGameInRoom(0)) {
@@ -489,17 +515,17 @@ namespace CTRPluginFramework {
 			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
 			return;
 		}
-		
+
 		std::vector<std::string> shopopt = {
-			Language::getInstance()->get(TextID::VECTOR_SHOP_NOOK), 	
-			Language::getInstance()->get(TextID::VECTOR_SHOP_FORTUNE), 
-			Language::getInstance()->get(TextID::VECTOR_SHOP_DREAM), 
-			Language::getInstance()->get(TextID::VECTOR_SHOP_CLUB), 	
-			Language::getInstance()->get(TextID::VECTOR_SHOP_MUSEUM), 
-			Language::getInstance()->get(TextID::VECTOR_SHOP_SHAMPOODLE), 
-			Language::getInstance()->get(TextID::VECTOR_SHOP_KICKS) 
+			Language::getInstance()->get(TextID::VECTOR_SHOP_NOOK),
+			Language::getInstance()->get(TextID::VECTOR_SHOP_FORTUNE),
+			Language::getInstance()->get(TextID::VECTOR_SHOP_DREAM),
+			Language::getInstance()->get(TextID::VECTOR_SHOP_CLUB),
+			Language::getInstance()->get(TextID::VECTOR_SHOP_MUSEUM),
+			Language::getInstance()->get(TextID::VECTOR_SHOP_SHAMPOODLE),
+			Language::getInstance()->get(TextID::VECTOR_SHOP_KICKS)
 		};
-		
+
 		std::vector<std::string> nookopt = {
 			Language::getInstance()->get(TextID::VECTOR_SHOP_CRANNY),
 			Language::getInstance()->get(TextID::VECTOR_SHOP_TT_MART),
@@ -522,12 +548,12 @@ namespace CTRPluginFramework {
 		};
 
 		bool IsON = false;
-		
-		for(int i = 0; i < 6; ++i) { 
+
+		for(int i = 0; i < 6; ++i) {
 			IsON = *UnlockStates[i] != 0;
 			shopopt[i + 1] = (IsON ? Color(pGreen) : Color(pRed)) << shopopt[i + 1];
 		}
-		
+
 		Keyboard shopkb(Language::getInstance()->get(TextID::KEY_CHOOSE_STORE), shopopt);
 
 		int op = shopkb.Open();
@@ -541,8 +567,8 @@ namespace CTRPluginFramework {
 				for(int i = 0; i < 5; ++i) {
 					nookopt[i] = ((town->NooklingState == i) ? Color(pGreen) : Color(pRed)) << nookopt[i];
 				}
-				
-				Keyboard nookkb(Language::getInstance()->get(TextID::KEY_CHOOSE_UPGRADE), nookopt); 
+
+				Keyboard nookkb(Language::getInstance()->get(TextID::KEY_CHOOSE_UPGRADE), nookopt);
 
 				int nook = nookkb.Open();
 				if(nook < 0) {
@@ -555,7 +581,7 @@ namespace CTRPluginFramework {
 				town->LeifUnlockStatus = (nook == 1 ? 2 : nook);
 			} break;
 		//Fortune Teller
-			case 1: 
+			case 1:
 				town->FortuneTellerUnlockStatus = !town->FortuneTellerUnlockStatus;
 			break;
 		//Dream Suite
@@ -608,7 +634,7 @@ namespace CTRPluginFramework {
 			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
 			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
 		};
-		
+
 		for(int i = 0; i <= 3; ++i) {
 			ACNL_Player *player = Player::GetSaveData(i);
 			if(player) {
@@ -619,9 +645,9 @@ namespace CTRPluginFramework {
 				}
 			}
 		}
-		
+
 		Keyboard pKB(Language::getInstance()->get(TextID::KEY_SELECT_PLAYER), pV);
-	
+
 		int pChoice = pKB.Open();
 		if((pChoice < 0) || (pV[pChoice] == Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY))) {
 			return -1;
@@ -674,9 +700,9 @@ namespace CTRPluginFramework {
 	}
 
 	void UpgradeHouse(ACNL_Player *player, ACNL_TownData *town, int playerIndex) {
-		struct Option { 
-			u8 size; 
-			UpgradeOption upgradeOption; 
+		struct Option {
+			u8 size;
+			UpgradeOption upgradeOption;
 		};
 		std::vector<Option> options;
 
@@ -742,14 +768,14 @@ namespace CTRPluginFramework {
 		bool wasUpgraded = false;
 
 		using RoomOp = void(*)(ACNL_Player*, ACNL_TownData*, int);
-		struct RoomOps { 
-			RoomOp build; 
-			RoomOp up1; 
-			RoomOp up2; 
+		struct RoomOps {
+			RoomOp build;
+			RoomOp up1;
+			RoomOp up2;
 		};
 
 		static const RoomOps ops[6] = {
-			/* 0: Main */	  { nullptr,                  House::UpgradeHouseFirst,        House::UpgradeHouseSecond },	
+			/* 0: Main */	  { nullptr,                  House::UpgradeHouseFirst,        House::UpgradeHouseSecond },
 			/* 1: Second */   { House::BuildSecondRoom,   House::UpgradeSecondRoomFirst,   House::UpgradeSecondRoomSecond },
 			/* 2: Basement */ { House::BuildBasementRoom, House::UpgradeBasementRoomFirst, House::UpgradeBasementRoomSecond },
 			/* 3: Right */    { House::BuildRightRoom,    House::UpgradeRightRoomFirst,    House::UpgradeRightRoomSecond },
@@ -760,17 +786,17 @@ namespace CTRPluginFramework {
 		switch (chosen.upgradeOption) {
 			case Upgrade_Middle: case Upgrade_Second: case Upgrade_Basement: case Upgrade_Right: case Upgrade_Left: case Upgrade_Back: {
 				const RoomOps &ro = ops[chosen.upgradeOption];
-				if (chosen.size < 2 && ro.build) { 
-					ro.build(player, town, playerIndex); 
-					wasUpgraded = true; 
+				if (chosen.size < 2 && ro.build) {
+					ro.build(player, town, playerIndex);
+					wasUpgraded = true;
 				}
-				else if (chosen.size == 2 && ro.up1) { 
-					ro.up1(player, town, playerIndex); 
-					wasUpgraded = true; 
+				else if (chosen.size == 2 && ro.up1) {
+					ro.up1(player, town, playerIndex);
+					wasUpgraded = true;
 				}
-				else if (chosen.size == 3 && ro.up2) { 
-					ro.up2(player, town, playerIndex); 
-					wasUpgraded = true; 
+				else if (chosen.size == 3 && ro.up2) {
+					ro.up2(player, town, playerIndex);
+					wasUpgraded = true;
 				}
 				break;
 			}
@@ -843,7 +869,7 @@ namespace CTRPluginFramework {
 		if (chosenId < 0) {
 			return;
 		}
-		
+
 		using ExteriorOp = void(*)(ACNL_TownData*, int, u8);
 		static const ExteriorOp ops[7] = {
 			Exterior::SetDoorStyle,
@@ -880,12 +906,12 @@ namespace CTRPluginFramework {
 			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
 			return;
 		}
-		
-		if(Game::GetOnlinePlayerCount() != 0) {		
+
+		if(Game::GetOnlinePlayerCount() != 0) {
 			MessageBox(Language::getInstance()->get(TextID::ONLY_TOWN_ERROR)).SetClear(ClearScreen::Top)();
 			return;
 		}
-		
+
 		int playerIndex = SelectPlayerToEditHouse();
 		if(playerIndex < 0) {
 			return;
@@ -925,7 +951,7 @@ namespace CTRPluginFramework {
 		}
 
 		Keyboard hKB(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), houseEditorOptions);
-		
+
 		int hChoice = hKB.Open();
 		if(hChoice < 0) {
 			return;
@@ -977,7 +1003,7 @@ namespace CTRPluginFramework {
 		switch(optKb.Open()) {
 			case 0:
 				u8 id;
-				if(Wrap::KB<u8>(Language::getInstance()->get(TextID::ENTER_ID), 1, 2, id, 0, onBuildingChange)) {
+				if(PluginUtils::Input::PromptNumber<u8>({ Language::getInstance()->get(TextID::ENTER_ID), 1, 2, 0, onBuildingChange }, id)) {
 					Game::PlaceBuilding(id);
 				}
 				break;
@@ -1005,7 +1031,7 @@ namespace CTRPluginFramework {
 				if(amiibo.VID == 0xFFFF) //non villager get skipped
 					continue;
 
-				if(amiibo.VID == *(u16 *)((VillagerBase) + (0x2518 * i))) 
+				if(amiibo.VID == *(u16 *)((VillagerBase) + (0x2518 * i)))
 					vill.push_back(amiibo.Name);
 			}
 			if(*(u16 *)((VillagerBase) + (0x2518 * i)) == 0xFFFF)
@@ -1021,8 +1047,8 @@ namespace CTRPluginFramework {
 
 		Keyboard opKB("Select Option:", Options);
 		int opChoice = opKB.Open();
-		
-		if(opChoice == -1) 
+
+		if(opChoice == -1)
 			return;
 	//remove villager
 		if(opChoice == 0) {
@@ -1037,7 +1063,7 @@ namespace CTRPluginFramework {
 
 			opKB.Populate(Options);
 			opChoice = opKB.Open();
-			if(opChoice == -1 || vill[opChoice] == (Color::Gray << "-empty-")) 
+			if(opChoice == -1 || vill[opChoice] == (Color::Gray << "-empty-"))
 				return;
 
 			if(IsVillagerBoxed(GameHelper::GetGardenPlus(0x292A4) + (0x2518 * opChoice)))
@@ -1066,11 +1092,11 @@ namespace CTRPluginFramework {
 	VILLAGER_FLOOR = 		0x247A;
 	VILLAGER_UMBRELLA = 	0x247E;
 	VILLAGER_FURNITURE = 	0x2482;
-	VILLAGER_CATCHPHRASE = 	0x24C6; 
+	VILLAGER_CATCHPHRASE = 	0x24C6;
 	VILLAGER_STATUS = 		0x24E4; //1 = boxed | 2 = moving in
 
 	VILLAGER_AFFINITY =		0x9A7
-	
+
 
 
 	31F5EA58 = If talked to villager streak is active (right nibble)
@@ -1089,7 +1115,7 @@ namespace CTRPluginFramework {
 
 
 	VILLAGER_SIZE = 		0x2518; //Villager Size
-	
+
 	//Villager Start
 	0x292D0
 
@@ -1098,18 +1124,18 @@ namespace CTRPluginFramework {
 
 	0x2B7B4 //Boxed 1st Villager | 1 Bit Boolean
 	0x2DCCC //Boxed 2nd Villager | 1 Bit Boolean
-	
-	
+
+
 	//Move Away Villager Instantly
-	//FUN_00308CC8(u32 VillagerOffset); 31F54C54   
-	
+	//FUN_00308CC8(u32 VillagerOffset); 31F54C54
+
 	31F52768
-	
+
 	31F5273C
 	31F6E3BC
 	31F708D4
-	
-	
+
+
 	31F5273C
 	31F23DC8
 	31F23DB8
@@ -1126,7 +1152,7 @@ namespace CTRPluginFramework {
 			return;
 		}
 
-		static const std::pair<u16, u16> Pairs[6] = { 
+		static const std::pair<u16, u16> Pairs[6] = {
 			{ 0x3130, 0x3173 }, //AnalyzedFossils 43
 			{ 0x22E1, 0x2329 }, //Fish 48
 			{ 0x232D, 0x234B }, //SeaCreatures 1E
@@ -1197,7 +1223,7 @@ namespace CTRPluginFramework {
 		}
 	}
 
-//Finish Mayor Permit | only for player 1	
+//Finish Mayor Permit | only for player 1
 	void Permit100(MenuEntry *entry) {
 		ACNL_Player *player = Player::GetSaveData();
 
@@ -1237,7 +1263,7 @@ namespace CTRPluginFramework {
 	static constexpr int J_RectYPos[4] = { 54, 90, 126, 162 };
 	static constexpr int Addage[4] = { 0x8, 0xF, 0x16, 0x1D };
 //OSD for Map Editor
-	bool MapDraw(const Screen &screen) {	
+	bool MapDraw(const Screen &screen) {
 		if(!screen.IsTop) {
 			for(int j = 0; j < 4; ++j) {
 				for(int i = 0; i < 5; ++i) {
@@ -1263,7 +1289,7 @@ namespace CTRPluginFramework {
 			for(int i = 0; i < 5; ++i) {
 				S_AcreID[j][i] = (Utils::Format("%02X", town->TownAcres[Addage[j] + i]));
 			}
-		}	
+		}
 	}
 
 	c_RGBA* acreArray = nullptr;
@@ -1287,9 +1313,9 @@ namespace CTRPluginFramework {
 				Pixels++;
 			}
 		}
-		
+
 		Top.DrawSysfont(((acreID <= 0) ? "    " : "\uE052 ") + Utils::Format(Language::getInstance()->get(TextID::ACRE_EDITOR_ACRE).c_str(), acreID) + ((acreID >= 0xD6) ? "  " : " \uE053"), 145, 70);
-	
+
 		Top.DrawSysfont(Language::getInstance()->get(TextID::ACRE_EDITOR_SET), 100, 160);
 		Top.DrawSysfont(Language::getInstance()->get(TextID::ACRE_EDITOR_CONFIRM), 140, 180);
 		Top.DrawSysfont(Language::getInstance()->get(TextID::ACRE_EDITOR_CANCEL), 140, 200);
@@ -1328,7 +1354,7 @@ namespace CTRPluginFramework {
 
 		Process::Pause();
 
-		bool okay = false;	
+		bool okay = false;
 
 		while(true) {
 			Controller::Update();
@@ -1372,7 +1398,7 @@ namespace CTRPluginFramework {
 
 			OSD::SwapBuffers();
 		}
-		
+
 		delete[] acreArray;
 		acreArray = nullptr;
 
@@ -1434,7 +1460,7 @@ namespace CTRPluginFramework {
 						if(!rec.Contains(Touch::GetPosition())) {
 							continue;
 						}
-						
+
 						AcreChange(res, Addage[j] + i);
 					}
 				}
@@ -1449,7 +1475,7 @@ namespace CTRPluginFramework {
 			OSD::Stop(MapDraw);
 			WasActivated = false;
 		}
-		
+
 		if(!entry->IsActivated()) {
 			PluginMenu *menu = PluginMenu::GetRunningInstance();
 			*menu -= GetAcreID;

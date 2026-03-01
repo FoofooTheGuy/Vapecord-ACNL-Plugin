@@ -160,7 +160,7 @@
     "CHAT_INVALID_MUSIC": "ID musica non valido",
     "CHAT_NO_ITEM_FOUND": "Nessun oggetto trovato con quel nome",
     "WRAPPER_ADDRESS": "Indirizzo: %08X",
-    "WRAPPER_LENGHT": "Lunghezza: %08X",
+    "WRAPPER_LENGTH": "Lunghezza: %08X",
     "NPC_RACE_SPECIAL": "NPC speciale",
     "ITEMSEQ_STANDARD_DROP": "Oggetto drop standard",
     "ITEMSEQ_ADD": "Aggiungi...",

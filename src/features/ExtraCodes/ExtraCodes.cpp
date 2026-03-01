@@ -5,7 +5,7 @@
 #include "core/game_api/Dropper.hpp"
 #include "core/game_api/PlayerClass.hpp"
 #include "core/game_api/Inventory.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/checks/IDChecks.hpp"
 #include "core/RuntimeContext.hpp"
 #include "core/infrastructure/CROEditing.hpp"
@@ -19,14 +19,14 @@ namespace CTRPluginFramework {
 		static Address shopgarden(0x711BCC);
 		static Address shopables(0x713EB0);
 		static Address shopshampoodle(0x71D42C);
-		static Address shopkicks(0x71184C);   
+		static Address shopkicks(0x71184C);
 		static Address shopnooks(0x71F654);
 		static Address shopkatrina(0x718098);
 		static Address shopredd(0x718444);
 
-		static Address ShopOpen[9] = { 
-			shopretail, shopnookling, shopgarden, shopables, 
-			shopshampoodle, shopkicks, shopnooks, shopkatrina, shopredd 
+		static Address ShopOpen[9] = {
+			shopretail, shopnookling, shopgarden, shopables,
+			shopshampoodle, shopkicks, shopnooks, shopkatrina, shopredd
 		};
 
 		if(entry->WasJustActivated()) {
@@ -70,7 +70,7 @@ namespace CTRPluginFramework {
 	void noTrap(MenuEntry *entry) {
 		static Address notraps1(0x65A668);
 		static Address notraps2(0x6789E4);
-		
+
 		if(entry->WasJustActivated()) {
 			notraps1.Patch(0xEA000014);
 			notraps2.Patch(0xEA00002D);
@@ -88,7 +88,7 @@ namespace CTRPluginFramework {
 		}
 
 		const std::vector<std::string> spotVEC = {
-			Language::getInstance()->get(TextID::VECTOR_QUICK_LOCK_SPOT), 
+			Language::getInstance()->get(TextID::VECTOR_QUICK_LOCK_SPOT),
 			Language::getInstance()->get(TextID::VECTOR_QUICK_UNLOCK_SPOT),
 			Language::getInstance()->get(TextID::VECTOR_QUICK_LOCK_MAP),
 			Language::getInstance()->get(TextID::VECTOR_QUICK_UNLOCK_MAP)
@@ -106,8 +106,8 @@ namespace CTRPluginFramework {
 			default: break;
 			case 0: {
 				if(Game::CreateLockedSpot(0x12, x, y, Game::GetRoom(), true) == 0xFFFFFFFF) {
-					OSD::NotifySysFont(Language::getInstance()->get(TextID::SPOT_STATE_TOO_MANY));		
-				}	
+					OSD::NotifySysFont(Language::getInstance()->get(TextID::SPOT_STATE_TOO_MANY));
+				}
 				else {
 					OSD::NotifySysFont(Language::getInstance()->get(TextID::SPOT_STATE_LOCK));
 				}
@@ -122,11 +122,11 @@ namespace CTRPluginFramework {
 				x = 0, y = 0;
 				while(Game::CreateLockedSpot(0x12, 0x10 + x, 0x10 + y, Game::GetRoom(), true) != 0xFFFFFFFF) {
 					x++;
-					if(x % 6 == 2) { 
-						y++; 
-						x = 0; 
+					if(x % 6 == 2) {
+						y++;
+						x = 0;
 					}
-					
+
 					Sleep(Milliseconds(40));
 				}
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::SPOT_STATE_MAP_LOCK));
@@ -178,15 +178,15 @@ namespace CTRPluginFramework {
 		u32 count = 0;
 		Item ItemToSearch = {0x7FFE, 0};
 		Item ItemToReplace = {0x7FFE, 0};
-		
-		if(!Wrap::KB<u32>(Language::getInstance()->get(TextID::QUICK_MENU_SEARCH_REPLACE_SEARCH), true, 8, *(u32 *)&ItemToSearch, 0x7FFE)) {
+
+		if(!PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::QUICK_MENU_SEARCH_REPLACE_SEARCH), true, 8, 0x7FFE }, *(u32 *)&ItemToSearch)) {
 			return;
 		}
-		
-		if(!Wrap::KB<u32>(Language::getInstance()->get(TextID::QUICK_MENU_SEARCH_REPLACE_REPLACE), true, 8, *(u32 *)&ItemToReplace, *(u32 *)&ItemToReplace)) {
+
+		if(!PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::QUICK_MENU_SEARCH_REPLACE_REPLACE), true, 8, *(u32 *)&ItemToReplace }, *(u32 *)&ItemToReplace)) {
 			return;
 		}
-		
+
 		if(!ItemToReplace.isValid()) {
 			OSD::NotifySysFont(Language::getInstance()->get(TextID::INVALID_ITEM), Color::Red);
 			return;
@@ -225,12 +225,12 @@ namespace CTRPluginFramework {
 
 		entry->Disable();
 	}
-	
+
 	const int TimeMax[5] = { 60, 24, 30, 12, 50 };
 	static int CurrTime = 0;
-	
+
 	bool CheckTimeInput(const void *input, std::string &error) {
-		const std::string TimeMode[5] = { 
+		const std::string TimeMode[5] = {
 			Language::getInstance()->get(TextID::TIME_MINUTE),
 			Language::getInstance()->get(TextID::TIME_HOUR),
 			Language::getInstance()->get(TextID::TIME_DAY),
@@ -246,7 +246,7 @@ namespace CTRPluginFramework {
 
         return 1;
     }
-	
+
 	void TTKeyboard(MenuEntry *entry) {
 		const std::string TimeMode[5] = {
 			Language::getInstance()->get(TextID::TIME_MINUTE),
@@ -260,14 +260,14 @@ namespace CTRPluginFramework {
 			Language::getInstance()->get(TextID::TIME_BACKWARDS),
 			Language::getInstance()->get(TextID::TIME_FORWARD)
 		};
-		
+
 		u8 timedat[5] = { 0, 0, 0, 0, 0 };
 		Keyboard KB("", TTKB);
 		int ch = KB.Open();
 		if(ch < 0) {
 			return;
 		}
-		
+
 		for(int i = 0; i < 5; ++i) {
 			Keyboard KBS(Utils::Format(Language::getInstance()->get(TextID::TIME_KB1).c_str(), TimeMode[i].c_str()));
 			KBS.IsHexadecimal(false);
@@ -280,21 +280,21 @@ namespace CTRPluginFramework {
 				return;
 			}
 		}
-		
+
 		Game::SetCurrentTime(ch, timedat[0], timedat[1], timedat[2], timedat[3], timedat[4]);
 	}
-	
+
 	void TimeTravel(MenuEntry *entry) {
 		static u32 PressedTicks = 0;
 		int minute = 1;
-		
+
 		if(entry->Hotkeys[0].IsDown() || entry->Hotkeys[0].IsPressed()) {
 			PressedTicks++;
 			if((PressedTicks < 50 ? (PressedTicks % 8) == 1 : (PressedTicks % 3) == 1) || PressedTicks > 100) {
 				Game::SetCurrentTime(true, minute, 0, 0, 0, 0);
 			}
 		}
-		
+
 		else if(entry->Hotkeys[1].IsDown() || entry->Hotkeys[1].IsPressed()) {
 			PressedTicks++;
 			if((PressedTicks < 50 ? (PressedTicks % 8) == 1 : (PressedTicks % 3) == 1) || PressedTicks > 100) {

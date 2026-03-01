@@ -1,6 +1,6 @@
 #include "features/cheats.hpp"
 #include "core/infrastructure/Address.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "Color.h"
 #include "core/checks/IDChecks.hpp"
 #include "core/game_api/GameStructs.hpp"
@@ -17,13 +17,13 @@ namespace CTRPluginFramework {
 			fruitstay.Unpatch();
 		}
 	}
-//Axe Tree Shake	
+//Axe Tree Shake
 	void shakechop(MenuEntry *entry) {
 		static Address shake1(0x5971D4);
 		static Address shake2(0x5971DC);
 		static Address shake3(0x5971E4);
 		static Address shake4(0x5971EC);
-		
+
 		if(entry->WasJustActivated()) {
 			shake1.Patch(0xE1A00000);
 			shake2.Patch(0xE1A00000);
@@ -37,12 +37,12 @@ namespace CTRPluginFramework {
 			shake4.Unpatch();
 		}
     }
-//Fruit Tree Item Modifier	
+//Fruit Tree Item Modifier
 	void fruititemmod(MenuEntry *entry) {
 		static Address fruitmod(0x2FE6A0);
 		static Address fruitmod2 = fruitmod.MoveOffset(0xC);
 		static Address fruitmod3 = fruitmod.MoveOffset(0x28);
-		
+
 		static Item val = {0x2018, 0};
 
 		if(entry->WasJustActivated()) {
@@ -50,21 +50,21 @@ namespace CTRPluginFramework {
 			fruitmod2.Patch(0xE3500000);
 			fruitmod3.Patch(*(u32 *)&val);
 		}
-		
+
 		if(entry->Hotkeys[0].IsDown()) {
-			if(Wrap::KB<u32>(Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&val, *(u32 *)&val, TextItemChange)) {
+			if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&val, TextItemChange }, *(u32 *)&val)) {
 				fruitmod3.Patch(*(u32 *)&val);
 			}
 		}
-		
+
 		if(!entry->IsActivated()) {
 			fruitmod.Unpatch();
 			fruitmod2.Unpatch();
 			fruitmod3.Unpatch();
 		}
 	}
-//Instant Tree Chop	
-	void instantchop(MenuEntry *entry) { 
+//Instant Tree Chop
+	void instantchop(MenuEntry *entry) {
 		static Address instchop(0x59945C);
 		if(entry->WasJustActivated()) {
 			instchop.Patch(0xE1A00000);

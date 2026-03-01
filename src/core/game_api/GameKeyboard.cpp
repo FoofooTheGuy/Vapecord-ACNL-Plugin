@@ -17,7 +17,7 @@ namespace CTRPluginFramework {
 		u16 buffer[str.size() + 1] = { 0 };
 		utf8_to_utf16(buffer, reinterpret_cast<const u8*>(str.data()), str.size());
 
-		static Address WriteFunc(0x5231D0);	
+		static Address WriteFunc(0x5231D0);
 
 		const u16* hex = (const u16 *)buffer;
 		u8 i = *(u8 *)(*(u32 *)(Address(0x95F11C).addr) + 0x14);
@@ -101,7 +101,7 @@ namespace CTRPluginFramework {
 
 //If keyboard is opened 32DE75BC
 	bool GameKeyboard::IsOpen() {
-		static Address KeyBool(0x523F48); 
+		static Address KeyBool(0x523F48);
 		bool res = KeyBool.Call<bool>();
 		if(res) {
 			if(*(u32 *)(*(u32 *)(*(u32 *)(Address(0x95F11C).addr) + 4) + 0x50) == 0) {
@@ -119,7 +119,7 @@ namespace CTRPluginFramework {
 		return *(bool *)(*(u32 *)(*(u32 *)(Address(0x95F11C).addr) + 0x10) + 0x98 + 0x11B1) != true;
 	}
 
-	bool GameKeyboard::Copy(std::string& str, int pos, int lenght) {
+	bool GameKeyboard::Copy(std::string& str, int pos, int length) {
 		if(!GameKeyboard::IsOpen()) {
 			return false;
 		}
@@ -130,7 +130,7 @@ namespace CTRPluginFramework {
 
 		u32 ChatText = *(u32 *)(*(u32 *)(Address(0x95F11C).addr) + 0x10);
 
-		return Process::ReadString(ChatText + pos, str, lenght, StringFormat::Utf16);
+		return Process::ReadString(ChatText + pos, str, length, StringFormat::Utf16);
 	}
 
 	bool GameKeyboard::ConvertToItemID(std::string& str, Item &ItemID) {

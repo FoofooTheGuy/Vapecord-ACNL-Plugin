@@ -8,7 +8,7 @@
 #include "core/game_api/AnimData.hpp"
 #include "core/game_api/Dropper.hpp"
 #include "core/hooks/GameLoopHook.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/checks/IDChecks.hpp"
 #include "core/RuntimeContext.hpp"
 #include "Color.h"
@@ -318,7 +318,7 @@ namespace CTRPluginFramework {
 				Keyboard KB(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), options);
 				if (int choice = KB.Open(); choice == 0) {
 					u32 id = item;
-					if (Wrap::KB<u32>(lang->get(TextID::ENTER_ID), true, 8, id, id, TextItemChange)) {
+					if (PluginUtils::Input::PromptNumber<u32>({ lang->get(TextID::ENTER_ID), true, 8, id, TextItemChange }, id)) {
 						item = id;
 					}
 				}
@@ -326,7 +326,7 @@ namespace CTRPluginFramework {
 					random = !random;
 				}
 				else if (choice == 2) {
-					Wrap::KB<float>("", false, 3, distance, distance);
+					PluginUtils::Input::PromptNumber<float>({ "", false, 3, distance }, distance);
 				}
 				else if (choice == 3) {
 					putInHand = !putInHand;

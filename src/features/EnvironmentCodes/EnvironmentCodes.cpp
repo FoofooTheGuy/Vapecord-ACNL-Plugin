@@ -2,7 +2,7 @@
 #include "features/cheats.hpp"
 #include "core/infrastructure/Address.hpp"
 #include "core/game_api/PlayerClass.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/infrastructure/Language.hpp"
 #include "core/checks/IDChecks.hpp"
 #include "core/infrastructure/CROEditing.hpp"

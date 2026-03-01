@@ -11,7 +11,7 @@ namespace CTRPluginFramework {
 		bool 				DeleteSelected(void);
 		bool 				IsOpen();
 		bool				IsEmpty();
-		bool 				Copy(std::string& str, int pos, int lenght);
+		bool 				Copy(std::string& str, int pos, int length);
 		bool 				ConvertToItemID(std::string& str, Item &ItemID);
 		void 				SendMessage(const std::string& str);
 	}

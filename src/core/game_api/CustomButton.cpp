@@ -3,7 +3,7 @@
 #include "core/game_api/Game.hpp"
 #include "core/checks/IDChecks.hpp"
 #include "core/game_api/Player.hpp"
-#include "core/infrastructure/Wrapper.hpp"
+#include "core/infrastructure/PluginUtils.hpp"
 #include "core/infrastructure/Address.hpp"
 #include "core/infrastructure/Language.hpp"
 #include "core/infrastructure/TextID.hpp"
