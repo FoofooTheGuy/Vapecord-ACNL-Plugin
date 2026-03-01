@@ -56,6 +56,7 @@ namespace CTRPluginFramework {
 
 	static MenuFolder *CreateFolder(FolderType folderType, SubFolder subFolder = SubFolder::None, const std::string &note = "") {
 		MenuFolder *folder = new MenuFolder(GetFolderColor(folderType) << (subFolder != SubFolder::None ? GetSubFolderName(folderType, subFolder) : GetFolderName(folderType)), note);
+		folder->SetColor(GetFolderColor(folderType));
 		g_folderInfos[folder] = { folderType, subFolder };
 		return folder;
 	}
@@ -85,7 +86,6 @@ namespace CTRPluginFramework {
 
 		entry->SetNameKey(static_cast<u32>(nameKey));
 		entry->SetNoteKey(noteKey != TextID::NONE ? static_cast<u32>(noteKey) : 0);
-		entry->UpdateLocalizedText();
 		return entry;
 	}
 
@@ -99,7 +99,6 @@ namespace CTRPluginFramework {
 
 		entry->SetNameKey(static_cast<u32>(nameKey));
 		entry->SetNoteKey(noteKey != TextID::NONE ? static_cast<u32>(noteKey) : 0);
-		entry->UpdateLocalizedText();
 		return entry;
 	}
 
@@ -124,23 +123,14 @@ namespace CTRPluginFramework {
 /*This will load all the folders and entrys*/
     void InitMenu(PluginMenu *menu) {
 		MenuEntry::SetLocalizationCallback(ResolveTextByKey);
-		PluginMenu::SetFolderRefreshCallback([](MenuFolder *folder)
-		{
+		PluginMenu::SetFolderRefreshCallback([](MenuFolder *folder) {
 			auto it = g_folderInfos.find(folder);
 			if (it == g_folderInfos.end())
 				return;
 
 			const FolderInfo &info = it->second;
+			folder->SetColor(GetFolderColor(info.folderType));
 			folder->SetName(GetFolderColor(info.folderType) << (info.subFolder != SubFolder::None ? GetSubFolderName(info.folderType, info.subFolder) : GetFolderName(info.folderType)));
-
-			for (MenuEntry *entry : folder->GetEntryList())
-			{
-				if (entry != nullptr)
-				{
-					entry->SetColor(GetFolderColor(info.folderType));
-					entry->UpdateLocalizedText();
-				}
-			}
 		});
 	/////////////////////
 	/*Save Codes Folder*/
