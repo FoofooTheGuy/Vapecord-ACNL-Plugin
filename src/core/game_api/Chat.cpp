@@ -11,7 +11,7 @@ namespace CTRPluginFramework {
 		else if(_pID == 0) {
 			_pID = Game::GetOnlinePlayerIndex();
 		}
-		
+
 	    u32 PTR = *(u32 *)Address(0x94FD84).addr; //0x94FD84
 		PTR += 0x464; //33078FA0
 		PTR += (0x530 * _pID);
@@ -20,12 +20,12 @@ namespace CTRPluginFramework {
 
 	std::string Chat::GetPlayerMessage() {
         std::string pMessage;
-        Process::ReadString(GetPlayerMessageData() + 0x40C, pMessage, 0x64, StringFormat::Utf16);
+        Process::ReadString(GetPlayerMessageData() + 0x40C, pMessage, 0x82, StringFormat::Utf16);
 		return pMessage;
 	}
 
 	void Chat::ClearPlayerMessage() {
-		std::memset((void *)(GetPlayerMessageData() + 0x40C), 0, 0x64);
+		std::memset((void *)(GetPlayerMessageData() + 0x40C), 0, 0x82);
 	}
 
 	std::string Chat::GetPlayerName() {
@@ -51,7 +51,7 @@ namespace CTRPluginFramework {
 			Sleep(Seconds(2));
 			Animation::ExecuteAnimationWrapper(GetPlayerIndex(), 6, {0, 0}, 0, 0, 0, 0, x, y, true);
 
-			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_ANIMATION).c_str(), animID)); 
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_ANIMATION).c_str(), animID));
 		}
 	}
 
@@ -73,7 +73,7 @@ namespace CTRPluginFramework {
 			Sleep(Seconds(2));
 			Animation::ExecuteAnimationWrapper(GetPlayerIndex(), 6, {0, 0}, 0, 0, 0, 0, x, y, true);
 
-			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_SNAKE).c_str(), snakeID)); 
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_SNAKE).c_str(), snakeID));
 		}
 	}
 
@@ -84,17 +84,17 @@ namespace CTRPluginFramework {
 			Sleep(Milliseconds(100));
 			Animation::ExecuteAnimationWrapper(GetPlayerIndex(), 6, {0, 0}, 0, 0, 0, 0, x, y, true);
 
-			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_MUSIC).c_str(), musicID)); 
+			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_MUSIC).c_str(), musicID));
 		}
 	}
 
 	void Chat::ItemCommand() {
 		u32 x, y;
-		if(PlayerClass::GetInstance()->GetWorldCoords(&x, &y)) {	
+		if(PlayerClass::GetInstance()->GetWorldCoords(&x, &y)) {
 			Dropper::PlaceItemWrapper(0xA, ReplaceEverything, &itemID, &itemID, x, y, 0, 0, 0, 0, 0, 0x56, 0xA5, false);
 
 			OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::CHAT_ITEM).c_str(), *(u32*)&itemID));
-		}	
+		}
 	}
 
 	void Chat::CommandLoop() {
@@ -201,7 +201,7 @@ namespace CTRPluginFramework {
 
 			ItemCommand();
 		}
-		
+
 		else { // any other message
 			return;
 		}
@@ -222,7 +222,7 @@ namespace CTRPluginFramework {
         if (!menu) {
             return;
         }
-        
+
         *menu += CommandCallback;
     }
 
