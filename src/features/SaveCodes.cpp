@@ -44,7 +44,9 @@ namespace CTRPluginFramework {
 			Language::getInstance()->get(TextID::FILE_DELETE),
 		};
 
-		MemoryRange lock = { (u32 *)Address(0x2FB344).Call<u32>(), 0x89B00 };
+		MemoryRange lock;
+		lock.address = Address(0x2FB344).Call<u32 *>();
+		lock.length = 0x89B00;
 
 		Keyboard KB(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), options);
 
@@ -128,7 +130,8 @@ namespace CTRPluginFramework {
 						return;
 					}
 
-					loc = { (u32 *)&town->BBoardMessages[KBChoice], sizeof(ACNL_BulletinBoardMessage) };
+					loc.address = (u32 *)&town->BBoardMessages[KBChoice];
+					loc.length = sizeof(ACNL_BulletinBoardMessage);
 					PluginUtils::Backup::DumpMemory(
 						Utils::Format(PATH_BULLETIN, Address::regionName.c_str()),
 						filename,
@@ -142,7 +145,8 @@ namespace CTRPluginFramework {
 				optKb.Populate(backmessage);
 				int KBChoice = optKb.Open();
 				if(KBChoice >= 0) {
-					loc = { (u32 *)&town->BBoardMessages[KBChoice], sizeof(ACNL_BulletinBoardMessage) };
+					loc.address = (u32 *)&town->BBoardMessages[KBChoice];
+					loc.length = sizeof(ACNL_BulletinBoardMessage);
 					PluginUtils::Backup::RestoreMemory(
 						Utils::Format(PATH_BULLETIN, Address::regionName.c_str()),
 						".dat",
