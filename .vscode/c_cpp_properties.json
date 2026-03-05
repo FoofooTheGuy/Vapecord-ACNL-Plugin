@@ -9,17 +9,19 @@
             "name": "Library - Unix",
             "includePath": [
                 "${default}",
+                "${workspaceFolder}/../ctr-plugin-framework-for-vapecord/Library/include",
                 "C:/devkitPro/devkitARM/arm-none-eabi/include/**",
                 "C:/devkitPro/devkitARM/lib/**",
                 "C:/devkitPro/libctru/include",
                 "C:/devkitPro/libctrpf/include",
                 "C:/devkitPro/portlibs/3ds/bin",
-                "${workspaceFolder}/includes"
+                "${workspaceFolder}/include"
             ],
             "defines": ["ARM11", "_3DS"],
             "compilerPath": "C:/devkitPro/devkitARM/bin/arm-none-eabi-g++.exe",
             "browse": {
                 "path": [
+                    "${workspaceFolder}/../ctr-plugin-framework-for-vapecord/Library/include/**",
                     "C:/devkitPro/libctrpf/include/**",
                     "C:/devkitPro/libctru/include/**"
                 ],
@@ -27,8 +29,8 @@
                 "databaseFilename": ""
             },
             "cStandard": "c11",
-            "cppStandard": "c++11",
-            "intelliSenseMode": "gcc-arm"  
+            "cppStandard": "c++20",
+            "intelliSenseMode": "gcc-arm"
         }
     ],
     "version": 4
