@@ -11,6 +11,15 @@ address_usage_pattern = re.compile(
     r"\bAddress(?:\s+\w+)?\s*\(\s*(0x[0-9A-Fa-f]+)\s*\)"
 )
 
+address_declaration_pattern = re.compile(
+    r"\b(?:static\s+)?(?:inline\s+)?(?:constexpr\s+)?(?:const\s+)?Address\b([^;]*);",
+    flags=re.MULTILINE,
+)
+
+address_direct_initializer_pattern = re.compile(
+    r"(?:^|,)\s*[A-Za-z_]\w*\s*[\(\{]\s*(0x[0-9A-Fa-f]+)\s*[\)\}]"
+)
+
 array_pattern = re.compile(
     r"\{\s*(0x[0-9A-Fa-f]+)\s*,"
 )
@@ -51,6 +60,17 @@ def collect_addresses_from_header():
 def collect_used_addresses():
     used = set()
 
+    def collect_from_content(content: str):
+        nonlocal used
+
+        for match in address_usage_pattern.finditer(content):
+            used.add(match.group(1).lower())
+
+        for declaration in address_declaration_pattern.finditer(content):
+            declarators = declaration.group(1)
+            for init_match in address_direct_initializer_pattern.finditer(declarators):
+                used.add(init_match.group(1).lower())
+
     for root, _, files in os.walk(PROJECT_ROOT / "src"):
         for file in files:
             if not file.endswith((".cpp", ".hpp", ".h")):
@@ -64,8 +84,7 @@ def collect_used_addresses():
             with open(path, "r", encoding="utf-8", errors="ignore") as f:
                 content = strip_all_comments(f.read())
 
-            for match in address_usage_pattern.finditer(content):
-                used.add(match.group(1).lower())
+            collect_from_content(content)
 
     for root, _, files in os.walk(PROJECT_ROOT / "include"):
         for file in files:
@@ -80,8 +99,7 @@ def collect_used_addresses():
             with open(path, "r", encoding="utf-8", errors="ignore") as f:
                 content = strip_all_comments(f.read())
 
-            for match in address_usage_pattern.finditer(content):
-                used.add(match.group(1).lower())
+            collect_from_content(content)
 
     return used
 
