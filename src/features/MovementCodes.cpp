@@ -7,6 +7,7 @@
 #include "core/infrastructure/PluginUtils.hpp"
 #include "core/game_api/Dropper.hpp"
 #include "Color.h"
+#include <cstring>
 
 extern "C" void SetWalkParticleID(void);
 
@@ -27,13 +28,35 @@ namespace CTRPluginFramework {
 
 //Definition for Coordinate Mod Speed
 	float cspeed = 5.0;
+
+	static u32 EncodeFloatValue(float value) {
+		u32 raw = 0;
+		std::memcpy(&raw, &value, sizeof(raw));
+		return raw;
+	}
+
+	static float DecodeFloatValue(u32 raw, float fallback) {
+		float value = fallback;
+		std::memcpy(&value, &raw, sizeof(value));
+		return value;
+	}
+
+	void CoordSpeedApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		const float value = DecodeFloatValue(savedValue, 5.0f);
+		if(value > 0.0f && value <= 99.0f) {
+			cspeed = value;
+		}
+	}
 //Coordinate Mod Speed Changer Keyboard
 	void coordspeed(MenuEntry *entry) {
 		Keyboard kb(Language::getInstance()->get(TextID::ENTER_ID));
 		kb.GetMessage() = Utils::Format(Language::getInstance()->get(TextID::COORD_MOD_ENTER_SPEED).c_str(), 5);
 		kb.IsHexadecimal(false);
 		kb.SetMaxLength(2);
-		kb.Open(cspeed);
+		if(kb.Open(cspeed) >= 0) {
+			entry->SetSavedValue(EncodeFloatValue(cspeed));
+		}
 	}
 
 //Coordinate Modifier
@@ -318,7 +341,17 @@ namespace CTRPluginFramework {
 		kb.IsHexadecimal(false);
 		kb.SetMaxLength(7);
 		kb.OnKeyboardEvent(SpeedCheck);
-		kb.Open(walkSpeed);
+		if(kb.Open(walkSpeed) >= 0) {
+			entry->SetSavedValue(EncodeFloatValue(walkSpeed));
+		}
+	}
+
+	void SpeedModApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		const float value = DecodeFloatValue(savedValue, 1.0f);
+		if(value > 0.0f && value < 15.0f) {
+			walkSpeed = value;
+		}
 	}
 
 //InputChangeEvent for Room Warper

@@ -14,21 +14,38 @@
 #include "core/RuntimeContext.hpp"
 
 namespace CTRPluginFramework {
+	namespace {
+		void ApplyItemSequenceEnabled(bool enabled) {
+			if(ItemSequence::Enabled() != enabled) {
+				ItemSequence::Switch(enabled);
+			}
+		}
+	}
+
+	void ItemSequencerApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		ApplyItemSequenceEnabled(savedValue != 0);
+	}
+
 //Item Sequencer
 	void Entry_itemsequence(MenuEntry *entry) {
-		std::vector<std::string> cmnOpt = { "" };
+		while(true) {
+			std::vector<std::string> cmnOpt = { "" };
 
-		cmnOpt[0] = (ItemSequence::Enabled() ? Color(pGreen) << Language::getInstance()->get(TextID::VECTOR_ENABLED) : Color(pRed) << Language::getInstance()->get(TextID::VECTOR_DISABLED));
+			cmnOpt[0] = (ItemSequence::Enabled()
+				? Color(pGreen) << Language::getInstance()->get(TextID::VECTOR_ENABLED)
+				: Color(pRed) << Language::getInstance()->get(TextID::VECTOR_DISABLED));
 
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), cmnOpt);
+			Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), cmnOpt);
+			const int op = optKb.Open();
+			if(op < 0) {
+				return;
+			}
 
-		int op = optKb.Open();
-		if(op < 0) {
-			return;
+			const bool enabled = !ItemSequence::Enabled();
+			ApplyItemSequenceEnabled(enabled);
+			entry->SetSavedValue(enabled ? 1u : 0u);
 		}
-
-		ItemSequence::Switch(ItemSequence::Enabled() ? false : true);
-		Entry_itemsequence(entry);
 	}
 //Drop Modifier /*Radius calculations done by Nico*/
 	void dropMod(MenuEntry *entry) {

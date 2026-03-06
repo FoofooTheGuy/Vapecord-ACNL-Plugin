@@ -5,7 +5,7 @@
 #include <string>
 
 #define majorV 3
-#define minorV 1
+#define minorV 2
 #define revisV 0
 
 #define APP_VERSION (majorV * 100 + minorV * 10 + revisV)

@@ -18,12 +18,27 @@ extern "C" void PATCH_ToolAnim(void);
 u8 toolTypeAnimID = 6;
 
 namespace CTRPluginFramework {
-//Change Tool Animation
-	void tooltype(MenuEntry *entry) {
-		static Hook hook;
-		if(PluginUtils::Input::PromptNumber<u8>({ Language::getInstance()->get(TextID::TOOL_ANIM_ENTER_ANIM), true, 2, toolTypeAnimID }, toolTypeAnimID)) {
-			if(toolTypeAnimID == 0) { //if switched OFF
-				hook.Disable();
+	namespace {
+		Hook g_toolTypeHook;
+		bool g_toolTypeHookInitialized = false;
+
+		void EnsureToolTypeHookInitialized(void) {
+			if(g_toolTypeHookInitialized) {
+				return;
+			}
+
+			g_toolTypeHook.Initialize(Address(0x64DB90).addr + 0x10, (u32)PATCH_ToolAnim);
+			g_toolTypeHook.SetFlags(USE_LR_TO_RETURN);
+			g_toolTypeHookInitialized = true;
+		}
+
+		void ApplyToolTypeAnimId(u8 animId) {
+			toolTypeAnimID = animId;
+
+			if(toolTypeAnimID == 0) {
+				if(g_toolTypeHookInitialized) {
+					g_toolTypeHook.Disable();
+				}
 				return;
 			}
 
@@ -31,36 +46,54 @@ namespace CTRPluginFramework {
 				toolTypeAnimID = 6;
 			}
 
-			hook.Initialize(Address(0x64DB90).addr + 0x10, (u32)PATCH_ToolAnim);
-			hook.SetFlags(USE_LR_TO_RETURN);
-			hook.Enable();
+			EnsureToolTypeHookInitialized();
+			g_toolTypeHook.Enable();
+		}
+	}
+
+	void ToolTypeApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		ApplyToolTypeAnimId(static_cast<u8>(savedValue & 0xFF));
+	}
+
+//Change Tool Animation
+	void tooltype(MenuEntry *entry) {
+		if(PluginUtils::Input::PromptNumber<u8>({ Language::getInstance()->get(TextID::TOOL_ANIM_ENTER_ANIM), true, 2, toolTypeAnimID }, toolTypeAnimID)) {
+			ApplyToolTypeAnimId(toolTypeAnimID);
+			entry->SetSavedValue(toolTypeAnimID);
 		}
 	}
 //Change Gametype
+	void GameTypeApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		if(savedValue < 4) {
+			Game::ChangeGameMode((Game::GameMode)savedValue);
+		}
+	}
+
 	void mgtype(MenuEntry *entry) {
-		std::vector<std::string> gametype = {
-			Language::getInstance()->get(TextID::VECTOR_GAMETYPE_OFFLINE),
-			Language::getInstance()->get(TextID::VECTOR_GAMETYPE_ONLINE1),
-			Language::getInstance()->get(TextID::VECTOR_GAMETYPE_ONLINE2),
-			Language::getInstance()->get(TextID::VECTOR_GAMETYPE_DREAM),
-		};
+		while(true) {
+			std::vector<std::string> gametype = {
+				Language::getInstance()->get(TextID::VECTOR_GAMETYPE_OFFLINE),
+				Language::getInstance()->get(TextID::VECTOR_GAMETYPE_ONLINE1),
+				Language::getInstance()->get(TextID::VECTOR_GAMETYPE_ONLINE2),
+				Language::getInstance()->get(TextID::VECTOR_GAMETYPE_DREAM),
+			};
 
-		bool IsON;
+			for(int i = 0; i < 4; ++i) {
+				const bool isOn = Game::GetGameMode() == i;
+				gametype[i] = (isOn ? Color(pGreen) : Color(pRed)) << gametype[i];
+			}
 
-		for(int i = 0; i < 4; ++i) {
-			IsON = Game::GetGameMode() == i;
-			gametype[i] = (IsON ? Color(pGreen) : Color(pRed)) << gametype[i];
+			Keyboard keyboard(Language::getInstance()->get(TextID::GAME_TYPE_CHOOSE), gametype);
+			const int gametchoice = keyboard.Open();
+			if(gametchoice < 0 || gametchoice > 3) {
+				return;
+			}
+
+			Game::ChangeGameMode((Game::GameMode)gametchoice);
+			entry->SetSavedValue((u32)gametchoice);
 		}
-
-        Keyboard keyboard(Language::getInstance()->get(TextID::GAME_TYPE_CHOOSE), gametype);
-
-        int gametchoice = keyboard.Open();
-        if(gametchoice < 0)	{
-			return;
-		}
-
-		Game::ChangeGameMode((Game::GameMode)gametchoice);
-		mgtype(entry);
     }
 
 	void ShowPlayingMusic(u32 musicData, u32 r1, u32 r2, u32 r3) {

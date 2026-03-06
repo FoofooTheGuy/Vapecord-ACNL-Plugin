@@ -157,40 +157,44 @@ namespace CTRPluginFramework {
 	/*Movement Codes Folder*/
 	/////////////////////////
 		MenuFolder *MOVEC = CreateFolder(FolderType::Movement);
-		MOVEC->Append(CreateEntry(TextID::CANT_PUSH, noPush, TextID::CANT_PUSH_NOTE, MenuEntryId::MovementCantPush)),
-		MOVEC->Append(EntryWithHotkey(CreateEntry(TextID::COORD_MOD, coordinate, coordspeed, TextID::COORD_MOD_NOTE, MenuEntryId::MovementCoordMod), {
+		MOVEC->Append(CreateEntry(TextID::CANT_PUSH, noPush, TextID::CANT_PUSH_NOTE, MenuEntryId::MovementCantPush));
+		MenuEntry *coordModEntry = EntryWithHotkey(CreateEntry(TextID::COORD_MOD, coordinate, coordspeed, TextID::COORD_MOD_NOTE, MenuEntryId::MovementCoordMod), {
 			NamedHotkey(Key::A, TextID::COORD_MOD_KEY1),
 			NamedHotkey(Key::DPadRight, TextID::COORD_MOD_KEY2),
 			NamedHotkey(Key::DPadLeft, TextID::COORD_MOD_KEY3),
 			NamedHotkey(Key::DPadDown, TextID::COORD_MOD_KEY4),
 			NamedHotkey(Key::DPadUp, TextID::COORD_MOD_KEY5)
-		})),
+		});
+		coordModEntry->SetSavedValueApplyCallback(CoordSpeedApplySaved);
+		MOVEC->Append(coordModEntry);
 		MOVEC->Append(EntryWithHotkey(CreateEntry(TextID::MOON_JUMP, moonjump, TextID::MOON_JUMP_NOTE, MenuEntryId::MovementMoonJump), {
 			NamedHotkey(Key::L | Key::DPadUp, TextID::MOON_JUMP_KEY1),
 			NamedHotkey(Key::L | Key::DPadDown, TextID::MOON_JUMP_KEY2)
-		})),
-		MOVEC->Append(CreateEntry(TextID::TOUCH_WARP, tch_warp, TextID::TOUCH_WARP_NOTE, MenuEntryId::MovementTouchWarp)),
+		}));
+		MOVEC->Append(CreateEntry(TextID::TOUCH_WARP, tch_warp, TextID::TOUCH_WARP_NOTE, MenuEntryId::MovementTouchWarp));
 		MOVEC->Append(EntryWithHotkey(CreateEntry(TextID::WALK_OVER, walkOver, TextID::WALK_OVER_NOTE, MenuEntryId::MovementWalkOver), {
 			NamedHotkey(Key::L | Key::DPadUp, TextID::WALK_OVER)
-		})),
+		}));
 		MOVEC->Append(EntryWithHotkey(CreateEntry(TextID::MOVEMENT_CHANGE, MovementChanger, TextID::MOVEMENT_CHANGE_NOTE, MenuEntryId::MovementChange), {
 			NamedHotkey(Key::L | Key::B, TextID::MOVEMENT_CHANGE)
-		})),
+		}));
 		MOVEC->Append(EntryWithHotkey(CreateEntry(TextID::WALK_PARTICLE_CHANGE, Walkparticle, TextID::WALK_PARTICLE_CHANGE_NOTE, MenuEntryId::MovementWalkParticleChange), {
 			NamedHotkey(Key::L | Key::X, TextID::WALK_PARTICLE_CHANGE)
-		})),
+		}));
 		MOVEC->Append(EntryWithHotkey(CreateEntry(TextID::PLAYER_TELEPORT, stalk, TextID::PLAYER_TELEPORT_NOTE, MenuEntryId::MovementPlayerTeleport), {
 			NamedHotkey(Key::R | Key::DPadLeft, TextID::PLAYER_TELEPORT_KEY1),
 			NamedHotkey(Key::R | Key::DPadRight, TextID::PLAYER_TELEPORT_KEY2)
-		})),
+		}));
 		MOVEC->Append(EntryWithHotkey(CreateEntry(TextID::VISIBILITY_MOD, onlineplayermod, TextID::VISIBILITY_MOD_NOTE, MenuEntryId::MovementVisibilityMod), {
 			NamedHotkey(Key::L | Key::A, TextID::VISIBILITY_MOD_KEY1)
-		})),
-		MOVEC->Append(CreateEntry(TextID::SPEED_MOD, speedMod, menuSpeedMod, TextID::SPEED_MOD_NOTE, MenuEntryId::MovementSpeedMod)),
+		}));
+		MenuEntry *speedModEntry = CreateEntry(TextID::SPEED_MOD, speedMod, menuSpeedMod, TextID::SPEED_MOD_NOTE, MenuEntryId::MovementSpeedMod);
+		speedModEntry->SetSavedValueApplyCallback(SpeedModApplySaved);
+		MOVEC->Append(speedModEntry);
 		MOVEC->Append(EntryWithHotkey(CreateEntry(TextID::ROOM_WARPING, roomWarp, TextID::ROOM_WARPING_NOTE, MenuEntryId::MovementRoomWarping), {
 			NamedHotkey(Key::L | Key::X, TextID::ROOM_WARPING)
-		})),
-		MOVEC->Append(CreateEntry(TextID::SHOVEL_KNOCKBACK, shovelknockback, TextID::SHOVEL_KNOCKBACK_NOTE, MenuEntryId::MovementShovelKnockback)),
+		}));
+		MOVEC->Append(CreateEntry(TextID::SHOVEL_KNOCKBACK, shovelknockback, TextID::SHOVEL_KNOCKBACK_NOTE, MenuEntryId::MovementShovelKnockback));
 		menu->Append(MOVEC);
 
 	//////////////////////////
@@ -201,22 +205,28 @@ namespace CTRPluginFramework {
 			NamedHotkey(Key::X | Key::DPadRight, TextID::TEXT_2_ITEM_KEY1),
 			NamedHotkey(Key::X |Key::DPadUp, TextID::TEXT_2_ITEM_KEY2),
 			NamedHotkey(Key::X | Key::DPadDown, TextID::TEXT_2_ITEM_KEY3),
-		})),
+		}));
 		INVC->Append(EntryWithHotkey(CreateEntry(TextID::DUPE_ITEMS, duplication, TextID::DUPE_ITEMS_NOTE, MenuEntryId::InventoryDupeItems), {
 			NamedHotkey(Key::R, TextID::DUPE_ITEMS_KEY1),
 			NamedHotkey(Key::R | Key::X, TextID::DUPE_ITEMS_KEY2)
-		})),
+		}));
 		INVC->Append(EntryWithHotkey(CreateEntry(TextID::CATALOG_TO_POCKET, catalog, TextID::CATALOG_TO_POCKET_NOTE, MenuEntryId::InventoryCatalogToPocket), {
 			NamedHotkey(Key::L | Key::DPadRight, TextID::CATALOG_TO_POCKET_KEY1)
-		})),
+		}));
 		INVC->Append(EntryWithHotkey(CreateEntry(TextID::CHAT_T2I, chatt2i, TextID::CHAT_T2I_NOTE, MenuEntryId::InventoryChatT2I), {
 			NamedHotkey(Key::R | Key::DPadLeft, TextID::CHAT_T2I_KEY1)
-		})),
-		INVC->Append(CreateEntry(TextID::CLEAR_INV_NAME, nullptr, ClearInventory, TextID::CLEAR_INV_NOTE, MenuEntryId::InventoryClearInventory)),
-		INVC->Append(CreateEntry(TextID::ITEM_SETTINGS, nullptr, itemsettings, TextID::ITEM_SETTINGS_NOTE, MenuEntryId::InventoryItemSettings)),
-		INVC->Append(CreateEntry(TextID::SAVE_MENU_CHANGER, nullptr, MenuChanger, TextID::SAVE_MENU_CHANGER_NOTE, MenuEntryId::InventorySaveMenuChanger)),
-		INVC->Append(CreateEntry(TextID::GET_SET, nullptr, getset, TextID::GET_SET_NOTE, MenuEntryId::InventoryGetSet)),
-		INVC->Append(CreateEntry(TextID::CUSTOM_BUTTON, nullptr, SettingsButton, TextID::CUSTOM_BUTTON_NOTE, MenuEntryId::InventoryCustomButton)),
+		}));
+		INVC->Append(CreateEntry(TextID::CLEAR_INV_NAME, nullptr, ClearInventory, TextID::CLEAR_INV_NOTE, MenuEntryId::InventoryClearInventory));
+		MenuEntry *itemSettingsEntry = CreateEntry(TextID::ITEM_SETTINGS, nullptr, itemsettings, TextID::ITEM_SETTINGS_NOTE, MenuEntryId::InventoryItemSettings);
+		itemSettingsEntry->SetSavedValueApplyCallback(ItemSettingsApplySaved);
+		INVC->Append(itemSettingsEntry);
+		MenuEntry *saveMenuChanger = CreateEntry(TextID::SAVE_MENU_CHANGER, nullptr, MenuChanger, TextID::SAVE_MENU_CHANGER_NOTE, MenuEntryId::InventorySaveMenuChanger);
+		saveMenuChanger->SetSavedValueApplyCallback(MenuChangerApplySaved);
+		INVC->Append(saveMenuChanger);
+		INVC->Append(CreateEntry(TextID::GET_SET, nullptr, getset, TextID::GET_SET_NOTE, MenuEntryId::InventoryGetSet));
+		MenuEntry *customButtonEntry = CreateEntry(TextID::CUSTOM_BUTTON, nullptr, SettingsButton, TextID::CUSTOM_BUTTON_NOTE, MenuEntryId::InventoryCustomButton);
+		customButtonEntry->SetSavedValueApplyCallback(CustomButtonApplySaved);
+		INVC->Append(customButtonEntry);
 		menu->Append(INVC);
 
 	///////////////////////
@@ -332,7 +342,9 @@ namespace CTRPluginFramework {
 	/*Drop Codes SubFolder*/
 	////////////////////////
 		MenuFolder *DROPC = CreateFolder(FolderType::Seeding, SubFolder::Drop);
-		DROPC->Append(CreateEntry(TextID::ITEM_SEQUENCER, nullptr, Entry_itemsequence, TextID::ITEM_SEQUENCER_NOTE, MenuEntryId::DropItemSequencer)),
+		MenuEntry *itemSequencerEntry = CreateEntry(TextID::ITEM_SEQUENCER, nullptr, Entry_itemsequence, TextID::ITEM_SEQUENCER_NOTE, MenuEntryId::DropItemSequencer);
+		itemSequencerEntry->SetSavedValueApplyCallback(ItemSequencerApplySaved);
+		DROPC->Append(itemSequencerEntry);
 	    DROPC->Append(EntryWithHotkey(CreateEntry(TextID::DROP_MODS, dropMod, TextID::DROP_MODS_NOTE, MenuEntryId::DropMods), {
 			NamedHotkey(Key::A | Key::DPadRight, TextID::DROP_MODS_KEY1),
 			NamedHotkey(Key::A | Key::DPadLeft, TextID::DROP_MODS_KEY2),
@@ -403,23 +415,25 @@ namespace CTRPluginFramework {
 		MenuFolder *NPCC = CreateFolder(FolderType::NPC);
 		NPCC->Append(EntryWithHotkey(CreateEntry(TextID::NPC_SELECTOR, NPCFunction, TextID::NPC_SELECTOR_NOTE, MenuEntryId::NpcSelector), {
 			NamedHotkey(Key::L | Key::A, TextID::NPC_SELECTOR_KEY1)
-		})),
-		NPCC->Append(EntryWithHotkey(CreateEntry(TextID::NPC_ANIMATION,  NPCAnimation, NPCSetAnim, TextID::NPC_ANIMATION_NOTE, MenuEntryId::NpcAnimation), {
+		}));
+		MenuEntry *npcAnimEntry = EntryWithHotkey(CreateEntry(TextID::NPC_ANIMATION,  NPCAnimation, NPCSetAnim, TextID::NPC_ANIMATION_NOTE, MenuEntryId::NpcAnimation), {
 			NamedHotkey(Key::L | Key::B, TextID::NPC_ANIMATION_KEY1)
-		})),
+		});
+		npcAnimEntry->SetSavedValueApplyCallback(NPCSetAnimApplySaved);
+		NPCC->Append(npcAnimEntry);
 		NPCC->Append(EntryWithHotkey(CreateEntry(TextID::NPC_COORDINATE, NPCCoordinates, TextID::NPC_COORDINATE_NOTE, MenuEntryId::NpcCoordinate), {
 			NamedHotkey(Key::L, TextID::NPC_COORDINATE_KEY1),
 			NamedHotkey(Key::DPadRight, TextID::NPC_COORDINATE_KEY2),
 			NamedHotkey(Key::DPadLeft, TextID::NPC_COORDINATE_KEY3),
 			NamedHotkey(Key::DPadDown, TextID::NPC_COORDINATE_KEY4),
 			NamedHotkey(Key::DPadUp, TextID::NPC_COORDINATE_KEY5)
-		})),
+		}));
 		NPCC->Append(EntryWithHotkey(CreateEntry(TextID::NPC_TELEPORT, NPCTeleportToYou, TextID::NPC_TELEPORT_NOTE, MenuEntryId::NpcTeleport), {
 			NamedHotkey(Key::L | Key::Y, TextID::NPC_TELEPORT_KEY1)
-		})),
+		}));
 		NPCC->Append(EntryWithHotkey(CreateEntry(TextID::NPC_ROTATION, NPCRotate, TextID::NPC_ROTATION_NOTE, MenuEntryId::NpcRotation), {
 			NamedHotkey(Key::L, TextID::NPC_ROTATION_KEY1)
-		})),
+		}));
 		menu->Append(NPCC);
 
 	////////////////////////////
@@ -430,31 +444,35 @@ namespace CTRPluginFramework {
 	/*Fish Codes Folder*/
 	/////////////////////
 		MenuFolder *FISC = CreateFolder(FolderType::Environment, SubFolder::Fish);
-		FISC->Append(CreateEntry(TextID::FISH_ALWAYS_BITE_NAME, FishAlwaysBiteRightAway, TextID::FISH_ALWAYS_BITE_NOTE, MenuEntryId::EnvFishAlwaysBite)),
-		FISC->Append(CreateEntry(TextID::FISH_CANT_SCARE_NAME, FishCantBeScared, TextID::FISH_CANT_SCARE_NOTE, MenuEntryId::EnvFishCantScare)),
+		FISC->Append(CreateEntry(TextID::FISH_ALWAYS_BITE_NAME, FishAlwaysBiteRightAway, TextID::FISH_ALWAYS_BITE_NOTE, MenuEntryId::EnvFishAlwaysBite));
+		FISC->Append(CreateEntry(TextID::FISH_CANT_SCARE_NAME, FishCantBeScared, TextID::FISH_CANT_SCARE_NOTE, MenuEntryId::EnvFishCantScare));
 		ENVC->Append(FISC);
 	///////////////////////
 	/*Insect Codes Folder*/
 	///////////////////////
 		MenuFolder *INSC = CreateFolder(FolderType::Environment, SubFolder::Insect);
-		INSC->Append(CreateEntry(TextID::SPAWN_INSECT, SpawnInsectEntry, SetInsectIdEntry, TextID::SPAWN_INSECT_NOTE, MenuEntryId::EnvInsectSpawn)),
-		INSC->Append(CreateEntry(TextID::INSECT_CANT_SCARE, InsectsCantBeScared, TextID::INSECT_CANT_SCARE_NOTE, MenuEntryId::EnvInsectCantScare)),
+		MenuEntry *spawnInsect = CreateEntry(TextID::SPAWN_INSECT, SpawnInsectEntry, SetInsectIdEntry, TextID::SPAWN_INSECT_NOTE, MenuEntryId::EnvInsectSpawn);
+		spawnInsect->SetSavedValueApplyCallback(InsectSetIdApplySaved);
+		INSC->Append(spawnInsect);
+		INSC->Append(CreateEntry(TextID::INSECT_CANT_SCARE, InsectsCantBeScared, TextID::INSECT_CANT_SCARE_NOTE, MenuEntryId::EnvInsectCantScare));
 		ENVC->Append(INSC);
 
-		ENVC->Append(CreateEntry(TextID::DAYTIME, Daytime, TextID::DAYTIME_NOTE, MenuEntryId::EnvironmentDaytime)),
-		ENVC->Append(CreateEntry(TextID::ALWAYS_AURORA_MOD, auroralights , TextID::ALWAYS_AURORA_MOD_NOTE, MenuEntryId::EnvironmentAlwaysAurora)),
-		ENVC->Append(CreateEntry(TextID::UNBREAK_FLOWER, unbreakableflower, TextID::UNBREAK_FLOWER_NOTE, MenuEntryId::EnvironmentUnbreakFlower)),
-		ENVC->Append(CreateEntry(TextID::WEATHER_MOD, nullptr, Weathermod , TextID::WEATHER_MOD_NOTE, MenuEntryId::EnvironmentWeatherMod)),
-		ENVC->Append(CreateEntry(TextID::WATER_FLOWERS_NAME, nullptr, WaterAllFlowers, TextID::WATER_FLOWERS_NOTE, MenuEntryId::EnvironmentWaterFlowers)),
-		ENVC->Append(CreateEntry(TextID::WEED_REMOVER_NAME, nullptr, weedremover, TextID::WEED_REMOVER_NOTE, MenuEntryId::EnvironmentWeedRemover)),
+		ENVC->Append(CreateEntry(TextID::DAYTIME, Daytime, TextID::DAYTIME_NOTE, MenuEntryId::EnvironmentDaytime));
+		ENVC->Append(CreateEntry(TextID::ALWAYS_AURORA_MOD, auroralights , TextID::ALWAYS_AURORA_MOD_NOTE, MenuEntryId::EnvironmentAlwaysAurora));
+		ENVC->Append(CreateEntry(TextID::UNBREAK_FLOWER, unbreakableflower, TextID::UNBREAK_FLOWER_NOTE, MenuEntryId::EnvironmentUnbreakFlower));
+		MenuEntry *weatherMod = CreateEntry(TextID::WEATHER_MOD, nullptr, Weathermod , TextID::WEATHER_MOD_NOTE, MenuEntryId::EnvironmentWeatherMod);
+		weatherMod->SetSavedValueApplyCallback(WeatherModApplySaved);
+		ENVC->Append(weatherMod);
+		ENVC->Append(CreateEntry(TextID::WATER_FLOWERS_NAME, nullptr, WaterAllFlowers, TextID::WATER_FLOWERS_NOTE, MenuEntryId::EnvironmentWaterFlowers));
+		ENVC->Append(CreateEntry(TextID::WEED_REMOVER_NAME, nullptr, weedremover, TextID::WEED_REMOVER_NOTE, MenuEntryId::EnvironmentWeedRemover));
 		ENVC->Append(EntryWithHotkey(CreateEntry(TextID::GRASS_EDITOR, grasseditor, grasscomplete, TextID::GRASS_EDITOR_NOTE, MenuEntryId::EnvironmentGrassEditor), {
 			NamedHotkey(Key::R | Key::DPadDown, TextID::GRASS_EDITOR_HOTKEY1),
 			NamedHotkey(Key::R | Key::DPadUp, TextID::GRASS_EDITOR_HOTKEY2),
 			NamedHotkey(Key::R | Key::DPadRight, TextID::GRASS_EDITOR_HOTKEY3)
-		})),
-		ENVC->Append(CreateEntry(TextID::KEEP_GRASS_STATE, KeepGrassState, TextID::KEEP_GRASS_STATE_NOTE, MenuEntryId::EnvironmentKeepGrassState)),
-		ENVC->Append(CreateEntry(TextID::BURIED_INSPECTOR, BuriedInspector, TextID::BURIED_INSPECTOR_NOTE, MenuEntryId::EnvironmentBuriedInspector)),
-		ENVC->Append(CreateEntry(TextID::ITEMS_DONT_DISSAPPEAR, ItemsDontDissappearOnInvalidPositions, TextID::ITEMS_DONT_DISSAPPEAR_NOTE, MenuEntryId::EnvironmentItemsDontDissapear)),
+		}));
+		ENVC->Append(CreateEntry(TextID::KEEP_GRASS_STATE, KeepGrassState, TextID::KEEP_GRASS_STATE_NOTE, MenuEntryId::EnvironmentKeepGrassState));
+		ENVC->Append(CreateEntry(TextID::BURIED_INSPECTOR, BuriedInspector, TextID::BURIED_INSPECTOR_NOTE, MenuEntryId::EnvironmentBuriedInspector));
+		ENVC->Append(CreateEntry(TextID::ITEMS_DONT_DISSAPPEAR, ItemsDontDissappearOnInvalidPositions, TextID::ITEMS_DONT_DISSAPPEAR_NOTE, MenuEntryId::EnvironmentItemsDontDissapear));
 
 		menu->Append(ENVC);
 
@@ -489,7 +507,11 @@ namespace CTRPluginFramework {
 	/*Fun Codes Folder*/
 	////////////////////
 		MenuFolder *FUNC = CreateFolder(FolderType::Extra, SubFolder::Fun);
-		FUNC->Append(CreateEntry(TextID::SIZE_CODES, nullptr, sizecodes, TextID::SIZE_CODES_NOTE, MenuEntryId::FunSizeCodes)),
+		{
+			MenuEntry *sizeCodesEntry = CreateEntry(TextID::SIZE_CODES, nullptr, sizecodes, TextID::SIZE_CODES_NOTE, MenuEntryId::FunSizeCodes);
+			sizeCodesEntry->SetSavedValueApplyCallback(SizeCodesApplySaved);
+			FUNC->Append(sizeCodesEntry);
+		}
 		FUNC->Append(CreateEntry(TextID::T_POSE, tposeentry, TextID::T_POSE_NOTE, MenuEntryId::FunTPose)),
 		FUNC->Append(EntryWithHotkey(CreateEntry(TextID::TAKE_TPC_PIC, freezeframe, TextID::TAKE_TPC_PIC_NOTE, MenuEntryId::FunTakeTpcPic), {
 			NamedHotkey(Key::DPadRight, TextID::TAKE_TPC_PIC_KEY1),
@@ -521,8 +543,16 @@ namespace CTRPluginFramework {
 	/*Misc Codes Folder*/
 	/////////////////////
 		MenuFolder *MISC = CreateFolder(FolderType::Misc);
-		MISC->Append(CreateEntry(TextID::TOOL_ANIM, nullptr, tooltype, TextID::TOOL_ANIM_NOTE, MenuEntryId::MiscToolAnim)),
-		MISC->Append(CreateEntry(TextID::GAME_TYPE, nullptr, mgtype, TextID::GAME_TYPE_NOTE, MenuEntryId::MiscGameType)),
+		{
+			MenuEntry *toolAnimEntry = CreateEntry(TextID::TOOL_ANIM, nullptr, tooltype, TextID::TOOL_ANIM_NOTE, MenuEntryId::MiscToolAnim);
+			toolAnimEntry->SetSavedValueApplyCallback(ToolTypeApplySaved);
+			MISC->Append(toolAnimEntry);
+		}
+		{
+			MenuEntry *gameTypeEntry = CreateEntry(TextID::GAME_TYPE, nullptr, mgtype, TextID::GAME_TYPE_NOTE, MenuEntryId::MiscGameType);
+			gameTypeEntry->SetSavedValueApplyCallback(GameTypeApplySaved);
+			MISC->Append(gameTypeEntry);
+		}
 		MISC->Append(CreateEntry(TextID::RADIO_PLAYER, radioPlayer , TextID::RADIO_PLAYER_NOTE, MenuEntryId::MiscRadioPlayer)),
 		MISC->Append(CreateEntry(TextID::RELOAD_ROOM_NAME, nullptr, ReloadRoomCheat, TextID::RELOAD_ROOM_NOTE, MenuEntryId::MiscReloadRoom)),
 		MISC->Append(CreateEntry(TextID::LARGE_FOV, fovlarge, TextID::LARGE_FOV_NOTE, MenuEntryId::MiscLargeFov)),

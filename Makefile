@@ -32,6 +32,7 @@ SOURCES 	:= 	src \
 				src/features/DefaultCodes \
 				src/features/EnvironmentCodes \
 				src/features/MiniGame1 \
+				src/features/InventoryCodes \
 				src/core \
 				src/core/game_api \
 				src/core/game_api/House \
@@ -92,7 +93,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I $(CURDIR)/$(dir) ) \
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L $(dir)/lib)
 
-.PHONY: $(BUILD) clean all
+.PHONY: $(BUILD) clean all check-address
 
 #---------------------------------------------------------------------------------
 all: $(BUILD)
@@ -113,6 +114,9 @@ re: clean all
 relink:
 	@rm -f *.elf *.3gx
 	@$(MAKE)
+
+check-address:
+	@python3 $(CURDIR)/tools/check_no_global_address.py || python $(CURDIR)/tools/check_no_global_address.py
 
 #---------------------------------------------------------------------------------
 

@@ -110,6 +110,12 @@ namespace CTRPluginFramework {
 	static int mode = 0;
 	static u16 npcID = 0;
 
+	void NPCSetAnimApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		mode = static_cast<int>(savedValue & 0x3);
+		npcID = static_cast<u16>((savedValue >> 16) & 0xFFFF);
+	}
+
 	void NPCSetAnim(MenuEntry *entry) {
 		const std::vector<std::string> vec = {
 			Language::getInstance()->get(TextID::NPC_ANIM_ANIMATION),
@@ -127,6 +133,7 @@ namespace CTRPluginFramework {
 
 		if(PluginUtils::Input::PromptNumber<u16>({ Utils::Format(Language::getInstance()->get(TextID::NPC_ANIM_SET).c_str(), vec[op].c_str()), true, 4, npcID }, npcID)) {
 			mode = op;
+			entry->SetSavedValue((static_cast<u32>(npcID) << 16) | static_cast<u32>(mode & 0x3));
 		}
 	}
 

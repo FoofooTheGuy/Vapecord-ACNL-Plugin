@@ -74,43 +74,54 @@ namespace CTRPluginFramework {
 		}
 	}
 //Weather Mod
-	void Weathermod(MenuEntry *entry) { 
+	static constexpr u32 WeatherPatches[5] = {
+		0xE3A00000, 0xE3A00002, 0xE3A00003, 0xE3A00004, 0xE3A00005
+	};
+
+	static void ApplyWeatherSelection(u32 selection) {
 		static Address weather(0x62FC30);
-		
-		std::vector<std::string> weatheropt = {
-			Language::getInstance()->get(TextID::VECTOR_WEATHER_SUNNY),
-			Language::getInstance()->get(TextID::VECTOR_WEATHER_CLOUDY),
-			Language::getInstance()->get(TextID::VECTOR_WEATHER_RAINY),
-			Language::getInstance()->get(TextID::VECTOR_WEATHER_STORMY),
-			Language::getInstance()->get(TextID::VECTOR_WEATHER_SNOWY),
-			Language::getInstance()->get(TextID::VECTOR_DISABLE)
-		};
-		
-		static constexpr u32 Weathers[5] = {
-			0xE3A00000, 0xE3A00002, 0xE3A00003, 0xE3A00004, 0xE3A00005
-		};
 
-		bool IsON;
-		
-		for(int i = 0; i < 5; ++i) { 
-			IsON = *(u32 *)weather.addr == Weathers[i];
-			weatheropt[i] = (IsON ? Color(pGreen) : Color(pRed)) << weatheropt[i];
-		}
-		
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), weatheropt);
-
-		int op = optKb.Open();
-		if(op < 0) {
-			return;
-		}
-		
-		if(op == 5) {
+		if(selection >= 5) {
 			weather.Unpatch();
 			return;
 		}
-		
-		weather.Patch(Weathers[op]);
-		Weathermod(entry);
+
+		weather.Patch(WeatherPatches[selection]);
+	}
+
+	void WeatherModApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		ApplyWeatherSelection(savedValue);
+	}
+
+	void Weathermod(MenuEntry *entry) { 
+		while(true) {
+			static Address weather(0x62FC30);
+
+			std::vector<std::string> weatheropt = {
+				Language::getInstance()->get(TextID::VECTOR_WEATHER_SUNNY),
+				Language::getInstance()->get(TextID::VECTOR_WEATHER_CLOUDY),
+				Language::getInstance()->get(TextID::VECTOR_WEATHER_RAINY),
+				Language::getInstance()->get(TextID::VECTOR_WEATHER_STORMY),
+				Language::getInstance()->get(TextID::VECTOR_WEATHER_SNOWY),
+				Language::getInstance()->get(TextID::VECTOR_DISABLE)
+			};
+
+			for(int i = 0; i < 5; ++i) {
+				const bool isOn = *(u32 *)weather.addr == WeatherPatches[i];
+				weatheropt[i] = (isOn ? Color(pGreen) : Color(pRed)) << weatheropt[i];
+			}
+			weatheropt[5] = (*(u32 *)weather.addr == weather.origVal ? Color(pGreen) : Color(pRed)) << weatheropt[5];
+
+			Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), weatheropt);
+			const int op = optKb.Open();
+			if(op < 0 || op > 5) {
+				return;
+			}
+
+			ApplyWeatherSelection(static_cast<u32>(op));
+			entry->SetSavedValue(static_cast<u32>(op));
+		}
 	}
 
 	//Water All Flowers	

@@ -273,158 +273,84 @@ namespace CTRPluginFramework {
 	}
 
 //Item Settings
-	void itemsettings(MenuEntry *entry) {
+	static void ApplyItemSettingsMask(u32 mask) {
 		static Address showoff(0x19BA78);
 		static Address infinite1(0x19C574);
 		static Address infinite2(0x19C4D0);
 		static Address eat(0x19C1F0);
 
-		std::vector<std::string> itemsettopt = {
-			Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_SHOWOFF),
-			Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_INFINITE),
-			Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_EAT),
-		};
-
-		static Address settings[3] = {
-			showoff, infinite1, eat
-		};
-
-		bool IsON;
-
-		for(int i = 0; i < 3; ++i) {
-			IsON = *(u32 *)settings[i].addr != settings[i].origVal;
-			itemsettopt[i] = IsON ? (Color(pGreen) << itemsettopt[i]) : (Color(pRed) << itemsettopt[i]);
-		}
-
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), itemsettopt);
-
-		int op = optKb.Open();
-		if(op < 0) {
-			return;
-		}
-		else if(op == 0) {
-			if (*(u32 *)showoff.addr == showoff.origVal) {
-				showoff.Patch(0xE1A00000);
-			}
-			else {
-				showoff.Unpatch();
-			}
-			itemsettings(entry);
-			return;
-		}
-		else if(op == 1) {
-			if (*(u32 *)infinite1.addr == infinite1.origVal) {
-				infinite1.Patch(0xE2805A00);
-				infinite2.Patch(0xE2805A00);
-			}
-			else {
-				infinite1.Unpatch();
-				infinite2.Unpatch();
-			}
-			itemsettings(entry);
-			return;
-		}
-		else if(op == 2) {
-			if (*(u32 *)eat.addr == eat.origVal) {
-				eat.Patch(0xE1A00000);
-			}
-			else {
-				eat.Unpatch();
-			}
-			itemsettings(entry);
-			return;
-		}
-	}
-
-	static bool IsMenuPatchOpen = false;
-	static u8 CurrentMenu = 0xFF;
-	const u8 Menus[8] = {
-		0x2E, 0x37, 0x38, 0x3D, 0x79, 0x89, 0x00, 0xFF
-	};
-
-	void Callback_MenuPatch(void) {
-		if(Inventory::GetCurrent() == CurrentMenu && !IsMenuPatchOpen) {
-			IsMenuPatchOpen = true;
-		}
-
-		if(Inventory::GetCurrent() != CurrentMenu && IsMenuPatchOpen) {
-			Animation::Idle();
-			IsMenuPatchOpen = false;
-			PluginMenu *menu = PluginMenu::GetRunningInstance();
-			*menu -= Callback_MenuPatch; //delete itself
-		}
-	}
-
-	void Hook_MenuPatch(u32 r0, u32 r1, u32 r3) {
-		u8 roomId = Player::GetRoom(4);
-		if (roomId == 0xA1 || roomId == 0xA2 || (roomId >= 0x92 && roomId <= 0x97)) {
-			OSD::NotifySysFont(Language::getInstance()->get(TextID::MENU_CHANGER_INVALID_ROOM), Color::Red);
-
-			const HookContext &curr = HookContext::GetCurrent();
-			static Address func = Address::decodeARMBranch(curr.targetAddress, curr.overwrittenInstr);
-			func.Call<void>(r0, r1, r3);
+		if(mask & 0x1) {
+			showoff.Patch(0xE1A00000);
 		}
 		else {
-			Game::OpenMenu(CurrentMenu);
-			PluginMenu *menu = PluginMenu::GetRunningInstance();
-			*menu += Callback_MenuPatch;
+			showoff.Unpatch();
+		}
+
+		if(mask & 0x2) {
+			infinite1.Patch(0xE2805A00);
+			infinite2.Patch(0xE2805A00);
+		}
+		else {
+			infinite1.Unpatch();
+			infinite2.Unpatch();
+		}
+
+		if(mask & 0x4) {
+			eat.Patch(0xE1A00000);
+		}
+		else {
+			eat.Unpatch();
 		}
 	}
 
-//Menu Changer
-	void MenuChanger(MenuEntry *entry) {
-		static Hook hook;
+	static u32 GetItemSettingsMask(void) {
+		static Address showoff(0x19BA78);
+		static Address infinite1(0x19C574);
+		static Address eat(0x19C1F0);
 
-		std::vector<std::string> menuopt = {
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_DATETIME),
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_BELLPOINT_DEPO),
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_BELLPOINT_WITHDRAW),
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_LOCKER),
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_TOWNTUNE),
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_HOUSESTORAGE),
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_CUSTOM),
-			Language::getInstance()->get(TextID::VECTOR_DISABLE)
-		};
-
-		bool IsON;
-
-		for(int i = 0; i < 6; ++i) {
-			IsON = CurrentMenu == Menus[i];
-			menuopt[i] = (IsON ? Color(pGreen) :  Color(pRed)) << menuopt[i];
+		u32 mask = 0;
+		if(*(u32 *)showoff.addr != showoff.origVal) {
+			mask |= 0x1;
+		}
+		if(*(u32 *)infinite1.addr != infinite1.origVal) {
+			mask |= 0x2;
+		}
+		if(*(u32 *)eat.addr != eat.origVal) {
+			mask |= 0x4;
 		}
 
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), menuopt);
+		return mask;
+	}
 
-		int dChoice = optKb.Open();
-		if(dChoice < 0) {
-			return;
-		}
+	void ItemSettingsApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		ApplyItemSettingsMask(savedValue & 0x7);
+	}
 
-		hook.Initialize(Address(0x1A0980).addr + 8, (u32)Hook_MenuPatch);
-		hook.SetFlags(USE_LR_TO_RETURN);
+	void itemsettings(MenuEntry *entry) {
+		while(true) {
+			u32 currentMask = GetItemSettingsMask();
 
-	//If Custom Menu is chosen
-		if(dChoice == 6) {
-			if(PluginUtils::Input::PromptNumber<u8>({ Language::getInstance()->get(TextID::SAVE_MENU_CHANGER_ENTER_ID), true, 2, 0 }, CurrentMenu)) {
-				if(IDChecks::MenuValid(CurrentMenu)) {
-					hook.Enable();
-				}
-				else {
-					hook.Disable();
-					MessageBox(Language::getInstance()->get(TextID::INVALID_ID)).SetClear(ClearScreen::Top)();
-				}
+			std::vector<std::string> itemsettopt = {
+				Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_SHOWOFF),
+				Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_INFINITE),
+				Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_EAT),
+			};
+
+			itemsettopt[0] = ((currentMask & 0x1) ? Color(pGreen) : Color(pRed)) << itemsettopt[0];
+			itemsettopt[1] = ((currentMask & 0x2) ? Color(pGreen) : Color(pRed)) << itemsettopt[1];
+			itemsettopt[2] = ((currentMask & 0x4) ? Color(pGreen) : Color(pRed)) << itemsettopt[2];
+
+			Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), itemsettopt);
+			const int op = optKb.Open();
+			if(op < 0 || op > 2) {
+				return;
 			}
-			return;
-		}
 
-		CurrentMenu = Menus[dChoice];
-		if(CurrentMenu == 0xFF) {
-			hook.Disable();
-			return;
+			u32 nextMask = currentMask ^ (1u << op);
+			ApplyItemSettingsMask(nextMask);
+			entry->SetSavedValue(nextMask);
 		}
-
-		hook.Enable();
-		MenuChanger(entry);
 	}
 
 	void GetCustomView(Keyboard& keyboard, KeyboardEvent& event) {
