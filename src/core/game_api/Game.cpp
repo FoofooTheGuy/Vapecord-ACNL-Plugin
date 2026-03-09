@@ -34,19 +34,19 @@ namespace CTRPluginFramework {
 		}
 
 		void ResetValueDisplay(void) {
-			static Address disp(0x2912B8); 
+			static Address disp(0x2912B8);
 			static Address reset = disp.MoveOffset(0x28);
 
 			Process::Write8(*(u32 *)(reset.addr) + 0xA, 0);
 		}
 
 		bool SetValueDisplay(u8 type) {
-			static Address disp(0x2912B8); 
+			static Address disp(0x2912B8);
 			return disp.Call<bool>(type);
 		}
 
-		u8 GetGrassStateAtWorldCoords(u8 wX, u8 wY) {	
-			static Address gState(0x6C92FC); 
+		u8 GetGrassStateAtWorldCoords(u8 wX, u8 wY) {
+			static Address gState(0x6C92FC);
 			return gState.Call<u8>(wX, wY);
 		}
 
@@ -54,8 +54,8 @@ namespace CTRPluginFramework {
 			if(!PlayerClass::GetInstance()->IsLoaded()) {
 				return false;
 			}
-			
-			static Address WFlower(0x765B14); 
+
+			static Address WFlower(0x765B14);
 			WFlower.Call<void>(PlayerClass::GetInstance()->Offset(), wX, wY);
 			return true;
 		}
@@ -63,21 +63,21 @@ namespace CTRPluginFramework {
 		void ReloadRoom(float *coords) {
 			static const Address u0Data(0x976C0E);
 
-			static Address ReloadFunc(0x5B6660); 
+			static Address ReloadFunc(0x5B6660);
 			ReloadFunc.Call<void>(GetRoomData(), GetRoom(), coords, (u32 *)u0Data.addr, 6, 0, 0, 1, 1);
 		}
-		
+
 		u32 GetRoomData() {
-			static Address RoomDat(0x308154); 
+			static Address RoomDat(0x308154);
 			return RoomDat.Call<u32>();
 		}
 
-	//check if save screen is active 
+	//check if save screen is active
 		bool IsGameSaving() {
-			static Address saving(0x126568); 
+			static Address saving(0x126568);
 			return saving.Call<bool>();
 		}
-		
+
 		/*u32 GameHelper::GetExhibition() {
 			static const Address d_exhibition(0x9B4AC0);
 			return *(u32 *)d_exhibition.addr;
@@ -115,8 +115,8 @@ namespace CTRPluginFramework {
 			if(NoMenCall) {
 				return;
 			}
-			
-			static Address OpenMenu(0x6D3F8C); 
+
+			static Address OpenMenu(0x6D3F8C);
 			OpenMenu.Call<void>(menuID, 0, 0);
 		}
 
@@ -146,30 +146,30 @@ namespace CTRPluginFramework {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
-			
+
 			if(!IsGameInRoom(0)) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NOT_IN_TOWN), Color::Red);
 				return;
 			}
-			
+
 			if(GetOnlinePlayerCount() != 0) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NOT_IN_OWN_TOWN), Color::Red);
 				return;
 			}
-			
+
 			std::vector<u8> index;
 
 			std::vector<std::string> buildingOpt;
 			buildingOpt.clear();
 
-			for(int i = 0; i < 56; i++) { 
+			for(int i = 0; i < 56; i++) {
 				u8 bID = building->Buildings.Building[i].ID;
 				if(bID != 0xFC) {
 					index.push_back(i);
 					buildingOpt.push_back(IDChecks::GetBuildingName(bID));
 				}
 			}
-			
+
 			Keyboard optKb("");
 			optKb.Populate(buildingOpt);
 			int val = optKb.Open();
@@ -182,12 +182,12 @@ namespace CTRPluginFramework {
 
 			if (building->Buildings.Building[index.at(val)].ID == 0xDC || building->Buildings.Building[index.at(val)].ID == 0xDD) {
 				EditFaceCutOutData(
-					building->Buildings.Building[index.at(val)].XCoord, 
+					building->Buildings.Building[index.at(val)].XCoord,
 					building->Buildings.Building[index.at(val)].YCoord,
 					x & 0xFF,
 					y & 0xFF);
 			}
-			
+
 			building->Buildings.Building[index.at(val)].XCoord = x & 0xFF;
 			building->Buildings.Building[index.at(val)].YCoord = y & 0xFF;
 
@@ -206,17 +206,17 @@ namespace CTRPluginFramework {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
-			
+
 			if(!IsGameInRoom(0)) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NOT_IN_TOWN), Color::Red);
 				return;
 			}
-			
+
 			if(GetOnlinePlayerCount() != 0) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NOT_IN_OWN_TOWN), Color::Red);
 				return;
 			}
-			
+
 			std::vector<u8> index;
 
 			std::vector<std::string> buildingOpt;
@@ -228,14 +228,14 @@ namespace CTRPluginFramework {
 					buildingOpt.push_back(IDChecks::GetBuildingName(bID));
 				}
 			}
-			
+
 			Keyboard optKb("");
 			optKb.Populate(buildingOpt);
 			int val = optKb.Open();
 			if(val < 0) {
 				return;
 			}
-			
+
 			if(!IDChecks::BuildingValid(building->Buildings.Building[index.at(val)].ID)) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_CANT_REMOVE), Color::Red);
 				return;
@@ -268,16 +268,16 @@ namespace CTRPluginFramework {
 			}
 
 			int Bslot = 0;
-			while(true) { 
+			while(true) {
 				if(0xFC == building->Buildings.Building[Bslot].ID) { //If empty building slot was found
 					return true;
 				}
-				
+
 				Bslot++; //goto next slot
-				
+
 				if(56 < Bslot) { //no empty building slot found
 					return false;
-				}		
+				}
 			}
 		}
 
@@ -308,11 +308,11 @@ namespace CTRPluginFramework {
 
 				//Move default design to next empty one
 					for (int j = 0; j < 8; ++j) {
-						if (building->Stands[j].xCoord == -1 && building->Stands[j].yCoord == -1) { 
+						if (building->Stands[j].xCoord == -1 && building->Stands[j].yCoord == -1) {
 							building->Stands[j].Pattern = building->Stands[i].Pattern;
 						}
 					}
-					
+
 					return;
 				}
 			}
@@ -324,35 +324,35 @@ namespace CTRPluginFramework {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
 				return;
 			}
-			
+
 			if(!IsGameInRoom(0)) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NOT_IN_TOWN), Color::Red);
 				return;
 			}
-			
+
 			if(!IDChecks::BuildingValid(buildingID)) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_INVALID_ID), Color::Red);
 				return;
 			}
-			
+
 			if(GetOnlinePlayerCount() != 0) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NOT_IN_OWN_TOWN), Color::Red);
 				return;
 			}
-			
+
 			if(!IsBuildingSpotFree()) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NO_SLOT_FREE), Color::Red);
 				return;
 			}
 
-			if (buildingID == 0xDC || buildingID == 0xDD) { 
+			if (buildingID == 0xDC || buildingID == 0xDD) {
 				if (!IsFaceCutOutSpaceFree()) {
 					OSD::NotifySysFont(Language::getInstance()->get(TextID::BUILDING_MOD_NO_DESIGN_STAND_FREE), Color::Red);
 					return;
 				}
 			}
 
-			u32 x, y;	
+			u32 x, y;
 			PlayerClass::GetInstance()->GetWorldCoords(&x, &y);
 			PlaceBuildingUpdateCollisions(x, y, buildingID);
 
@@ -371,15 +371,15 @@ namespace CTRPluginFramework {
 		bool IsGameInRoom(u8 room) {
 			return GetRoom() == room;
 		}
-		
+
 		void SetCurrentTime(bool forward, int Minutes, int Hours, int Days, int Months, int Years) {
 			u64 SMinute = (Minutes * 60000000000);
 			u64 SHour = (Hours * 60 * 60000000000);
 			u64 SDay = (Days * 24 * 60 * 60000000000);
 			u64 SMonth = (Months * 30 * 24 * 60 * 60000000000);
 			u64 SYear = (Years * 365 * 24 * 60 * 60000000000);
-			
-			u64 Time = SMinute + SHour + SDay + SMonth + SYear;	
+
+			u64 Time = SMinute + SHour + SDay + SMonth + SYear;
 
 			static const Address RealTime(0x95D508);
 
@@ -387,18 +387,18 @@ namespace CTRPluginFramework {
 			if(!forward) {
 				Time = Time * (-1);
 			}
-			
+
 			Town::GetSaveData()->CurrentTime += Time;
 			*(u64 *)RealTime.addr += Time;
 		}
-		
+
 		int DecryptValue(u64 *position) {
 			static Address moneyget(0x3037DC);
 			return moneyget.Call<int>(position);
 		}
 
 		void EncryptValue(u64 *position, int moneyamount) {
-			static Address moneyset(0x3036A4); 
+			static Address moneyset(0x3036A4);
 			moneyset.Call<void>(position, moneyamount);
 		}
 
@@ -413,16 +413,16 @@ namespace CTRPluginFramework {
 			if(WithStats) {
 				//type = {3 = Gold, 2 = Silver, 1 = Bronze, 0 = None}
 				static const int Values[3][24] = {
-					{ 36, 36, 15, 500, 500, 100, 30, 100, 
-					50, 100, 1000000, 500000, 150, 100, 500, 500000, 
+					{ 36, 36, 15, 500, 500, 100, 30, 100,
+					50, 100, 1000000, 500000, 150, 100, 500, 500000,
 					50, 30, 20, 20, 50000, 50, 50, 50 },
 
-					{ 58, 58, 24, 2000, 2000, 200, 100, 250, 
-					200, 250, 10000000, 3000000, 1500, 300, 2000, 2000000, 
+					{ 58, 58, 24, 2000, 2000, 200, 100, 250,
+					200, 250, 10000000, 3000000, 1500, 300, 2000, 2000000,
 					100, 100, 50, 50, 100000, 200, 100, 200 },
-					
-					{ 72, 72, 30, 5000, 5000, 1000, 200, 500, 
-					500, 500, 100000000, 10000000, 5000, 1000, 5000, 5000000, 
+
+					{ 72, 72, 30, 5000, 5000, 1000, 200, 500,
+					500, 500, 100000000, 10000000, 5000, 1000, 5000, 5000000,
 					200, 200, 80, 100, 150000, 500, 300, 500 }
 				};
 
@@ -453,14 +453,14 @@ namespace CTRPluginFramework {
 				Animation::Idle();
 				OpenMenu(0, true);
 			}
-			
-			static Address cfunction(0x6D33D8); 
+
+			static Address cfunction(0x6D33D8);
 			cfunction.Call<void>(0);
 		}
 
 		u32 BaseInvPointer() {
 			static const Address InvMenu(0x98D500);
-			return *(u32 *)InvMenu.addr; 
+			return *(u32 *)InvMenu.addr;
 		}
 
 		u32 TeleportToRoom(u8 room, bool u0, bool u1, bool u2) {
@@ -472,7 +472,7 @@ namespace CTRPluginFramework {
 				return -2;
 			}
 
-			static Address roomfunc(0x304A60);	
+			static Address roomfunc(0x304A60);
 			return roomfunc.Call<u32>(room, u0, u1, u2);
 		}
 
@@ -506,7 +506,7 @@ namespace CTRPluginFramework {
 			if(index >= 4) {
 				return 0;
 			}
-			
+
 			return index;
 		}
 
@@ -515,17 +515,17 @@ namespace CTRPluginFramework {
 			return getplayer2.Call<u8>(*(u32 *)Address(0x954648).addr);
 		}
 
-		Item *GetItemAtWorldCoords(u32 x, u32 y, u32* mapData) {
-			if (!mapData) {
+		Item *GetItemAtWorldCoords(u32 x, u32 y, u32 mapData) {
+			if (mapData == 0) {
 				return nullptr;
 			}
 			static Address WorlditemCoords(0x2FEF9C);
 			return WorlditemCoords.Call<Item *>(mapData, x, y, 0);
 		}
 
-		u32* GetCurrentMap(void) {
+		u32 GetCurrentMap(void) {
 			static Address Currentmap(0x6A690C);
-			return Currentmap.Call<u32*>();
+			return Currentmap.Call<u32>();
 		}
 
 		void PlaceBuildingUpdateCollisions(u32 x, u32 y, u16 buildingID) {
@@ -542,11 +542,11 @@ namespace CTRPluginFramework {
 			if(!PlayerClass::GetInstance()->IsLoaded()) {
 				return res;
 			}
-			
+
 			static Address rem1(0x597F54);
 			static Address rem2(0x597F38);
 			static Address rem3(0x597FAC);
-			
+
 			if(removeEverything) {
 				if(!Player::IsIndoors()) {
 					x = 0x10;
@@ -563,7 +563,7 @@ namespace CTRPluginFramework {
 				rem2.Patch(0xE1A00000);
 				rem3.Patch(0xE1A00000);
 			}
-			
+
 			while(res && (x - wX < width || removeEverything)) {
 				while(res && (y - wY < length || removeEverything)) {
 					if(GetItemAtWorldCoords(x, y)) {
@@ -594,7 +594,7 @@ namespace CTRPluginFramework {
 					y++;
 				}
 				res = true;
-				
+
 				if(removeEverything) {
 					y = !Player::IsIndoors() ? 0x10 : 0;
 				}
@@ -613,11 +613,11 @@ namespace CTRPluginFramework {
 				rem2.Unpatch();
 				rem3.Unpatch();
 			}
-			
+
 			if(counting) {
 				OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::SEARCH_REPLACE_REPLACED).c_str(), count));
 			}
-			
+
 			return true;
 		}
 
@@ -651,11 +651,11 @@ namespace CTRPluginFramework {
 			static const Address lockspot1(0x5A13C8);
 			u32 lockspot2 = lockspot1.addr + 4;
 			u32 index;
-			
+
 			if(*(u32 *)lockspot1.addr != 0xE3A00000) {
 				return createLocked.Call<u32>(DropID, wX, wY, roomID, sendPkt);
 			}
-			
+
 			Process::Patch(lockspot1.addr, 0xE24DD01C);
 			Process::Patch(lockspot2, 0xE1A07001);
 			index = createLocked.Call<u32>(DropID, wX, wY, roomID, sendPkt);
@@ -669,34 +669,34 @@ namespace CTRPluginFramework {
 			return getlocked.Call<u32>(wX, wY, roomID);
 		}
 
-		void TrampleAtWorldCoords(u8 wX, u8 wY) {		
+		void TrampleAtWorldCoords(u8 wX, u8 wY) {
 			Item *pItem = GetItemAtWorldCoords(wX, wY);
 			Item Empty = {0x7FFE, 0};
-			
+
 			if(!pItem) {
 				return;
 			}
-			
-			u8 room = Player::GetRoom(GetActualPlayerIndex()); 
-			if(GetOnlinePlayerCount() != 0) {	
+
+			u8 room = Player::GetRoom(GetActualPlayerIndex());
+			if(GetOnlinePlayerCount() != 0) {
 				TramplePkt data { *pItem, room, wX, wY, 0 };
-				
+
 				static Address trample(0x625488);
 				trample.Call<void>(0x47, 4, &data, 8);
 			}
-			
-			static Address trample1(0x168E20); 
+
+			static Address trample1(0x168E20);
 			trample1.Call<void>(wX, wY, 0, room, &Empty);
 
 			static Address trample3(0x59F144);
 			trample3.Call<void>(wX, wY, 1);
 		}
 
-		bool SetItem(Item *item) {		
+		bool SetItem(Item *item) {
 			if(Player::GetSaveOffset(4) == 0) {
 				return 0;
 			}
-			
+
 			if(!item->isValid(false)) {
 				return 0;
 			}
@@ -716,7 +716,7 @@ namespace CTRPluginFramework {
 		static const Address camera1(0x951884);
 		return *(u32 *)camera1.addr;
 	}
-	
+
 	float* Camera::GetCoordinates() {
 		static const Address camcoord(0x9866F4);
 		return (float *)camcoord.addr;
@@ -736,7 +736,7 @@ namespace CTRPluginFramework {
 	void Camera::AddToZ(float val) {
 		*(float *)(Camera::GetInstance() + 0xC) += val;
 	}
-	
+
 //add u16 to y rotation
 	void Camera::AddToYRotation(u16 val) {
 		*(u16 *)(Camera::GetInstance() + 0x1C) += val;

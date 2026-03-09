@@ -55,7 +55,7 @@ namespace CTRPluginFramework {
 		void				ClearLockedSpot(u8 wX, u8 wY, u8 roomID, u32 param_4 = 4);
 		u32					CreateLockedSpot(u8 DropID, u8 wX, u8 wY, u8 roomID, bool sendPkt = 1);
 		u32					GetLockedSpotIndex(u8 wX, u8 wY, u8 roomID = 0xA5);
-	//Other Stuff	
+	//Other Stuff
 		bool 				IsOutdoorItem(Item item);
 		void				ReloadRoom(float *coords = PlayerClass::GetInstance()->GetCoordinates());
 		void				Catalog(bool directcall = false);
@@ -63,8 +63,8 @@ namespace CTRPluginFramework {
 		u8					GetOnlinePlayerIndex();
 		u8					GetActualPlayerIndex();
 		u8					GetOnlinePlayerCount();
-		u32	*				GetCurrentMap(void);
-		Item				*GetItemAtWorldCoords(u32 x, u32 y, u32* mapData = GetCurrentMap());
+		u32					GetCurrentMap(void);
+		Item				*GetItemAtWorldCoords(u32 x, u32 y, u32 mapData = GetCurrentMap());
 		bool				RemoveItems(bool trample, u8 wX, u8 wY, u8 width, u8 length, bool allowAbort, bool removeEverything, bool counting = true);
 		void				SpawnParticlesAtCoords(u32 particleID, float *coords);
 		void				TrampleAtWorldCoords(u8 wX, u8 wY);
@@ -102,24 +102,24 @@ namespace CTRPluginFramework {
 	Data StringToHex(const std::string& str, Data returntype) {
 		u32 val = 0;
 		const u8* hex = (const u8*)str.c_str();
-		
+
 		while(*hex) {
 			u8 byte = (u8)*hex++;
 
-			if(byte >= '0' && byte <= '9') 
+			if(byte >= '0' && byte <= '9')
 				byte = byte - '0';
-			else if(byte >= 'a' && byte <= 'f') 
+			else if(byte >= 'a' && byte <= 'f')
 				byte = byte - 'a' + 10;
-			else if(byte >= 'A' && byte <= 'F') 
+			else if(byte >= 'A' && byte <= 'F')
 				byte = byte - 'A' + 10;
 			else if(byte == ' ') //skips space
 				continue;
-			else 
+			else
 				return returntype; ///< Incorrect char
 
 			val = (val << 4) | (byte & 0xF);
 		}
-		
+
 		return val;
 	}
 }
