@@ -23,6 +23,7 @@ namespace CTRPluginFramework {
 	struct FolderInfo {
 		FolderType folderType;
 		SubFolder subFolder;
+		std::string customNote;
 	};
 
 	static std::unordered_map<MenuFolder *, FolderInfo> g_folderInfos;
@@ -33,6 +34,23 @@ namespace CTRPluginFramework {
 
 	static std::string GetSubFolderName(FolderType parent, SubFolder sub) {
 		return Language::getInstance()->get(GetSubFolderTextId(parent, sub));
+	}
+
+	static std::string GetFolderNote(FolderType type) {
+		TextID noteKey = GetFolderNoteTextId(type);
+		return noteKey != TextID::NONE ? Language::getInstance()->get(noteKey) : "";
+	}
+
+	static std::string GetSubFolderNote(FolderType parent, SubFolder sub) {
+		TextID noteKey = GetSubFolderNoteTextId(parent, sub);
+		return noteKey != TextID::NONE ? Language::getInstance()->get(noteKey) : "";
+	}
+
+	static std::string ResolveFolderNote(FolderType folderType, SubFolder subFolder, const std::string &customNote = "") {
+		if (!customNote.empty())
+			return customNote;
+
+		return subFolder != SubFolder::None ? GetSubFolderNote(folderType, subFolder) : GetFolderNote(folderType);
 	}
 
 	static Color GetFolderColor(FolderType type) {
@@ -55,9 +73,9 @@ namespace CTRPluginFramework {
 	}
 
 	static MenuFolder *CreateFolder(FolderType folderType, SubFolder subFolder = SubFolder::None, const std::string &note = "") {
-		MenuFolder *folder = new MenuFolder(GetFolderColor(folderType) << (subFolder != SubFolder::None ? GetSubFolderName(folderType, subFolder) : GetFolderName(folderType)), note);
+		MenuFolder *folder = new MenuFolder(GetFolderColor(folderType) << (subFolder != SubFolder::None ? GetSubFolderName(folderType, subFolder) : GetFolderName(folderType)), ResolveFolderNote(folderType, subFolder, note));
 		folder->SetColor(GetFolderColor(folderType));
-		g_folderInfos[folder] = { folderType, subFolder };
+		g_folderInfos[folder] = { folderType, subFolder, note };
 		return folder;
 	}
 
@@ -131,6 +149,7 @@ namespace CTRPluginFramework {
 			const FolderInfo &info = it->second;
 			folder->SetColor(GetFolderColor(info.folderType));
 			folder->SetName(GetFolderColor(info.folderType) << (info.subFolder != SubFolder::None ? GetSubFolderName(info.folderType, info.subFolder) : GetFolderName(info.folderType)));
+			folder->Note() = ResolveFolderNote(info.folderType, info.subFolder, info.customNote);
 		});
 	/////////////////////
 	/*Save Codes Folder*/
