@@ -50,8 +50,7 @@ namespace CTRPluginFramework {
 	}
 //Coordinate Mod Speed Changer Keyboard
 	void coordspeed(MenuEntry *entry) {
-		Keyboard kb(Language::getInstance()->get(TextID::ENTER_ID));
-		kb.GetMessage() = Utils::Format(Language::getInstance()->get(TextID::COORD_MOD_ENTER_SPEED).c_str(), 5);
+		Keyboard kb(Utils::Format(Language::getInstance()->get(TextID::COORD_MOD_ENTER_SPEED).c_str(), 5));
 		kb.IsHexadecimal(false);
 		kb.SetMaxLength(2);
 		if(kb.Open(cspeed) >= 0) {
@@ -61,21 +60,19 @@ namespace CTRPluginFramework {
 
 //Coordinate Modifier
 	void coordinate(MenuEntry *entry) {
-		if(entry->Hotkeys[0].IsDown()) {//A
-			float *pCoords = PlayerClass::GetInstance()->GetCoordinates();
-			if(pCoords != nullptr && !MapEditorActive) { // if not in tile selection mode & valid player obj
-				if(entry->Hotkeys[1].IsDown()) {
-					pCoords[0] += cspeed; //DPadRight
-				}
-				if(entry->Hotkeys[2].IsDown()) {
-					pCoords[0] -= cspeed; //DPadLeft
-				}
-				if(entry->Hotkeys[3].IsDown()) {
-					pCoords[2] += cspeed; //DPadDown
-				}
-				if(entry->Hotkeys[4].IsDown()) {
-					pCoords[2] -= cspeed; //DPadUp
-				}
+		float *pCoords = PlayerClass::GetInstance()->GetCoordinates();
+		if(pCoords != nullptr && !MapEditorActive) { // if not in tile selection mode & valid player obj
+			if(entry->Hotkeys[0].IsDown()) {
+				pCoords[0] += cspeed; //DPadRight
+			}
+			if(entry->Hotkeys[1].IsDown()) {
+				pCoords[0] -= cspeed; //DPadLeft
+			}
+			if(entry->Hotkeys[2].IsDown()) {
+				pCoords[2] += cspeed; //DPadDown
+			}
+			if(entry->Hotkeys[3].IsDown()) {
+				pCoords[2] -= cspeed; //DPadUp
 			}
 		}
 	}
@@ -234,7 +231,7 @@ namespace CTRPluginFramework {
 				pos = -1;
 			}
 
-			OSD::NotifySysFont(allforce ? Language::getInstance()->get(TextID::PLAYER_TELEPORT_ALL) : Utils::Format(Language::getInstance()->get(TextID::PLAYER_TELEPORT_PLAYER).c_str(), pos));
+			OSD::NotifySysFont(allforce ? Language::getInstance()->get(TextID::PLAYER_TELEPORT_ALL) : Utils::Format(Language::getInstance()->get(TextID::PLAYER_TELEPORT_PLAYER).c_str(), pos + 1));
 		}
 
 		else if(entry->Hotkeys[1].IsPressed()) {
@@ -242,7 +239,7 @@ namespace CTRPluginFramework {
 			if(PlayerClass::GetInstance()->GetWorldCoords(&x, &y)) {
 				if(!allforce && pos >= 0) {
 					Animation::ExecuteAnimationWrapper(pos, 0x34, {1, 0}, 1, 1, 1, 0, x, y, true);
-					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_TELEPORT_PLAYER_TELEPORTED).c_str(), pos));
+					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_TELEPORT_PLAYER_TELEPORTED).c_str(), pos + 1));
 				}
 				else {
 					for(u8 i = 0; i < 4; ++i) {
@@ -336,8 +333,7 @@ namespace CTRPluginFramework {
 	}
 //Player Speed Changer Keyboard
 	void menuSpeedMod(MenuEntry *entry) {
-		Keyboard kb(Language::getInstance()->get(TextID::ENTER_ID));
-		kb.GetMessage() = Utils::Format(Language::getInstance()->get(TextID::SPEED_MOD_SPEED).c_str(), 1);
+		Keyboard kb(Utils::Format(Language::getInstance()->get(TextID::SPEED_MOD_SPEED).c_str(), 1));
 		kb.IsHexadecimal(false);
 		kb.SetMaxLength(7);
 		kb.OnKeyboardEvent(SpeedCheck);

@@ -82,7 +82,7 @@ namespace CTRPluginFramework {
 		Color darkGrey(40, 40, 40, 175);
 
 	//gets player
-		screen.DrawSysfontWithBackground(Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_PLAYER).c_str(), pIndex), 0, 0, Player::GetColor(pIndex), darkGrey);
+		screen.DrawSysfontWithBackground(Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_PLAYER).c_str(), pIndex + 1), 0, 0, Player::GetColor(pIndex), darkGrey);
 
 		for (int i = 0; i < 6; ++i) {
 			screen.DrawSysfontWithBackground(strings1.at(i), 0, YPositions1[i], Color::White, darkGrey);

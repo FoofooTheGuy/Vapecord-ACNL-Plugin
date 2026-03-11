@@ -12,10 +12,6 @@ namespace CTRPluginFramework {
 		u8 A;
 	};
 
-	namespace Building {
-		ACNL_BuildingData 	*GetSaveData();
-	}
-
 	namespace Game {
 		enum GameMode : u8 {
 			OFFLINE = 0,
@@ -36,11 +32,6 @@ namespace CTRPluginFramework {
 	//value display
 		bool 				SetValueDisplay(u8 type);
 		void 				ResetValueDisplay(void);
-	//Building Stuff
-		void				MoveBuilding();
-		void				RemoveBuilding();
-		void 				PlaceBuilding(u8 buildingID);
-		void				PlaceBuildingUpdateCollisions(u32 x, u32 y, u16 buildingID);
 	//Money Stuff
 		void 				SetBadges(u8 badge, u8 type, bool WithStats);
 		int					DecryptValue(u64 *position);

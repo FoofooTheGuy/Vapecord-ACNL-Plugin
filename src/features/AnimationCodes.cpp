@@ -68,7 +68,7 @@ namespace CTRPluginFramework {
 		if(entry->Hotkeys[0].IsPressed()) {
 			for(int i = 0; i <= 3; ++i) {
 				if(PlayerClass::GetInstance(i)->IsLoaded()) {
-					pV[i] = Player::GetColor(i) << Language::getInstance()->get(TextID::PLAYER_SELECTOR_PLAYER) << std::to_string(i);
+					pV[i] = Player::GetColor(i) << Language::getInstance()->get(TextID::PLAYER_SELECTOR_PLAYER) << std::to_string(i + 1);
 				}
 			}
 
@@ -78,7 +78,7 @@ namespace CTRPluginFramework {
 			if(pChoice >= 0) {
 				if(pV[pChoice] != Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY)) {
 					TogglePlayerSelect(pChoice);
-					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_ENABLED).c_str(), pChoice));
+					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_ENABLED).c_str(), pChoice + 1));
 				}
 				else {
 					OSD::NotifySysFont(Language::getInstance()->get(TextID::PLAYER_SELECT_PLAYER_NOT_EXISTS), Color::Red);
@@ -88,7 +88,7 @@ namespace CTRPluginFramework {
 
 		else if(entry->Hotkeys[1].IsPressed()) {
 			if(IsPlayerSelectEnabled) {
-				OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_DISABLED).c_str(), *(u8 *)(Address(0x75F010).addr + 0x10)));
+				OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_DISABLED).c_str(), *(u8 *)(Address(0x75F010).addr + 0x10) + 1));
 				TogglePlayerSelect(4);
 				return;
 			}

@@ -141,7 +141,7 @@ namespace CTRPluginFramework {
             return "";
         }
 
-        u16 idx = static_cast<u16>(id);
+        const u16 idx = static_cast<u16>(id) - 1;
         if (idx >= offsets.size()) {
             return "[invalid id]";
         }

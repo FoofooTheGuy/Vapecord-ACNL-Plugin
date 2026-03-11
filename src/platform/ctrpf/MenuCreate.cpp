@@ -149,7 +149,7 @@ namespace CTRPluginFramework {
 		SAVEC->Append(CreateEntry(TextID::HOUSE_EDITOR_NAME, nullptr, HouseChanger, TextID::HOUSE_EDITOR_NOTE, MenuEntryId::SaveHouseEditor)),
 		SAVEC->Append(CreateEntry(TextID::BUILDING_MOD_NAME, nullptr, BuildingMod, TextID::BUILDING_MOD_NOTE, MenuEntryId::SaveBuildingMod)),
 		SAVEC->Append(CreateEntry(TextID::FILL_MUSEUM_NAME, nullptr, CompleteMuseum, TextID::FILL_MUSEUM_NOTE, MenuEntryId::SaveFillMuseum)),
-		SAVEC->Append(CreateEntry(TextID::MAYOR_PERMIT_NAME, Permit100, TextID::MAYOR_PERMIT_NOTE, MenuEntryId::SaveMayorPermit)),
+		SAVEC->Append(CreateEntry(TextID::MAYOR_PERMIT_NAME, nullptr, Permit100, TextID::MAYOR_PERMIT_NOTE, MenuEntryId::SaveMayorPermit)),
 		SAVEC->Append(CreateEntry(TextID::REAL_TIME_ACRE, MapEditor, TextID::REAL_TIME_ACRE_NOTE, MenuEntryId::SaveRealTimeAcre)),
 		menu->Append(SAVEC);
 
@@ -159,11 +159,10 @@ namespace CTRPluginFramework {
 		MenuFolder *MOVEC = CreateFolder(FolderType::Movement);
 		MOVEC->Append(CreateEntry(TextID::CANT_PUSH, noPush, TextID::CANT_PUSH_NOTE, MenuEntryId::MovementCantPush));
 		MenuEntry *coordModEntry = EntryWithHotkey(CreateEntry(TextID::COORD_MOD, coordinate, coordspeed, TextID::COORD_MOD_NOTE, MenuEntryId::MovementCoordMod), {
-			NamedHotkey(Key::A, TextID::COORD_MOD_KEY1),
-			NamedHotkey(Key::DPadRight, TextID::COORD_MOD_KEY2),
-			NamedHotkey(Key::DPadLeft, TextID::COORD_MOD_KEY3),
-			NamedHotkey(Key::DPadDown, TextID::COORD_MOD_KEY4),
-			NamedHotkey(Key::DPadUp, TextID::COORD_MOD_KEY5)
+			NamedHotkey(Key::A | Key::DPadRight, TextID::COORD_MOD_KEY2),
+			NamedHotkey(Key::A | Key::DPadLeft, TextID::COORD_MOD_KEY3),
+			NamedHotkey(Key::A | Key::DPadDown, TextID::COORD_MOD_KEY4),
+			NamedHotkey(Key::A | Key::DPadUp, TextID::COORD_MOD_KEY5)
 		});
 		coordModEntry->SetSavedValueApplyCallback(CoordSpeedApplySaved);
 		MOVEC->Append(coordModEntry);
@@ -201,14 +200,13 @@ namespace CTRPluginFramework {
 	/*Inventory Codes Folder*/
 	//////////////////////////
 		MenuFolder *INVC = CreateFolder(FolderType::Inventory);
-		INVC->Append(EntryWithHotkey(CreateEntry(TextID::TEXT_2_ITEM, t2i, itemsearch, TextID::TEXT_2_ITEM_NOTE, MenuEntryId::InventoryText2Item), {
+		INVC->Append(EntryWithHotkey(CreateEntry(TextID::TEXT_2_ITEM, t2i, TextID::TEXT_2_ITEM_NOTE, MenuEntryId::InventoryText2Item), {
 			NamedHotkey(Key::X | Key::DPadRight, TextID::TEXT_2_ITEM_KEY1),
-			NamedHotkey(Key::X |Key::DPadUp, TextID::TEXT_2_ITEM_KEY2),
 			NamedHotkey(Key::X | Key::DPadDown, TextID::TEXT_2_ITEM_KEY3),
 		}));
 		INVC->Append(EntryWithHotkey(CreateEntry(TextID::DUPE_ITEMS, duplication, TextID::DUPE_ITEMS_NOTE, MenuEntryId::InventoryDupeItems), {
 			NamedHotkey(Key::R, TextID::DUPE_ITEMS_KEY1),
-			NamedHotkey(Key::R | Key::X, TextID::DUPE_ITEMS_KEY2)
+			NamedHotkey(Key::R | Key::Y, TextID::DUPE_ITEMS_KEY2)
 		}));
 		INVC->Append(EntryWithHotkey(CreateEntry(TextID::CATALOG_TO_POCKET, catalog, TextID::CATALOG_TO_POCKET_NOTE, MenuEntryId::InventoryCatalogToPocket), {
 			NamedHotkey(Key::L | Key::DPadRight, TextID::CATALOG_TO_POCKET_KEY1)
@@ -216,6 +214,7 @@ namespace CTRPluginFramework {
 		INVC->Append(EntryWithHotkey(CreateEntry(TextID::CHAT_T2I, chatt2i, TextID::CHAT_T2I_NOTE, MenuEntryId::InventoryChatT2I), {
 			NamedHotkey(Key::R | Key::DPadLeft, TextID::CHAT_T2I_KEY1)
 		}));
+		INVC->Append(CreateEntry(TextID::SEARCH_ITEM, nullptr, itemsearch, TextID::SEARCH_ITEM_NOTE, MenuEntryId::InventorySearchItem));
 		INVC->Append(CreateEntry(TextID::CLEAR_INV_NAME, nullptr, ClearInventory, TextID::CLEAR_INV_NOTE, MenuEntryId::InventoryClearInventory));
 		MenuEntry *itemSettingsEntry = CreateEntry(TextID::ITEM_SETTINGS, nullptr, itemsettings, TextID::ITEM_SETTINGS_NOTE, MenuEntryId::InventoryItemSettings);
 		itemSettingsEntry->SetSavedValueApplyCallback(ItemSettingsApplySaved);

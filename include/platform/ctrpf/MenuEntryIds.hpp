@@ -77,6 +77,7 @@ namespace CTRPluginFramework {
 		constexpr u32 InventorySaveMenuChanger = Make(GroupInventory, 0x0007);
 		constexpr u32 InventoryGetSet = Make(GroupInventory, 0x0008);
 		constexpr u32 InventoryCustomButton = Make(GroupInventory, 0x0009);
+		constexpr u32 InventorySearchItem = Make(GroupInventory, 0x000A);
 
 		// PlayerSave folder
 		constexpr u32 PlayerSaveNameChanger = Make(GroupPlayerSave, 0x0001);

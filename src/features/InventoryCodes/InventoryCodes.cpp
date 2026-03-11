@@ -67,7 +67,7 @@ namespace CTRPluginFramework {
 		}
 
 		Inventory::WriteSlot(slot, item);
-		MessageBox(Utils::Format(Language::getInstance()->get(TextID::INVENTORY_SEARCH_SET).c_str(), item.ID, slot)).SetClear(ClearScreen::Top)();
+		MessageBox(Utils::Format(Language::getInstance()->get(TextID::INVENTORY_SEARCH_SET).c_str(), item.ID, slot + 1)).SetClear(ClearScreen::Top)();
 	}
 
 //Text to Item
@@ -81,9 +81,14 @@ namespace CTRPluginFramework {
 				return;
 			}
 
-			Inventory::ReadSlot(0, val);
+			u8 slot = 0;
+			if(!Inventory::GetNextItem({0x7FFE, 0}, slot)) {
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::INVENTORY_SEARCH_INV_FULL), Color::Red);
+				return;
+			}
+
 			if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&val, TextItemChange }, *(u32 *)&val)) {
-				Inventory::WriteSlot(0, val);
+				Inventory::WriteSlot(slot, val);
 			}
 		}
 
@@ -93,25 +98,17 @@ namespace CTRPluginFramework {
 				return;
 			}
 
-			if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::TEXT_2_ITEM_SET), true, 8, 0x7FFE, TextItemChange }, *(u32 *)&val)) {
-				for(u16 i = 0; i < 0x10; ++i) {
-					Item item = {(u16)(val.ID + i), 0};
-					Inventory::WriteSlot(i, item);
-				}
-			}
-		}
-
-		else if(entry->Hotkeys[2].IsPressed()) {
-			if(!player) {
-				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
-				return;
-			}
-
 			u32 x, y;
 			if(PlayerClass::GetInstance()->GetWorldCoords(&x, &y)) {
 				Item *item = Game::GetItemAtWorldCoords(x, y);
 				if(item) {
-					Inventory::WriteSlot(0, *item);
+					u8 slot = 0;
+					if(!Inventory::GetNextItem({0x7FFE, 0}, slot)) {
+						OSD::NotifySysFont(Language::getInstance()->get(TextID::INVENTORY_SEARCH_INV_FULL), Color::Red);
+						return;
+					}
+
+					Inventory::WriteSlot(slot, *item);
 					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::INVENTORY_T2I_SET).c_str(), *(u32 *)item));
 				}
 			}

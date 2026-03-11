@@ -42,43 +42,33 @@ namespace CTRPluginFramework {
 			static Hook hook;
 			static Hook hook2;
 			static Hook hook3;
-			static bool initialized = false;
 			static Address buttonDataFunc(0x19C440);
 			static Address buttonDataFuncOption1 = buttonDataFunc.MoveOffset(4);
 			static Address buttonDataFuncOption2 = buttonDataFunc.MoveOffset(8);
 			static Address buttonFunctionFunc(0x19EE20);
-			static Address buttonFunctionFuncEnd = buttonFunctionFunc.MoveOffset(4);
 			static Address sysNameFunc(0x5D5860);
 
 			const bool anyActive = BuildCustomButtonMask() != 0;
 
 			if(anyActive) {
-				if(!initialized) {
-					hook.Initialize(buttonDataFunc.addr, (u32)SetCustomButtonData);
-					hook.SetFlags(USE_LR_TO_RETURN);
+				hook.Initialize(buttonDataFunc.addr, (u32)SetCustomButtonData);
+				hook.SetFlags(USE_LR_TO_RETURN);
 
-					hook2.Initialize(buttonFunctionFunc.addr, (u32)SetCustomButtonFunctions);
-					hook2.SetFlags(USE_LR_TO_RETURN);
+				hook2.InitializeForMitm(buttonFunctionFunc.addr, (u32)SetCustomButtonFunctions);
 
-					hook3.Initialize(sysNameFunc.addr, (u32)SetNameCall);
-					hook3.SetFlags(USE_LR_TO_RETURN);
-					initialized = true;
-				}
+				hook3.Initialize(sysNameFunc.addr, (u32)SetNameCall);
+				hook3.SetFlags(USE_LR_TO_RETURN);
 
 				hook.Enable();
 				hook2.Enable();
 				hook3.Enable();
-				buttonFunctionFuncEnd.Patch(0xE12FFF1E); // BX LR
 				return;
 			}
 
-			if(initialized) {
-				hook.Disable();
-				hook2.Disable();
-				hook3.Disable();
-			}
+			hook.Disable();
+			hook2.Disable();
+			hook3.Disable();
 
-			buttonFunctionFuncEnd.Unpatch();
 			buttonDataFuncOption1.Unpatch();
 			buttonDataFuncOption2.Unpatch();
 		}
@@ -93,8 +83,8 @@ namespace CTRPluginFramework {
 
 	void CustomButtonApplySaved(MenuEntry *entry, u32 savedValue) {
 		(void)entry;
-	//Boot-safe: restore chosen options, but do not force inventory hooks during early init.
 		ApplyCustomButtonSettingsState(savedValue);
+		ApplyCustomButtonHooksFromCurrentState();
 	}
 
 	void CustomButton::DuplicateItem(u32 ItemData) {
@@ -359,32 +349,31 @@ namespace CTRPluginFramework {
 	}
 
 	void SettingsButton(MenuEntry *entry) {
-		ApplyCustomButtonHooksFromCurrentState();
-
-		while(true) {
-			std::vector<std::string> options;
-			for(ItemButtonSettings &setting : citemsettings) {
-				if(setting.active) {
-					options.push_back(Color::Green << Language::getInstance()->get(setting.textId));
-				}
-				else {
-					options.push_back(Color::Red << Language::getInstance()->get(setting.textId));
-				}
+		std::vector<std::string> options;
+		for(ItemButtonSettings &setting : citemsettings) {
+			if(setting.active) {
+				options.push_back(Color::Green << Language::getInstance()->get(setting.textId));
 			}
-
-			Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION));
-			optKb.Populate(options);
-			const int op = optKb.Open();
-			if(op < 0 || op >= static_cast<int>(citemsettings.size())) {
-				return;
+			else {
+				options.push_back(Color::Red << Language::getInstance()->get(setting.textId));
 			}
-
-			citemsettings[op].active = !citemsettings[op].active;
-			const u32 mask = BuildCustomButtonMask();
-			ApplyCustomButtonSettingsState(mask);
-			ApplyCustomButtonHooksFromCurrentState();
-			entry->SetSavedValue(mask);
 		}
+
+		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION));
+		optKb.Populate(options);
+		const int op = optKb.Open();
+		if(op < 0 || op >= static_cast<int>(citemsettings.size())) {
+			return;
+		}
+
+		citemsettings[op].active = !citemsettings[op].active;
+
+		const u32 mask = BuildCustomButtonMask();
+		ApplyCustomButtonSettingsState(mask);
+		ApplyCustomButtonHooksFromCurrentState();
+		entry->SetSavedValue(mask);
+
+		SettingsButton(entry);
 	}
 
 	/*void CustomButton::RandomOutfit(u32 ItemData) {
