@@ -1,6 +1,11 @@
 {
   "name": "日本語",
   "entries": {
+    "CUSTOM_HAIR_EYE_CHOOSE_ACTION": "Choose a custom color action:",
+    "CUSTOM_HAIR_ID_FIX_LABEL": "Hair Color Compatibility",
+    "CUSTOM_HAIR_ID_FIX_NOTE": "Custom hair colors only work with Hair Color ID 00.\n\nCurrent Hair Color ID: %02X\nChange it automatically now?",
+    "CUSTOM_EYE_ID_FIX_LABEL": "Eye Color Compatibility",
+    "CUSTOM_EYE_ID_FIX_NOTE": "Custom eye colors only work with Eye Color ID 01.\n\nCurrent Eye Color ID: %02X\nChange it automatically now?",
     "SAVE_CODES_NOTE": "Edit town save data, backups, buildings, shops, and other long-term town progress.",
     "MOVEMENT_CODES_NOTE": "Movement cheats for warping, collision, speed, visibility, and player positioning.",
     "INVENTORY_CODES_NOTE": "Spawn, copy, clear, save, and customize inventory items and item-related menus.",
@@ -625,8 +630,6 @@
     "FILL_CATALOG_NOTE": "カタログの商品を全てアンロックします。",
     "PLAYER_INFO": "プレイヤー情報表示",
     "PLAYER_INFO_NOTE": "プレイヤーの座標などを画面上に表示します。",
-    "NECK_POSITION": "首の動きを変更",
-    "NECK_POSITION_NOTE": "首の動きがカオスになります。",
     "CUSTOM_HAIR_EYE": "カスタムヘア＆アイカラー",
     "CUSTOM_HAIR_EYE_NOTE": "プレイヤーの髪の色と目の色を設定できます。色のRGB値を入力することにより変更できます。\n [保存]を押すと、プラグインを起動するたびに、保存した変更点を自動で読み込むようになります。",
     "CUSTOM_SET_HAIR": "髪の色を変更する",

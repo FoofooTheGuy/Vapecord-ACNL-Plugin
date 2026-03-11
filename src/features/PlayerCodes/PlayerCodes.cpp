@@ -23,74 +23,266 @@ extern "C" void BGRHook(void);
 extern "C" void SetPlayerIconCoordinates(void);
 
 namespace CTRPluginFramework {
-	std::vector<std::string> strings1 = { "", "", "", "", "", "" };
+	namespace {
+		constexpr u8 CustomHairColorId = 0x00;
+		constexpr u8 CustomEyeColorId = 0x01;
+		bool g_appColorsLoaded = false;
+		bool g_appColorModEnabled = false;
+		Hook g_appColorHook;
+		bool g_appColorHookInitialized = false;
 
-	void GetPlayerInfoData(void) {
-		u8 pIndex = Game::GetOnlinePlayerIndex();
-		if(!PlayerClass::GetInstance(pIndex)->IsLoaded() || !Player::GetSaveData(pIndex)) {
-			return;
+		bool EnsureCompatibleCustomColorId(ACNL_Player *player, bool hairColor) {
+			if(player == nullptr) {
+				MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
+				return false;
+			}
+
+			u8 &currentId = hairColor ? player->PlayerAppearance.PlayerFeatures.HairColor : player->PlayerAppearance.PlayerFeatures.EyeColor;
+			const u8 requiredId = hairColor ? CustomHairColorId : CustomEyeColorId;
+			if(currentId == requiredId) {
+				return true;
+			}
+
+			const auto *lang = Language::getInstance();
+			const TextID labelId = hairColor ? TextID::CUSTOM_HAIR_ID_FIX_LABEL : TextID::CUSTOM_EYE_ID_FIX_LABEL;
+			const TextID noteId = hairColor ? TextID::CUSTOM_HAIR_ID_FIX_NOTE : TextID::CUSTOM_EYE_ID_FIX_NOTE;
+
+			if(!(MessageBox(
+				lang->get(labelId),
+				Utils::Format(lang->get(noteId).c_str(), currentId),
+				DialogType::DialogYesNo
+			)).SetClear(ClearScreen::Top)()) {
+				return false;
+			}
+
+			currentId = requiredId;
+			Player::UpdateStyle();
+			return true;
 		}
 
-	//gets coordinates
-		float *pCoords = PlayerClass::GetInstance(pIndex)->GetCoordinates();
-		if(!pCoords) {
-			return;
+			bool EnsureCompatibleCustomColors(ACNL_Player *player) {
+				return EnsureCompatibleCustomColorId(player, true) && EnsureCompatibleCustomColorId(player, false);
+			}
+
+		std::vector<std::string> strings1 = { "", "", "", "", "", "" };
+
+		void GetPlayerInfoData(void) {
+			u8 pIndex = Game::GetOnlinePlayerIndex();
+			if(!PlayerClass::GetInstance(pIndex)->IsLoaded() || !Player::GetSaveData(pIndex)) {
+				return;
+			}
+
+		//gets coordinates
+			float *pCoords = PlayerClass::GetInstance(pIndex)->GetCoordinates();
+			if(!pCoords) {
+				return;
+			}
+
+		//Gets world coords
+			if(!MapEditorActive) {
+				PlayerClass::GetInstance(pIndex)->GetWorldCoords(&selectedX, &selectedY);
+			}
+
+		//gets item standing on
+			Item *pItem = Game::GetItemAtWorldCoords(selectedX, selectedY);
+			if(!pItem) {
+				return;
+			}
+
+		//gets inv item
+			u8 slot = 0;
+			if(Inventory::GetSelectedSlot(slot)) {
+				Inventory::ReadSlot(slot, itemslotid);
+			}
+			else {
+				itemslotid = ReplaceEverything;
+			}
+
+			u8 menuID = Inventory::GetCurrent();
+
+			strings1[0] = (Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_WORLD_COORDS).c_str(), (u8)(selectedX & 0xFF), (u8)(selectedY & 0xFF)));
+			strings1[1] = (Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_ANIMATION).c_str(), *PlayerClass::GetInstance(pIndex)->GetAnimation(), *PlayerClass::GetInstance(pIndex)->GetSnake()));
+			strings1[2] = (Language::getInstance()->get(TextID::PLAYER_INFO_ITEM_STANDING) << " " << (pItem->ID != 0 ? Utils::Format("%08X", *(u32 *)pItem) : Language::getInstance()->get(TextID::PLAYER_INFO_ITEM_NA)) << (Game::GetLockedSpotIndex(selectedX, selectedY) != 0xFFFFFFFF ? Language::getInstance()->get(TextID::PLAYER_INFO_ITEM_LOCKED) : ""));
+			strings1[3] = (itemslotid != ReplaceEverything) ? Utils::Format(Language::getInstance()->get(TextID::INVENTORY_T2I_SET).c_str(), itemslotid) : Language::getInstance()->get(TextID::PLAYER_INFO_INV_NO_SLOT);
+			strings1[4] = menuID != 0xFF ? Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_MENU_ID).c_str(), menuID) : Language::getInstance()->get(TextID::PLAYER_INFO_MENU_ID_NO);
+			strings1[5] = (Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_ROOM).c_str(), Player::GetRoom(pIndex)));
+		}
+	//debug OSD
+		bool debugOSD(const Screen &screen) {
+			u8 pIndex = Game::GetOnlinePlayerIndex();
+			if(!PlayerClass::GetInstance(pIndex)->IsLoaded()) {
+				return 0;
+			}
+
+			if(!screen.IsTop) {
+				return 0;
+			}
+
+			static constexpr u8 YPositions1[7] = { 16, 32, 48, 64, 80, 96, 112 };
+
+			Color darkGrey(40, 40, 40, 175);
+
+		//gets player
+			screen.DrawSysfontWithBackground(Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_PLAYER).c_str(), pIndex + 1), 0, 0, Player::GetColor(pIndex), darkGrey);
+
+			for (int i = 0; i < 6; ++i) {
+				screen.DrawSysfontWithBackground(strings1.at(i), 0, YPositions1[i], Color::White, darkGrey);
+			}
+
+			return 1;
 		}
 
-	//Gets world coords
-		if(!MapEditorActive) {
-			PlayerClass::GetInstance(pIndex)->GetWorldCoords(&selectedX, &selectedY);
+		u32 SwapRgbBgr(u32 value) {
+			u8 byteshift[3] = { 0 };
+
+		//shifts into bytes
+			byteshift[0] = ((value & 0x00FF0000) >> 16);
+			byteshift[1] = ((value & 0x0000FF00) >> 8);
+			byteshift[2] = ((value & 0x000000FF));
+
+		//reshifts back into integer
+			return (byteshift[2] << 16) + (byteshift[1] << 8) + byteshift[0];
 		}
 
-	//gets item standing on
-		Item *pItem = Game::GetItemAtWorldCoords(selectedX, selectedY);
-		if(!pItem) {
-			return;
+		u32 RainbowBGR() {
+			u8 ShiftB = Utils::Random(0, 255);
+			u8 ShiftG = Utils::Random(0, 255);
+			u8 ShiftR = Utils::Random(0, 255);
+
+			return (ShiftB << 16 | ShiftG << 8 | ShiftR);
 		}
 
-	//gets inv item
-		u8 slot = 0;
-		if(Inventory::GetSelectedSlot(slot)) {
-			Inventory::ReadSlot(slot, itemslotid);
-		}
-		else {
-			itemslotid = ReplaceEverything;
+		static u32 rval1 = 0, rval2 = 0;
+
+		struct App_Colors {
+			u32 Hair_BGR;
+			u32 Eye_BGR;
+		};
+
+		bool LoadAppColors(bool notify = false) {
+			const std::string path = Utils::Format(PATH_COLOR, Address::regionName.c_str());
+			if(!File::Exists(path)) {
+				return false;
+			}
+
+			App_Colors oldColor;
+			File f_color(path, File::READ);
+			f_color.Read(&oldColor, 8);
+			f_color.Flush();
+			f_color.Close();
+
+			rval1 = oldColor.Hair_BGR;
+			rval2 = oldColor.Eye_BGR;
+			g_appColorsLoaded = true;
+
+			if(notify) {
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::COLOR_MOD_PLAYER_LOADED), Color::Orange);
+			}
+
+			return true;
 		}
 
-		u8 menuID = Inventory::GetCurrent();
+		void EnsureAppColorsLoaded(void) {
+			if(!g_appColorsLoaded) {
+				LoadAppColors();
+			}
+		}
 
-		strings1[0] = (Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_WORLD_COORDS).c_str(), (u8)(selectedX & 0xFF), (u8)(selectedY & 0xFF)));
-		strings1[1] = (Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_ANIMATION).c_str(), *PlayerClass::GetInstance(pIndex)->GetAnimation(), *PlayerClass::GetInstance(pIndex)->GetSnake()));
-		strings1[2] = (Language::getInstance()->get(TextID::PLAYER_INFO_ITEM_STANDING) << " " << (pItem->ID != 0 ? Utils::Format("%08X", *(u32 *)pItem) : Language::getInstance()->get(TextID::PLAYER_INFO_ITEM_NA)) << (Game::GetLockedSpotIndex(selectedX, selectedY) != 0xFFFFFFFF ? Language::getInstance()->get(TextID::PLAYER_INFO_ITEM_LOCKED) : ""));
-		strings1[3] = (itemslotid != ReplaceEverything) ? Utils::Format(Language::getInstance()->get(TextID::INVENTORY_T2I_SET).c_str(), itemslotid) : Language::getInstance()->get(TextID::PLAYER_INFO_INV_NO_SLOT);
-		strings1[4] = menuID != 0xFF ? Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_MENU_ID).c_str(), menuID) : Language::getInstance()->get(TextID::PLAYER_INFO_MENU_ID_NO);
-		strings1[5] = (Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_ROOM).c_str(), Player::GetRoom(pIndex)));
+		void SaveAppColors(void) {
+			const std::string path = Utils::Format(PATH_COLOR, Address::regionName.c_str());
+			if(!File::Exists(path)) {
+				File::Create(path);
+			}
+
+			App_Colors newColor = { rval1, rval2 };
+
+			File f_color(path, File::WRITE);
+			f_color.Write(&newColor, 8);
+			f_color.Flush();
+			f_color.Close();
+
+			g_appColorsLoaded = true;
+		}
+
+		void SyncAppColorValues(void) {
+			BGR_HairVal = rval1;
+			BGR_EyeVal = rval2;
+		}
+
+		void EnableAppColorMod(bool notifyLoaded = false) {
+			if(notifyLoaded) {
+				LoadAppColors(true);
+			}
+			else {
+				EnsureAppColorsLoaded();
+			}
+
+			if(!g_appColorHookInitialized) {
+				static const Address address(0x4A33C8);
+				g_appColorHook.Initialize(address.addr, (u32)BGRHook);
+				g_appColorHook.SetFlags(USE_LR_TO_RETURN);
+				g_appColorHookInitialized = true;
+			}
+
+			SyncAppColorValues();
+			g_appColorHook.Enable();
+			g_appColorModEnabled = true;
+		}
+
+		void DisableAppColorMod(void) {
+			if(g_appColorModEnabled) {
+				g_appColorHook.Disable();
+				g_appColorModEnabled = false;
+			}
+		}
+
+		std::string FormatStoredColorOption(TextID labelId, u32 storedBgr) {
+			u32 rgb = SwapRgbBgr(storedBgr);
+			return Language::getInstance()->get(labelId)
+				<< Color((rgb << 8) | 0xFF)
+				<< Utils::Format(" [%06X]", rgb & 0xFFFFFF);
+		}
+
+		bool SetAppColorModEnabled(MenuEntry *entry, bool enabled, bool validatePlayerAppearance) {
+			(void)entry;
+
+			if(enabled) {
+				if(validatePlayerAppearance) {
+					ACNL_Player *player = Player::GetSaveData();
+					if(!EnsureCompatibleCustomColors(player)) {
+						return false;
+					}
+				}
+
+				EnableAppColorMod();
+
+				entry->SetSavedValue(1u);
+				return true;
+			}
+
+			DisableAppColorMod();
+
+			entry->ClearSavedValue();
+			return true;
+		}
+
+		bool EditStoredColor(u32 &storedBgr, TextID promptId) {
+			u32 rgbValue = SwapRgbBgr(storedBgr);
+			Keyboard kb(Language::getInstance()->get(promptId));
+			kb.IsHexadecimal(true);
+			kb.SetMaxLength(6);
+
+			if(kb.Open(rgbValue) < 0) {
+				return false;
+			}
+
+			storedBgr = SwapRgbBgr(rgbValue);
+			g_appColorsLoaded = true;
+			SyncAppColorValues();
+			return true;
+		}
 	}
-//debug OSD
-	bool debugOSD(const Screen &screen) {
-		u8 pIndex = Game::GetOnlinePlayerIndex();
-		if(!PlayerClass::GetInstance(pIndex)->IsLoaded()) {
-			return 0;
-		}
 
-		if(!screen.IsTop) {
-			return 0;
-		}
-
-		static constexpr u8 YPositions1[7] = { 16, 32, 48, 64, 80, 96, 112 };
-
-		Color darkGrey(40, 40, 40, 175);
-
-	//gets player
-		screen.DrawSysfontWithBackground(Utils::Format(Language::getInstance()->get(TextID::PLAYER_INFO_PLAYER).c_str(), pIndex + 1), 0, 0, Player::GetColor(pIndex), darkGrey);
-
-		for (int i = 0; i < 6; ++i) {
-			screen.DrawSysfontWithBackground(strings1.at(i), 0, YPositions1[i], Color::White, darkGrey);
-		}
-
-		return 1;
-	}
-//enable debug OSD
 	void debug(MenuEntry *entry) {
 		PluginMenu *menu = PluginMenu::GetRunningInstance();
 
@@ -141,127 +333,69 @@ namespace CTRPluginFramework {
 	}
 */
 
-//Neck Position
-	void neckentry(MenuEntry *entry) {
-		float speed = 5.0;
-		float neckpos = 0;
-		if(entry->Hotkeys[0].IsDown()) {
-			neckpos = Process::ReadFloat(PlayerClass::GetInstance()->Offset(0x210), neckpos);
-			Process::WriteFloat(PlayerClass::GetInstance()->Offset(0x210), (neckpos + -2.8633e+08 + speed));
-		}
-	}
-
-	void RGB_To_BGR(u32 &x) {
-		u8 byteshift[3] = { 0 };
-
-	//shifts into bytes
-		byteshift[0] = ((x & 0x00FF0000) >> 16);
-		byteshift[1] = ((x & 0x0000FF00) >> 8);
-		byteshift[2] = ((x & 0x000000FF));
-
-	//reshifts back into integer
-		x = (byteshift[2] << 16) + (byteshift[1] << 8) + byteshift[0];
-	}
-
-	u32 RainbowBGR() {
-		u8 ShiftB = Utils::Random(0, 255);
-		u8 ShiftG = Utils::Random(0, 255);
-		u8 ShiftR = Utils::Random(0, 255);
-
-		return (ShiftB << 16 | ShiftG << 8 | ShiftR);
-    }
-
-	static u32 rval1 = 0, rval2 = 0;
-
-	struct App_Colors {
-		u32 Hair_BGR;
-		u32 Eye_BGR;
-	};
-
 	void SaveColor(MenuEntry *entry) {
-		const std::vector<std::string> opt = {
-			Language::getInstance()->get(TextID::CUSTOM_SET_HAIR),
-			Language::getInstance()->get(TextID::CUSTOM_SET_EYE),
-			Language::getInstance()->get(TextID::CUSTOM_SAVE),
-		};
+		EnsureAppColorsLoaded();
+		auto *lang = Language::getInstance();
 
-		Keyboard KB("", opt);
+		while(true) {
+			const std::vector<std::string> options = {
+				g_appColorModEnabled
+					? (Color(pGreen) << lang->get(TextID::VECTOR_ENABLED))
+					: (Color(pRed) << lang->get(TextID::VECTOR_DISABLED)),
+				FormatStoredColorOption(TextID::CUSTOM_SET_HAIR, rval1),
+				FormatStoredColorOption(TextID::CUSTOM_SET_EYE, rval2),
+				lang->get(TextID::CUSTOM_HAIR_EYE_KEY1),
+				lang->get(TextID::CUSTOM_SAVE),
+			};
 
-		switch(KB.Open()) {
-			default: break;
-			case 0: {
-				Keyboard kb(Language::getInstance()->get(TextID::CUSTOM_ENTER_HAIR));
-				kb.IsHexadecimal(true);
-
-				int res = kb.Open(rval1);
-				if(res < 0) {
-					return;
-				}
-
-				RGB_To_BGR(rval1);
-			} break;
-
-			case 1: {
-				Keyboard kb(Language::getInstance()->get(TextID::CUSTOM_ENTER_EYE));
-				kb.IsHexadecimal(true);
-
-				int res = kb.Open(rval2);
-				if(res < 0) {
-					return;
-				}
-
-				RGB_To_BGR(rval2);
-			} break;
-
-			case 2: {
-				if(!File::Exists(Utils::Format(PATH_COLOR, Address::regionName.c_str())))
-					File::Create(Utils::Format(PATH_COLOR, Address::regionName.c_str()));
-
-				App_Colors NewColor = App_Colors{ rval1, rval2 };
-
-				File f_color(Utils::Format(PATH_COLOR, Address::regionName.c_str()), File::WRITE);
-				f_color.Write(&NewColor, 8);
-				f_color.Flush();
-                f_color.Close();
-
-				MessageBox(Language::getInstance()->get(TextID::CUSTOM_FILE_SAVED)).SetClear(ClearScreen::Top)();
-			} break;
-		}
-	}
-
-	void App_ColorMod(MenuEntry *entry) {
-		static Hook hook;
-		if(entry->WasJustActivated()) {
-			if(File::Exists(Utils::Format(PATH_COLOR, Address::regionName.c_str()))) {
-				App_Colors OldColor;
-
-				File f_color(Utils::Format(PATH_COLOR, Address::regionName.c_str()), File::READ);
-				f_color.Read(&OldColor, 8);
-				f_color.Flush();
-                f_color.Close();
-
-				rval1 = OldColor.Hair_BGR;
-				rval2 = OldColor.Eye_BGR;
-				OSD::NotifySysFont(Language::getInstance()->get(TextID::COLOR_MOD_PLAYER_LOADED), Color::Orange);
+			Keyboard KB(lang->get(TextID::CUSTOM_HAIR_EYE_CHOOSE_ACTION), options);
+			const int choice = KB.Open();
+			if(choice < 0) {
+				return;
 			}
 
-			static const Address address(0x4A33C8);
-			hook.Initialize(address.addr, (u32)BGRHook);
-		  	hook.SetFlags(USE_LR_TO_RETURN);
-			hook.Enable();
+			switch(choice) {
+				case 0:
+					SetAppColorModEnabled(entry, !g_appColorModEnabled, true);
+					break;
+
+				case 1:
+					if(EnsureCompatibleCustomColorId(Player::GetSaveData(), true) && EditStoredColor(rval1, TextID::CUSTOM_ENTER_HAIR)) {
+						SetAppColorModEnabled(entry, true, false);
+					}
+					break;
+
+				case 2:
+					if(EnsureCompatibleCustomColorId(Player::GetSaveData(), false) && EditStoredColor(rval2, TextID::CUSTOM_ENTER_EYE)) {
+						SetAppColorModEnabled(entry, true, false);
+					}
+					break;
+
+				case 3:
+					if(EnsureCompatibleCustomColors(Player::GetSaveData())) {
+						rval1 = RainbowBGR();
+						rval2 = RainbowBGR();
+						g_appColorsLoaded = true;
+						SetAppColorModEnabled(entry, true, false);
+					}
+					break;
+
+				case 4:
+					SaveAppColors();
+					MessageBox(lang->get(TextID::CUSTOM_FILE_SAVED)).SetClear(ClearScreen::Top)();
+					break;
+
+				default:
+					break;
+			}
 		}
+	}
 
-		BGR_HairVal = rval1;
-		BGR_EyeVal = rval2;
+	void AppColorModApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
 
-		if(entry->Hotkeys[0].IsDown()) {
-			Sleep(Milliseconds(100));
-			rval1 = RainbowBGR();
-			rval2 = RainbowBGR();
-		}
-
-		if(!entry->IsActivated()) {
-			hook.Disable();
+		if(savedValue != 0) {
+			EnableAppColorMod();
 		}
 	}
 

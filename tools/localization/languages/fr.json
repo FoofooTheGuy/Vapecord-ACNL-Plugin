@@ -1,6 +1,11 @@
 {
   "name": "Français",
   "entries": {
+    "CUSTOM_HAIR_EYE_CHOOSE_ACTION": "Choose a custom color action:",
+    "CUSTOM_HAIR_ID_FIX_LABEL": "Hair Color Compatibility",
+    "CUSTOM_HAIR_ID_FIX_NOTE": "Custom hair colors only work with Hair Color ID 00.\n\nCurrent Hair Color ID: %02X\nChange it automatically now?",
+    "CUSTOM_EYE_ID_FIX_LABEL": "Eye Color Compatibility",
+    "CUSTOM_EYE_ID_FIX_NOTE": "Custom eye colors only work with Eye Color ID 01.\n\nCurrent Eye Color ID: %02X\nChange it automatically now?",
     "SAVE_CODES_NOTE": "Edit town save data, backups, buildings, shops, and other long-term town progress.",
     "MOVEMENT_CODES_NOTE": "Movement cheats for warping, collision, speed, visibility, and player positioning.",
     "INVENTORY_CODES_NOTE": "Spawn, copy, clear, save, and customize inventory items and item-related menus.",
@@ -617,8 +622,6 @@
     "FILL_CATALOG_NOTE": "Vous permet de remplir le catalogue.",
     "PLAYER_INFO": "Infos joueur",
     "PLAYER_INFO_NOTE": "Vous montre beaucoup d'informations.",
-    "NECK_POSITION": "Position du cou",
-    "NECK_POSITION_NOTE": "Déplace la tête du joueur d'une façon bizarre.",
     "CUSTOM_HAIR_EYE": "Couleur des yeux et cheveux customisés",
     "CUSTOM_HAIR_EYE_NOTE": "Vous permet de customiser la couleur des yeux et des cheveux pour votre personnage! Insérez la valeur RGB pour la nouvelle couleur que vous voulez.\nSi vous appuyez sur \"Sauvegarder\"votre couleur customisée actuelle sera sauvegardée et chargée à chaque fois que vous mettez en marche le plugin.",
     "CUSTOM_SET_HAIR": "Définir la couleur des cheveux",

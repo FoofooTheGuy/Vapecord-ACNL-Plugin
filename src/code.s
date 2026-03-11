@@ -37,7 +37,7 @@ FUNCTION    PATCH_MoveFurnButton
     POP         {R0}                @restore R0
     MOVEQ       R5, #0              @writes 0 to R5 if player isnt in house
     LSRNE       R5, R0, #0x1F       @do standard instruction
-    
+
     POP         {R1-R4, PC}
 
 FUNCTION    PATCH_KappnBypass1      @0x005DC048 (0xEB061CE9)
@@ -103,7 +103,7 @@ FUNCTION    CHECK_IfFruit
     BL          __IsFruit
     CMP         R0, #1
     BLEQ        __AddFruit
-    
+
     MOV         R0, R7
     POP         {R1-R7, PC}
 
@@ -147,7 +147,7 @@ FUNCTION    SetMouthExpression
 
     POP         {R0}
     MOV         R4, R0
-    POP         {PC}    
+    POP         {PC}
 
 FUNCTION    SetProperParticle
     PUSH        {R0-R3, LR}

@@ -97,7 +97,7 @@ namespace CTRPluginFramework {
 
 		// Player folder
 		constexpr u32 PlayerInfo = Make(GroupPlayer, 0x0001);
-		constexpr u32 PlayerNeckPosition = Make(GroupPlayer, 0x0002);
+		//constexpr u32 PlayerNeckPosition = Make(GroupPlayer, 0x0002); Removed!
 		constexpr u32 PlayerCustomHairEye = Make(GroupPlayer, 0x0003);
 		constexpr u32 PlayerWearHelmet = Make(GroupPlayer, 0x0004);
 		constexpr u32 PlayerFaint = Make(GroupPlayer, 0x0005);

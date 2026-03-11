@@ -1,6 +1,11 @@
 {
   "name": "Deutsch",
   "entries": {
+    "CUSTOM_HAIR_EYE_CHOOSE_ACTION": "Wähle eine Aktion für benutzerdefinierte Farben:",
+    "CUSTOM_HAIR_ID_FIX_LABEL": "Haarfarben-Kompatibilität",
+    "CUSTOM_HAIR_ID_FIX_NOTE": "Benutzerdefinierte Haarfarben funktionieren nur mit Hair Color ID 00.\n\nAktuelle Hair Color ID: %02X\nSoll sie jetzt automatisch geändert werden?",
+    "CUSTOM_EYE_ID_FIX_LABEL": "Augenfarben-Kompatibilität",
+    "CUSTOM_EYE_ID_FIX_NOTE": "Benutzerdefinierte Augenfarben funktionieren nur mit Eye Color ID 01.\n\nAktuelle Eye Color ID: %02X\nSoll sie jetzt automatisch geändert werden?",
     "SAVE_CODES_NOTE": "Bearbeite Stadtspeicher, Backups, Gebäude, Läden und andere dauerhafte Stadtfortschritte.",
     "MOVEMENT_CODES_NOTE": "Bewegungs-Cheats für Warps, Kollision, Geschwindigkeit, Sichtbarkeit und Positionen.",
     "INVENTORY_CODES_NOTE": "Spawne, kopiere, leere, sichere und passe Inventar-Items und Item-Menüs an.",
@@ -617,8 +622,6 @@
     "FILL_CATALOG_NOTE": "Vervollständigt/leert den Katalog.",
     "PLAYER_INFO": "Spieler-Info",
     "PLAYER_INFO_NOTE": "Zeigt einige Informationen über den Spieler.",
-    "NECK_POSITION": "Spieler Kopfposition",
-    "NECK_POSITION_NOTE": "Ermöglicht es den Kopf in eine komische Position zu bewegen.",
     "CUSTOM_HAIR_EYE": "Benutzerspezifische Haar- und Augenfarbe",
     "CUSTOM_HAIR_EYE_NOTE": "Ermöglicht es eigene Farben für Haar- und Augenfarbe zu verwenden! Einfach die gewünschte Farbe als RGB-Wert eingeben.\n\"Farbe speichern\" sichert die aktuelle Farbe und sie wird jedes mal geladen, wenn das Plugin geladen wird.\nHinweis: Dieser Cheat funktioniert nur, wenn die IDs für die Haarfarbe auf 0 und für die Augenfarbe auf 1 gesetzt wurden.",
     "CUSTOM_SET_HAIR": "eigene Haarfarbe",

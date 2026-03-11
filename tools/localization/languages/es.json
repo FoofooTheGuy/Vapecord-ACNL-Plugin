@@ -1,6 +1,11 @@
 {
   "name": "Español",
   "entries": {
+    "CUSTOM_HAIR_EYE_CHOOSE_ACTION": "Choose a custom color action:",
+    "CUSTOM_HAIR_ID_FIX_LABEL": "Hair Color Compatibility",
+    "CUSTOM_HAIR_ID_FIX_NOTE": "Custom hair colors only work with Hair Color ID 00.\n\nCurrent Hair Color ID: %02X\nChange it automatically now?",
+    "CUSTOM_EYE_ID_FIX_LABEL": "Eye Color Compatibility",
+    "CUSTOM_EYE_ID_FIX_NOTE": "Custom eye colors only work with Eye Color ID 01.\n\nCurrent Eye Color ID: %02X\nChange it automatically now?",
     "SAVE_CODES_NOTE": "Edit town save data, backups, buildings, shops, and other long-term town progress.",
     "MOVEMENT_CODES_NOTE": "Movement cheats for warping, collision, speed, visibility, and player positioning.",
     "INVENTORY_CODES_NOTE": "Spawn, copy, clear, save, and customize inventory items and item-related menus.",
@@ -624,8 +629,6 @@
     "FILL_CATALOG_NOTE": "Lets you fill your catalog.",
     "PLAYER_INFO": "Información de jugadores",
     "PLAYER_INFO_NOTE": "Te enseña mucha Información.",
-    "NECK_POSITION": "Posición del cuello",
-    "NECK_POSITION_NOTE": "Mueve tu cabeza a posiciones bastante raras.",
     "CUSTOM_HAIR_EYE": "Colores de Pelo y Ojos customizables",
     "CUSTOM_HAIR_EYE_NOTE": "Te deja poner un color que tú elijas de ojos y pelo para tu jugador. Solo tienes que escribir el valor RGB para el nuevo color.\nSi pulsas \"Save\" (Guardar) tu color elegido sera guardado y se pondra cada cez que entras en el juego con el plugin.",
     "CUSTOM_SET_HAIR": "Establecer el color de pelo",

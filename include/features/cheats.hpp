@@ -79,7 +79,6 @@ namespace CTRPluginFramework {
 	void playerbackup(MenuEntry *entry);
 	void unlockqrmachine(MenuEntry *entry);
 
-	void neckentry(MenuEntry *entry);
 	void debug(MenuEntry *entry);
 	void hatz(MenuEntry *entry);
 	void Faint(MenuEntry *entry);
@@ -87,7 +86,7 @@ namespace CTRPluginFramework {
 	void map(MenuEntry *entry);
 	void NeverBedHead(MenuEntry *entry);
 	void SaveColor(MenuEntry *entry);
-	void App_ColorMod(MenuEntry *entry);
+	void AppColorModApplySaved(MenuEntry *entry, u32 savedValue);
 
 //Animation Codes Folder
 	void playerSelector(MenuEntry *entry);

@@ -255,39 +255,36 @@ namespace CTRPluginFramework {
 	/*Player Save Codes Folder*/
 	////////////////////////////
 		MenuFolder *PSAVEC = CreateFolder(FolderType::Player, SubFolder::PlayerSave);
-		PSAVEC->Append(CreateEntry(TextID::NAME_CHANGER, nullptr, NameChanger, TextID::NAME_CHANGER_NOTE, MenuEntryId::PlayerSaveNameChanger)),
-		PSAVEC->Append(CreateEntry(TextID::PLAYER_APPEARANCE, nullptr, playermod, TextID::PLAYER_APPEARANCE_NOTE, MenuEntryId::PlayerSaveAppearance)),
-		PSAVEC->Append(CreateEntry(TextID::RANDOM_PLAYER, nullptr, randomoutfit, TextID::RANDOM_PLAYER_NOTE, MenuEntryId::PlayerSaveRandomPlayer)),
-		PSAVEC->Append(CreateEntry(TextID::PLAYER_BACKUP_NAME, nullptr, playerbackup, TextID::PLAYER_BACKUP_NOTE, MenuEntryId::PlayerSaveBackup)),
-		PSAVEC->Append(CreateEntry(TextID::TPC_MESSAGE, nullptr, tpcmessage, TextID::TPC_MESSAGE_NOTE, MenuEntryId::PlayerSaveTPCMessage)),
-		PSAVEC->Append(CreateEntry(TextID::TPC_SETTINGS, nullptr, tpc, TextID::TPC_SETTINGS_NOTE, MenuEntryId::PlayerSaveTPCSettings)),
-		PSAVEC->Append(CreateEntry(TextID::DESIGN_DUMP, nullptr, DesignDumper, TextID::DESIGN_DUMP_NOTE, MenuEntryId::PlayerSaveDesignDump)),
-		PSAVEC->Append(CreateEntry(TextID::EMOTION_LIST, nullptr, emotelist, TextID::EMOTION_LIST_NOTE, MenuEntryId::PlayerSaveEmotionList)),
-		PSAVEC->Append(CreateEntry(TextID::ENCY_LIST, nullptr, enzyklopedia, TextID::ENCY_LIST_NOTE, MenuEntryId::PlayerSaveEncyList)),
-		PSAVEC->Append(CreateEntry(TextID::DREAM_CODE, nullptr, comodifier, TextID::DREAM_CODE_NOTE, MenuEntryId::PlayerSaveDreamCode)),
-		PSAVEC->Append(CreateEntry(TextID::DEBUG_MENU, nullptr, debug1, TextID::DEBUG_MENU_NOTE, MenuEntryId::PlayerSaveDebugMenu)),
-		PSAVEC->Append(CreateEntry(TextID::SONG_LIST_NAME, nullptr, FillSongs, TextID::SONG_LIST_NOTE, MenuEntryId::PlayerSaveSongList)),
-		PSAVEC->Append(CreateEntry(TextID::FILL_CATALOG_NAME, nullptr, FillCatalog, TextID::FILL_CATALOG_NOTE, MenuEntryId::PlayerSaveFillCatalog)),
-		PSAVEC->Append(CreateEntry(TextID::QR_MACHINE_NAME, nullptr, unlockqrmachine, TextID::QR_MACHINE_NOTE, MenuEntryId::PlayerSaveQRMachine)),
+		PSAVEC->Append(CreateEntry(TextID::NAME_CHANGER, nullptr, NameChanger, TextID::NAME_CHANGER_NOTE, MenuEntryId::PlayerSaveNameChanger));
+		PSAVEC->Append(CreateEntry(TextID::PLAYER_APPEARANCE, nullptr, playermod, TextID::PLAYER_APPEARANCE_NOTE, MenuEntryId::PlayerSaveAppearance));
+		PSAVEC->Append(CreateEntry(TextID::RANDOM_PLAYER, nullptr, randomoutfit, TextID::RANDOM_PLAYER_NOTE, MenuEntryId::PlayerSaveRandomPlayer));
+		PSAVEC->Append(CreateEntry(TextID::PLAYER_BACKUP_NAME, nullptr, playerbackup, TextID::PLAYER_BACKUP_NOTE, MenuEntryId::PlayerSaveBackup));
+		PSAVEC->Append(CreateEntry(TextID::TPC_MESSAGE, nullptr, tpcmessage, TextID::TPC_MESSAGE_NOTE, MenuEntryId::PlayerSaveTPCMessage));
+		PSAVEC->Append(CreateEntry(TextID::TPC_SETTINGS, nullptr, tpc, TextID::TPC_SETTINGS_NOTE, MenuEntryId::PlayerSaveTPCSettings));
+		PSAVEC->Append(CreateEntry(TextID::DESIGN_DUMP, nullptr, DesignDumper, TextID::DESIGN_DUMP_NOTE, MenuEntryId::PlayerSaveDesignDump));
+		PSAVEC->Append(CreateEntry(TextID::EMOTION_LIST, nullptr, emotelist, TextID::EMOTION_LIST_NOTE, MenuEntryId::PlayerSaveEmotionList));
+		PSAVEC->Append(CreateEntry(TextID::ENCY_LIST, nullptr, enzyklopedia, TextID::ENCY_LIST_NOTE, MenuEntryId::PlayerSaveEncyList));
+		PSAVEC->Append(CreateEntry(TextID::DREAM_CODE, nullptr, comodifier, TextID::DREAM_CODE_NOTE, MenuEntryId::PlayerSaveDreamCode));
+		PSAVEC->Append(CreateEntry(TextID::DEBUG_MENU, nullptr, debug1, TextID::DEBUG_MENU_NOTE, MenuEntryId::PlayerSaveDebugMenu));
+		PSAVEC->Append(CreateEntry(TextID::SONG_LIST_NAME, nullptr, FillSongs, TextID::SONG_LIST_NOTE, MenuEntryId::PlayerSaveSongList));
+		PSAVEC->Append(CreateEntry(TextID::FILL_CATALOG_NAME, nullptr, FillCatalog, TextID::FILL_CATALOG_NOTE, MenuEntryId::PlayerSaveFillCatalog));
+		PSAVEC->Append(CreateEntry(TextID::QR_MACHINE_NAME, nullptr, unlockqrmachine, TextID::QR_MACHINE_NOTE, MenuEntryId::PlayerSaveQRMachine));
 		PLAYC->Append(PSAVEC);
-		PLAYC->Append(CreateEntry(TextID::PLAYER_INFO, debug, TextID::PLAYER_INFO_NOTE, MenuEntryId::PlayerInfo)),
+		PLAYC->Append(CreateEntry(TextID::PLAYER_INFO, debug, TextID::PLAYER_INFO_NOTE, MenuEntryId::PlayerInfo));
 	//PLAYC->Append(CreateEntry(TextID::PLAYER_LOADER, nullptr, pLoaderEntry, TextID::PLAYER_LOADER_NOTE)),
-		PLAYC->Append(EntryWithHotkey(CreateEntry(TextID::NECK_POSITION, neckentry, TextID::NECK_POSITION_NOTE, MenuEntryId::PlayerNeckPosition), {
-			NamedHotkey(Key::L | Key::DPadDown, TextID::NECK_POSITION)
-		})),
-		PLAYC->Append(EntryWithHotkey(CreateEntry(TextID::CUSTOM_HAIR_EYE, App_ColorMod, SaveColor, TextID::CUSTOM_HAIR_EYE_NOTE, MenuEntryId::PlayerCustomHairEye), {
-			NamedHotkey(Key::R, TextID::CUSTOM_HAIR_EYE_KEY1)
-		})),
-		PLAYC->Append(CreateEntry(TextID::WEAR_HELMET, hatz, TextID::WEAR_HELMET_NOTE, MenuEntryId::PlayerWearHelmet)),
+		MenuEntry *customHairEyeEntry = CreateEntry(TextID::CUSTOM_HAIR_EYE, nullptr, SaveColor, TextID::CUSTOM_HAIR_EYE_NOTE, MenuEntryId::PlayerCustomHairEye);
+		customHairEyeEntry->SetSavedValueApplyCallback(AppColorModApplySaved);
+		PLAYC->Append(customHairEyeEntry);
+		PLAYC->Append(CreateEntry(TextID::WEAR_HELMET, hatz, TextID::WEAR_HELMET_NOTE, MenuEntryId::PlayerWearHelmet));
 		PLAYC->Append(EntryWithHotkey(CreateEntry(TextID::FAINT, Faint, TextID::FAINT_NOTE, MenuEntryId::PlayerFaint), {
 			NamedHotkey(Key::R | Key::A, TextID::FAINT)
-		})),
+		}));
 		PLAYC->Append(EntryWithHotkey(CreateEntry(TextID::FISH_THROWER, FishThrower, TextID::FISH_THROWER_NOTE, MenuEntryId::PlayerFishThrower), {
 			NamedHotkey(Key::B | Key::DPadLeft, TextID::FISH_THROWER_KEY1),
-		})),
-		PLAYC->Append(CreateEntry(TextID::PLAYERS_ON_MAP, map, TextID::PLAYERS_ON_MAP_NOTE, MenuEntryId::PlayerOnMap)),
+		}));
+		PLAYC->Append(CreateEntry(TextID::PLAYERS_ON_MAP, map, TextID::PLAYERS_ON_MAP_NOTE, MenuEntryId::PlayerOnMap));
 
-		PLAYC->Append(CreateEntry(TextID::NEVER_BEDHEAD, NeverBedHead, TextID::NEVER_BEDHEAD_NOTE, MenuEntryId::PlayerNeverBedhead)),
+		PLAYC->Append(CreateEntry(TextID::NEVER_BEDHEAD, NeverBedHead, TextID::NEVER_BEDHEAD_NOTE, MenuEntryId::PlayerNeverBedhead));
 		menu->Append(PLAYC);
 
 	//////////////////////////

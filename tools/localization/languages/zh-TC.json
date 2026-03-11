@@ -1,6 +1,11 @@
 {
   "name": "繁體中文",
   "entries": {
+    "CUSTOM_HAIR_EYE_CHOOSE_ACTION": "Choose a custom color action:",
+    "CUSTOM_HAIR_ID_FIX_LABEL": "Hair Color Compatibility",
+    "CUSTOM_HAIR_ID_FIX_NOTE": "Custom hair colors only work with Hair Color ID 00.\n\nCurrent Hair Color ID: %02X\nChange it automatically now?",
+    "CUSTOM_EYE_ID_FIX_LABEL": "Eye Color Compatibility",
+    "CUSTOM_EYE_ID_FIX_NOTE": "Custom eye colors only work with Eye Color ID 01.\n\nCurrent Eye Color ID: %02X\nChange it automatically now?",
     "SAVE_CODES_NOTE": "Edit town save data, backups, buildings, shops, and other long-term town progress.",
     "MOVEMENT_CODES_NOTE": "Movement cheats for warping, collision, speed, visibility, and player positioning.",
     "INVENTORY_CODES_NOTE": "Spawn, copy, clear, save, and customize inventory items and item-related menus.",
@@ -607,8 +612,6 @@
     "FILL_CATALOG_NOTE": "填滿/清空您的T&T商品目錄。",
     "PLAYER_INFO": "顯示玩家資訊",
     "PLAYER_INFO_NOTE": "顯示角色的各項詳細資訊。",
-    "NECK_POSITION": "玩家頸部位置",
-    "NECK_POSITION_NOTE": "以怪異的方式改變頸部位置",
     "CUSTOM_HAIR_EYE": "自訂髮色和瞳色",
     "CUSTOM_HAIR_EYE_NOTE": "自訂髮色和瞳色，只需輸入您想要的新顏色的 RGB 值即可\n在點擊『儲存』後，自訂的顏色就會被儲存，並在每次啟動此插件時啟用.\n注意: 自訂顏色目前僅適用於髮色ID為 0，瞳色ID為 1的情況!",
     "CUSTOM_SET_HAIR": "設定頭髮顏色",

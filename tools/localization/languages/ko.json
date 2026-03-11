@@ -1,6 +1,11 @@
 {
   "name": "한국어",
   "entries": {
+    "CUSTOM_HAIR_EYE_CHOOSE_ACTION": "Choose a custom color action:",
+    "CUSTOM_HAIR_ID_FIX_LABEL": "Hair Color Compatibility",
+    "CUSTOM_HAIR_ID_FIX_NOTE": "Custom hair colors only work with Hair Color ID 00.\n\nCurrent Hair Color ID: %02X\nChange it automatically now?",
+    "CUSTOM_EYE_ID_FIX_LABEL": "Eye Color Compatibility",
+    "CUSTOM_EYE_ID_FIX_NOTE": "Custom eye colors only work with Eye Color ID 01.\n\nCurrent Eye Color ID: %02X\nChange it automatically now?",
     "SAVE_CODES_NOTE": "Edit town save data, backups, buildings, shops, and other long-term town progress.",
     "MOVEMENT_CODES_NOTE": "Movement cheats for warping, collision, speed, visibility, and player positioning.",
     "INVENTORY_CODES_NOTE": "Spawn, copy, clear, save, and customize inventory items and item-related menus.",
@@ -620,8 +625,6 @@
     "FILL_CATALOG_NOTE": "카탈로그 리스트를 채우거나 지웁니다.",
     "PLAYER_INFO": "캐릭터 정보",
     "PLAYER_INFO_NOTE": "당신의 많은 캐릭터 정보를 보여줍니다.",
-    "NECK_POSITION": "캐릭터 목 꺾기",
-    "NECK_POSITION_NOTE": "캐릭터 목이 이상하게 꺾이면서 돌아다닐 수 있습니다.",
     "CUSTOM_HAIR_EYE": "헤어&눈 색깔 커스텀",
     "CUSTOM_HAIR_EYE_NOTE": "캐릭터의 헤어&눈 색상을 설정할 수 있습니다! 원하는 색깔의 RGB 값을 입력하기만 하면 됩니다.\n저장을 누르면 플러그인을 시작할 때마다 설정된 색상이 저장되고 로드됩니다.\\참고: 사용자 정의 색깔은 현재 Hair Color ID 0과 Eye Color ID 1이 있는 경우에만 작동합니다!",
     "CUSTOM_SET_HAIR": "머리 색 설정",
