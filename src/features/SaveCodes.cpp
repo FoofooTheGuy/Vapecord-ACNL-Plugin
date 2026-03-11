@@ -1297,6 +1297,7 @@ namespace CTRPluginFramework {
 		}
 
 		else if(state == 0) {
+			optKb.GetMessage() = Language::getInstance()->get(TextID::KEY_MUSEUM_SELECT_PLAYER);
 			optKb.Populate(pV);
 			int player = optKb.Open();
 			if(player < 0 || pV[player] == (Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY))) {

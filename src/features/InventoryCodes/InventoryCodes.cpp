@@ -338,7 +338,7 @@ namespace CTRPluginFramework {
 			itemsettopt[1] = ((currentMask & 0x2) ? Color(pGreen) : Color(pRed)) << itemsettopt[1];
 			itemsettopt[2] = ((currentMask & 0x4) ? Color(pGreen) : Color(pRed)) << itemsettopt[2];
 
-			Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), itemsettopt);
+			Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_ITEM_SETTINGS), itemsettopt);
 			const int op = optKb.Open();
 			if(op < 0 || op > 2) {
 				return;
@@ -350,80 +350,114 @@ namespace CTRPluginFramework {
 		}
 	}
 
-	void GetCustomView(Keyboard& keyboard, KeyboardEvent& event) {
-		if(event.type != KeyboardEvent::SelectionChanged) {
-			return;
-		}
-
-		int index = event.selectedIndex;
-
-		std::vector<std::string> f_file, f_Dir, f_all;
-		std::vector<bool> isDir;
-		File file;
-
-		if(PluginUtils::Backup::restoreDirectory.ListDirectories(f_Dir) == Directory::OPResult::NOT_OPEN) {
-			return;
-		}
-
-		if(PluginUtils::Backup::restoreDirectory.ListFiles(f_file, ".inv") == Directory::OPResult::NOT_OPEN)  {
-			return;
-		}
-
-		if(f_Dir.empty() && f_file.empty()) {
-			return;
-		}
-
-		for(const std::string& str : f_Dir) {
-			f_all.push_back(str);
-			isDir.push_back(true);
-		}
-
-		for(const std::string& str : f_file) {
-			f_all.push_back(str);
-			isDir.push_back(false);
-		}
-
-		if(index == -1) {
-			return;
-		}
-
-		std::string& input = keyboard.GetMessage();
-		input.clear();
-
-	//if directory return
-		if(isDir[index]) {
-			return;
-		}
-
-		if(PluginUtils::Backup::restoreDirectory.OpenFile(file, f_all[index], File::READ) != 0) {
-			return; //error opening file
-		}
-
-		std::string Sets[16];
-		Item SetItem[16];
-		std::vector<Item> OnlyItem;
-		file.Read(&SetItem, sizeof(SetItem));
-
-		for(int i = 0; i < 16; ++i) {
-			if(SetItem[i].ID != 0x7FFE) {
-				OnlyItem.push_back(SetItem[i]);
-			}
-		}
-
-		for(int i = 0; i < 11; ++i) {
-			if(i >= OnlyItem.size()) {
+	namespace {
+		void GetCustomView(Keyboard& keyboard, KeyboardEvent& event) {
+			if(event.type != KeyboardEvent::SelectionChanged) {
 				return;
 			}
 
-			Sets[i] = OnlyItem[i].GetName();
+			int index = event.selectedIndex;
 
-			input += Color(0x40FF40FF) << Utils::Format("%08X | ", OnlyItem[i]) << Color(0xFFFDD0FF) << Sets[i] << "\n";
+			std::vector<std::string> f_file, f_Dir, f_all;
+			std::vector<bool> isDir;
+			File file;
+
+			if(PluginUtils::Backup::restoreDirectory.ListDirectories(f_Dir) == Directory::OPResult::NOT_OPEN) {
+				return;
+			}
+
+			if(PluginUtils::Backup::restoreDirectory.ListFiles(f_file, ".inv") == Directory::OPResult::NOT_OPEN)  {
+				return;
+			}
+
+			if(f_Dir.empty() && f_file.empty()) {
+				return;
+			}
+
+			for(const std::string& str : f_Dir) {
+				f_all.push_back(str);
+				isDir.push_back(true);
+			}
+
+			for(const std::string& str : f_file) {
+				f_all.push_back(str);
+				isDir.push_back(false);
+			}
+
+			if(index == -1) {
+				return;
+			}
+
+			std::string& input = keyboard.GetMessage();
+
+		//if directory return
+			if(isDir[index]) {
+				return;
+			}
+
+			input.clear();
+
+			if(PluginUtils::Backup::restoreDirectory.OpenFile(file, f_all[index], File::READ) != 0) {
+				return; //error opening file
+			}
+
+			std::string Sets[16];
+			Item SetItem[16];
+			std::vector<Item> OnlyItem;
+			file.Read(&SetItem, sizeof(SetItem));
+
+			for(int i = 0; i < 16; ++i) {
+				if(SetItem[i].ID != 0x7FFE) {
+					OnlyItem.push_back(SetItem[i]);
+				}
+			}
+
+			for(int i = 0; i < 11; ++i) {
+				if(i >= OnlyItem.size()) {
+					return;
+				}
+
+				Sets[i] = OnlyItem[i].GetName();
+
+				input += Color(0x40FF40FF) << Utils::Format("%08X | ", OnlyItem[i]) << Color(0xFFFDD0FF) << Sets[i] << "\n";
+			}
+			input += "etc...";
+			file.Flush();
+			file.Close();
 		}
-		input += "etc...";
-		file.Flush();
-		file.Close();
-	}
-//Get Set
+
+		static OperationResult RestorePresetSet(const std::vector<MemoryRange> &ranges) {
+			std::vector<std::string> folders;
+			Directory presetDirectory(PATH_PRESET);
+
+			if(presetDirectory.ListDirectories(folders) == Directory::OPResult::NOT_OPEN || folders.empty()) {
+				MessageBox(Language::getInstance()->get(TextID::RESTORE_NOFILES)).SetClear(ClearScreen::Top)();
+				return OperationResult::ListingFailed;
+			}
+
+			Keyboard categoryKb(Language::getInstance()->get(TextID::GET_SET_PRESET_SELECT), folders);
+			const int folderChoice = categoryKb.Open();
+			if(folderChoice < 0 || folderChoice >= static_cast<int>(folders.size())) {
+				return OperationResult::Aborted;
+			}
+
+			return PluginUtils::Backup::RestoreMemory(
+				Utils::Format("%s/%s", PATH_PRESET, folders[folderChoice].c_str()),
+				".inv",
+				Language::getInstance()->get(TextID::GET_SET_PRESET_SELECT),
+				ranges,
+				PluginUtils::Backup::RestoreOptions{ GetCustomView, false }
+			);
+		}
+
+		static bool ConfirmInventorySetRestore(void) {
+			return MessageBox(
+				Language::getInstance()->get(TextID::GET_SET_RESTORE_WARNING),
+				DialogType::DialogYesNo
+			).SetClear(ClearScreen::Top)();
+		}
+	};
+
 	void getset(MenuEntry *entry) {
 		ACNL_Player *player = Player::GetSaveData();
 
@@ -446,25 +480,25 @@ namespace CTRPluginFramework {
 		MemoryRange LocInv = { (u32 *)player->Inventory, sizeof(player->Inventory) };
 		MemoryRange LocLock = { (u32 *)player->InventoryItemLocks, sizeof(player->InventoryItemLocks) };
 
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), setopt);
+		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_INVENTORY_SET_OPTION), setopt);
 
 		switch(optKb.Open()) {
 			default: return;
 			case 0: {
-				PluginUtils::Backup::RestoreMemory(
-						PATH_PRESET,
-						".inv",
-						Language::getInstance()->get(TextID::GET_SET_RESTORE),
-						{ LocInv, LocLock },
-						PluginUtils::Backup::RestoreOptions{ GetCustomView, false }
-				);
-				Inventory::ReloadIcons();
+				if(!ConfirmInventorySetRestore()) {
+					return;
+				}
+
+				if(RestorePresetSet({ LocInv, LocLock }) == OperationResult::Success) {
+					Inventory::ReloadIcons();
+					MessageBox(Language::getInstance()->get(TextID::GET_SET_RESTORE_SUCCESS)).SetClear(ClearScreen::Top)();
+				}
 			} return;
 
 			case 1: {
-				optKb.Populate(custinvopt);
+				Keyboard customKb(Language::getInstance()->get(TextID::KEY_CHOOSE_CUSTOM_SET_ACTION), custinvopt);
 
-				switch(optKb.Open()) {
+				switch(customKb.Open()) {
 					default: return;
 					case 0: {
 						std::string filename = "";
@@ -482,14 +516,20 @@ namespace CTRPluginFramework {
 					} return;
 
 					case 1: {
-						PluginUtils::Backup::RestoreMemory(
+						if(!ConfirmInventorySetRestore()) {
+							return;
+						}
+
+						if(PluginUtils::Backup::RestoreMemory(
 							Utils::Format(PATH_ITEMSET, Address::regionName.c_str()),
 							".inv",
 							Language::getInstance()->get(TextID::GET_SET_RESTORE),
 							{ LocInv, LocLock },
-							PluginUtils::Backup::RestoreOptions{ GetCustomView, true }
-						);
-						Inventory::ReloadIcons();
+							PluginUtils::Backup::RestoreOptions{ GetCustomView, false }
+						) == OperationResult::Success) {
+							Inventory::ReloadIcons();
+							MessageBox(Language::getInstance()->get(TextID::GET_SET_RESTORE_SUCCESS)).SetClear(ClearScreen::Top)();
+						}
 					} return;
 
 					case 2:

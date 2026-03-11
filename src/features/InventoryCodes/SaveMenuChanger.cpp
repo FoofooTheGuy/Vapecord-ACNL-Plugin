@@ -137,7 +137,7 @@ namespace CTRPluginFramework {
     //Menu Changer
 		void MenuChanger(MenuEntry *entry) {
 			while(true) {
-				Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), BuildMenuChangerOptions());
+				Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_SAVE_MENU), BuildMenuChangerOptions());
 
 				const int dChoice = optKb.Open();
 				if(dChoice < 0) {

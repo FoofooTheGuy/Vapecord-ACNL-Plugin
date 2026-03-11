@@ -1,6 +1,15 @@
 {
   "name": "繁體中文",
   "entries": {
+    "KEY_CHOOSE_SAVE_MENU": "Choose which menu should override the save menu:",
+    "KEY_CHOOSE_ITEM_SETTINGS": "Choose an item setting to toggle:",
+    "KEY_CHOOSE_INVENTORY_SET_OPTION": "Choose an inventory set option:",
+    "KEY_CHOOSE_CUSTOM_SET_ACTION": "Choose a custom set action:",
+    "GET_SET_PRESET_SELECT": "Choose a preset set category:",
+    "GET_SET_RESTORE_WARNING": "Loading a set will replace all items in your inventory.\n\nAre you sure?",
+    "GET_SET_RESTORE_SUCCESS": "Inventory set loaded successfully.",
+    "KEY_CHOOSE_CUSTOM_BUTTONS": "Choose a custom button to appear in the item pop-up menu.",
+    "KEY_MUSEUM_SELECT_PLAYER": "Choose the player who will appear as the donor of the museum collection.",
     "SEARCH_ITEM": "Search Items by Name",
     "SEARCH_ITEM_NOTE": "Search for an item by name and place the selected result into the next free inventory slot.",
     "MUSEUM_FILL_SUCCESS": "Successfully filled the museum collection.",

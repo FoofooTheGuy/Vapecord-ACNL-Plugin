@@ -368,7 +368,7 @@ namespace CTRPluginFramework {
 			}
 		}
 
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION));
+		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_CUSTOM_BUTTONS));
 		optKb.Populate(options);
 		const int op = optKb.Open();
 		if(op < 0 || op >= static_cast<int>(citemsettings.size())) {
