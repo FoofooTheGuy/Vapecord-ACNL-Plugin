@@ -43,8 +43,7 @@ namespace CTRPluginFramework {
 			static Hook hook2;
 			static Hook hook3;
 			static Address buttonDataFunc(0x19C440);
-			static Address buttonDataFuncOption1 = buttonDataFunc.MoveOffset(4);
-			static Address buttonDataFuncOption2 = buttonDataFunc.MoveOffset(8);
+			static Address buttonDataFuncReturn = buttonDataFunc.MoveOffset(0x48);
 			static Address buttonFunctionFunc(0x19EE20);
 			static Address sysNameFunc(0x5D5860);
 
@@ -53,6 +52,7 @@ namespace CTRPluginFramework {
 			if(anyActive) {
 				hook.Initialize(buttonDataFunc.addr, (u32)SetCustomButtonData);
 				hook.SetFlags(USE_LR_TO_RETURN);
+				hook.SetReturnAddress(buttonDataFuncReturn.addr);
 
 				hook2.InitializeForMitm(buttonFunctionFunc.addr, (u32)SetCustomButtonFunctions);
 
@@ -68,9 +68,6 @@ namespace CTRPluginFramework {
 			hook.Disable();
 			hook2.Disable();
 			hook3.Disable();
-
-			buttonDataFuncOption1.Unpatch();
-			buttonDataFuncOption2.Unpatch();
 		}
 	}
 
@@ -235,37 +232,49 @@ namespace CTRPluginFramework {
 	*/
 	void SetCustomButtonData(u32 *data, u32 sys2dUi) {
 		register u32 optionCount asm("r4");
+		register u32 menuData asm("r5");
+
+		static Address finalizeButtonLayout(0x5E5490);
+		static Address copyButtonData(0x5E5464);
+		static Address commitButtonLayout(0x5E5458);
 
 		register u32 itemOffset asm("r6");
 		Item itemId = *(Item *)itemOffset;
 		Item_Category category = Game::GetItemCategory(itemId);
 
+		const u32 originalOptionCount = optionCount;
+		ButtonData *buttonStackBase = reinterpret_cast<ButtonData *>(data) - originalOptionCount;
 		int addedOptions = 0;
 
-		if (citemsettings[0].active && (optionCount + (addedOptions + 1)) < 5) {
+		if (citemsettings[0].active && (originalOptionCount + (addedOptions + 1)) < 5) {
 			SetButtonData((ButtonData *)(data + (addedOptions * 8)), sys2dUi, 0x250, 0, 0, 0x40, 7); //Duplicate
 			addedOptions++;
 		}
-		if (citemsettings[1].active && (optionCount + (addedOptions + 1)) < 5) {
+		if (citemsettings[1].active && (originalOptionCount + (addedOptions + 1)) < 5) {
 			SetButtonData((ButtonData *)(data + (addedOptions * 8)), sys2dUi, 0x251, 0, 0, 0x41, 7); //Wrap It
 			addedOptions++;
 		}
-		if (citemsettings[2].active && (optionCount + (addedOptions + 1)) < 5) {
+		if (citemsettings[2].active && (originalOptionCount + (addedOptions + 1)) < 5) {
 			SetButtonData((ButtonData *)(data + (addedOptions * 8)), sys2dUi, 0x252, 0, 0, 0x42, 7); //Put in Storage
 			addedOptions++;
 		}
-		if (citemsettings[3].active && category == Item_Category::Bells && (optionCount + (addedOptions + 1)) < 5) {
+		if (citemsettings[3].active && category == Item_Category::Bells && (originalOptionCount + (addedOptions + 1)) < 5) {
 			SetButtonData((ButtonData *)(data + (addedOptions * 8)), sys2dUi, 0x253, 0, 0, 0x43, 7); //Pay Debt
 			addedOptions++;
 		}
 
-		static Address buttonDataFunc(0x19C440);
-		static Address buttonDataFuncOption1 = buttonDataFunc.MoveOffset(4);
-		static Address buttonDataFuncOption2 = buttonDataFunc.MoveOffset(8);
-		buttonDataFuncOption1.Patch(0xE2846001 + addedOptions);
-		buttonDataFuncOption2.Patch(0xE2842000 + addedOptions);
+		const u32 quitIndex = originalOptionCount + addedOptions;
+		const u32 totalOptionCount = quitIndex + 1;
 
 		SetButtonData((ButtonData *)(data + (addedOptions * 8)), sys2dUi, 0xB, 0, 0, 0x29, 1); //Quit Button
+
+		finalizeButtonLayout.Call<void>(menuData + 0xE0, totalOptionCount, quitIndex);
+
+		for(u32 i = 0; i < totalOptionCount; ++i) {
+			copyButtonData.Call<void>(menuData + 0xE0, i, buttonStackBase + i);
+		}
+
+		commitButtonLayout.Call<void>(menuData + 0xE0);
 	}
 
 	using FuncType = u32(*)(u32*);
