@@ -93,7 +93,6 @@ namespace CTRPluginFramework {
 	void execAnim(MenuEntry *entry);
 	void inf_expression(MenuEntry *entry);
 	void idle(MenuEntry *entry);
-	void slmoanms(MenuEntry *entry);
 	void doonall(MenuEntry *entry);
 	void anticheat(MenuEntry *entry);
 

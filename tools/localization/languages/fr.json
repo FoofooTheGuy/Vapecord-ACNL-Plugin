@@ -692,8 +692,6 @@
     "EMOTION_LOOP_NOTE": "Vous permet de répéter une émotion sélectionnée. \n",
     "IDLE": "Neutre",
     "IDLE_NOTE": "Appuyez sur le bouton pour réinstialiser votre animation.",
-    "SLOW_MO_ANIM": "Animation au ralenti",
-    "SLOW_MO_ANIM_NOTE": "Fait en sorte que les animations fonctionnent différemment.",
     "ANIM_ON_ALL": "Activer l'animation sur tout le monde",
     "ANIM_ON_ALL_NOTE": "Ce code active une animation sur tout les joueurs en une fois. Ceci va changer le mode de jeu en \"en ligne\" pour éviter des probèmes quand vous jouez en ligne. Note: Ceci ne fonctionne pas avec \"Animation secondaire\"",
     "ANIM_ON_ALL_KEY1": "Forcer l'animation sur tout le monde",

@@ -89,7 +89,7 @@
     "PWP_LOCK_ALL_SUCCESS": "Successfully locked all public works projects!",
     "OPTION_UNLOCK_ALL": "Unlock All",
     "OPTION_LOCK_ALL": "Lock All",
-    
+
     "BUILDING_MOD_NO_DESIGN_STAND_FREE": "You've reached the design stand limit!",
     "PATTERN_STOLEN": "All patterns are now editable.",
     "CHATCOPYPASTE_PASTE": "Pasted:",
@@ -687,8 +687,6 @@
     "EMOTION_LOOP_NOTE": "Loop the current emotion while holding the hotkey.",
     "IDLE": "Force Idle",
     "IDLE_NOTE": "Reset your player's current animation while holding the hotkey.",
-    "SLOW_MO_ANIM": "Slow Animations",
-    "SLOW_MO_ANIM_NOTE": "Toggle slower animation playback for a dramatic effect.",
     "ANIM_ON_ALL": "Animation on Everyone",
     "ANIM_ON_ALL_NOTE": "Apply the current animation mode to all players at once. This temporarily uses online mode behavior to avoid issues.",
     "ANIM_ON_ALL_KEY1": "Apply to Everyone",

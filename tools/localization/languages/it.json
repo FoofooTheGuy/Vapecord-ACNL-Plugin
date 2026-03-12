@@ -686,8 +686,6 @@
     "EMOTION_LOOP_NOTE": "Ripete all'infinito l'emozione selezionata. \n",
     "IDLE": "Inattivo",
     "IDLE_NOTE": "Premi i pulsanti per resettare l'animazione originale.",
-    "SLOW_MO_ANIM": "Animazioni in Slow-Motion",
-    "SLOW_MO_ANIM_NOTE": "Modifica la velocita' delle animazioni.",
     "ANIM_ON_ALL": "Imposta un animazione per tutti",
     "ANIM_ON_ALL_NOTE": "Tutti i giocatori faranno allo stesso tempo la stessa animazione. Lo stato del gioco viene modificato in modalita' online per prevenire problemi mentre si sta giocando. Nota: il trucco non funziona con le animazioni secondarie.",
     "ANIM_ON_ALL_KEY1": "Forza un'animazione per tutti",

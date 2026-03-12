@@ -308,9 +308,6 @@ namespace CTRPluginFramework {
 		ANIMC->Append(EntryWithHotkey(CreateEntry(TextID::IDLE, idle, TextID::IDLE_NOTE, MenuEntryId::AnimationIdle), {
 			NamedHotkey(Key::R, TextID::IDLE)
 		})),
-		ANIMC->Append(EntryWithHotkey(CreateEntry(TextID::SLOW_MO_ANIM, slmoanms, TextID::SLOW_MO_ANIM_NOTE, MenuEntryId::AnimationSlowMo), {
-			NamedHotkey(Key::L | Key::DPadLeft, TextID::SLOW_MO_ANIM)
-		})),
 		ANIMC->Append(EntryWithHotkey(CreateEntry(TextID::ANIM_ON_ALL, doonall, TextID::ANIM_ON_ALL_NOTE, MenuEntryId::AnimationOnAll), {
 			NamedHotkey(Key::R | Key::A, TextID::ANIM_ON_ALL_KEY1),
 			NamedHotkey(Key::R | Key::B, TextID::ANIM_ON_ALL_KEY2),

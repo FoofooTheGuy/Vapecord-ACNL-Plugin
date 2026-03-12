@@ -111,7 +111,7 @@ namespace CTRPluginFramework {
 		constexpr u32 AnimationMod = Make(GroupAnimation, 0x0003);
 		constexpr u32 AnimationEmotionLoop = Make(GroupAnimation, 0x0004);
 		constexpr u32 AnimationIdle = Make(GroupAnimation, 0x0005);
-		constexpr u32 AnimationSlowMo = Make(GroupAnimation, 0x0006);
+		//constexpr u32 AnimationSlowMo = Make(GroupAnimation, 0x0006); Removed!
 		constexpr u32 AnimationOnAll = Make(GroupAnimation, 0x0007);
 
 		// Seed subfolder

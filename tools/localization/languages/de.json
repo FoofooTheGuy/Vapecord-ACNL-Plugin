@@ -692,8 +692,6 @@
     "EMOTION_LOOP_NOTE": "Ermöglicht es eine Animation in Schleife zu wiederholen.",
     "IDLE": "Animation stoppen",
     "IDLE_NOTE": "Tastenkombinationen drücken, um die aktuellen Animationen zu stoppen.",
-    "SLOW_MO_ANIM": "Slow-Motion Animationen",
-    "SLOW_MO_ANIM_NOTE": "Macht das eine Animation langsamer aussieht für einen coolen Effekt.",
     "ANIM_ON_ALL": "Animation auf allen ausführen",
     "ANIM_ON_ALL_NOTE": "Führt eine Animation auf allen Spielern gleichzeitig aus. Der gamemode wird hierzu auf \"online\" gesetzt, um Fehler zu vermeiden.",
     "ANIM_ON_ALL_KEY1": "Animation auf allen ausführen",

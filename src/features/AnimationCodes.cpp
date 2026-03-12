@@ -317,38 +317,7 @@ namespace CTRPluginFramework {
 			Animation::Idle();
 		}
 	}
-//Slow Motion Animations
-	void slmoanms(MenuEntry *entry) {
-		static Address slo1(0x654578);
-		static Address slo2(0x652C10);
-		static Address slo3(0x887880);
 
-		if(entry->Hotkeys[0].IsPressed()) {//Key::L + Key::DPadLeft
-			bool isOrig = *(u32 *)slo1.addr == slo1.origVal;
-
-			Animation::Idle();
-
-			if (isOrig) {
-				slo1.Patch(0xE3A00001);
-				slo1.WriteFloat(8.0);
-				slo1.WriteFloat(6.0);
-
-				OSD::NotifySysFont(Language::getInstance()->get(TextID::SLOW_MO_ANIM) + " " << Color::Green << Language::getInstance()->get(TextID::STATE_ON));
-			} else {
-				slo1.Unpatch();
-				slo2.Unpatch();
-				slo3.Unpatch();
-
-				OSD::NotifySysFont(Language::getInstance()->get(TextID::SLOW_MO_ANIM) + " " << Color::Red << Language::getInstance()->get(TextID::STATE_OFF));
-			}
-		}
-
-		if(!entry->IsActivated()) {
-			slo1.Unpatch();
-			slo2.Unpatch();
-			slo3.Unpatch();
-        }
-	}
 //Set Animation On Everyone
 	void doonall(MenuEntry *entry) {
 		static Address doonall1(0x677504);

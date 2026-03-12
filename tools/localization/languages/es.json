@@ -699,8 +699,6 @@
     "EMOTION_LOOP_NOTE": "Te deja hacer en bucle una animación. \n",
     "IDLE": "Parado",
     "IDLE_NOTE": "Pulsa los botones para resetear tu animación.",
-    "SLOW_MO_ANIM": "Animaciones en Slow-Motion",
-    "SLOW_MO_ANIM_NOTE": "Hace animaciones diferentes.",
     "ANIM_ON_ALL": "Pone animaciones a todos",
     "ANIM_ON_ALL_NOTE": "Esto pone animaciones a todos los jugadores al mismo tiempo. Esto cambia el modo de juego a online para prevenir errores jugando online. Nota: Esto no funciona con Ssegundas animaciones.",
     "ANIM_ON_ALL_KEY1": "Forzar animación a todos",
