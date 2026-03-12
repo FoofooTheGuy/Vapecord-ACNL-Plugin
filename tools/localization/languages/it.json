@@ -1,6 +1,8 @@
 {
   "name": "Italiano",
   "entries": {
+    "KEY_OPTION_SIZE_CODES": "Choose what to resize:",
+    "KEY_OPTION_SIZE_CODES_CHOOSE": "Choose a size for %s:",
     "QR_MACHINE_DISABLE_SUCCESS": "Successfully disabled the QR machine.",
     "QR_MACHINE_ENABLE_SUCCESS": "Successfully enabled the QR machine.",
     "KEY_QR_MACHINE_CHOOSE_ACTION": "Choose a QR machine action:",
@@ -834,7 +836,6 @@
     "NPC_ANIMATION_KEY1": "Esegui Animazione",
     "NPC_COORDINATE": "Modifica coordinate NPC",
     "NPC_COORDINATE_NOTE": "Fa spostare l'NPC selezionato.",
-    "NPC_COORDINATE_KEY1": "Pulsante Iniziale",
     "NPC_COORDINATE_KEY2": "Muovi a Destra",
     "NPC_COORDINATE_KEY3": "Muovi a Sinistra",
     "NPC_COORDINATE_KEY4": "Muovi Giu",

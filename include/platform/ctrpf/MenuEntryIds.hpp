@@ -181,7 +181,7 @@ namespace CTRPluginFramework {
 
 		// Chat subfolder
 		constexpr u32 ChatDontDissapear = Make(GroupChat, 0x0001);
-		constexpr u32 ChatCopyPaste = Make(GroupChat, 0x0002);
+		//constexpr u32 ChatCopyPaste = Make(GroupChat, 0x0002); Removed!
 		constexpr u32 ChatForce = Make(GroupChat, 0x0003);
 		constexpr u32 ChatCommands = Make(GroupChat, 0x0004);
 		constexpr u32 ChatButton = Make(GroupChat, 0x0005);

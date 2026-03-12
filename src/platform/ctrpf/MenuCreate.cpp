@@ -272,6 +272,7 @@ namespace CTRPluginFramework {
 		PLAYC->Append(PSAVEC);
 		PLAYC->Append(CreateEntry(TextID::PLAYER_INFO, debug, TextID::PLAYER_INFO_NOTE, MenuEntryId::PlayerInfo));
 	//PLAYC->Append(CreateEntry(TextID::PLAYER_LOADER, nullptr, pLoaderEntry, TextID::PLAYER_LOADER_NOTE)),
+		PLAYC->Append(CreateEntry(TextID::EDIT_PATTERN_NAME, nullptr, editpattern, TextID::EDIT_PATTERN_NOTE, MenuEntryId::ExtraEditPattern));
 		MenuEntry *customHairEyeEntry = CreateEntry(TextID::CUSTOM_HAIR_EYE, nullptr, SaveColor, TextID::CUSTOM_HAIR_EYE_NOTE, MenuEntryId::PlayerCustomHairEye);
 		customHairEyeEntry->SetSavedValueApplyCallback(AppColorModApplySaved);
 		PLAYC->Append(customHairEyeEntry);
@@ -312,7 +313,12 @@ namespace CTRPluginFramework {
 			NamedHotkey(Key::R | Key::A, TextID::ANIM_ON_ALL_KEY1),
 			NamedHotkey(Key::R | Key::B, TextID::ANIM_ON_ALL_KEY2),
 			NamedHotkey(Key::R | Key::Y, TextID::ANIM_ON_ALL_KEY3)
-		})),
+		}));
+		{
+			MenuEntry *toolAnimEntry = CreateEntry(TextID::TOOL_ANIM, nullptr, tooltype, TextID::TOOL_ANIM_NOTE, MenuEntryId::MiscToolAnim);
+			toolAnimEntry->SetSavedValueApplyCallback(ToolTypeApplySaved);
+			ANIMC->Append(toolAnimEntry);
+		}
 		menu->Append(ANIMC);
 
 	////////////////////////
@@ -416,29 +422,24 @@ namespace CTRPluginFramework {
 		ISLC->Append(CreateEntry(TextID::ALL_TOURS, alltour, TextID::ALL_TOURS_NOTE, MenuEntryId::IslandAllTours)),
 		ISLC->Append(CreateEntry(TextID::ISLAND_ACRE, acreMod, menuAcreMod, TextID::ISLAND_ACRE_NOTE, MenuEntryId::IslandAcre)),
 		ISLC->Append(CreateEntry(TextID::ISLAND_BUILDING, buildingMod, menuBuildingMod, TextID::ISLAND_BUILDING_NOTE, MenuEntryId::IslandBuilding)),
-		ISLC->Append(EntryWithHotkey(CreateEntry(TextID::ISLAND_SAVER, IslandSaver, TextID::ISLAND_SAVER_NOTE, MenuEntryId::IslandSaver), {
-			NamedHotkey(Key::L | Key::Y, TextID::OPEN_MENU)
-		})),
+		ISLC->Append(CreateEntry(TextID::ISLAND_SAVER, nullptr, IslandSaver, TextID::ISLAND_SAVER_NOTE, MenuEntryId::IslandSaver));
 		menu->Append(ISLC);
 
 	//////////////
 	/*NPC Folder*/
 	//////////////
 		MenuFolder *NPCC = CreateFolder(FolderType::NPC);
-		NPCC->Append(EntryWithHotkey(CreateEntry(TextID::NPC_SELECTOR, NPCFunction, TextID::NPC_SELECTOR_NOTE, MenuEntryId::NpcSelector), {
-			NamedHotkey(Key::L | Key::A, TextID::NPC_SELECTOR_KEY1)
-		}));
+		NPCC->Append(CreateEntry(TextID::NPC_SELECTOR, nullptr, NPCFunction, TextID::NPC_SELECTOR_NOTE, MenuEntryId::NpcSelector));
 		MenuEntry *npcAnimEntry = EntryWithHotkey(CreateEntry(TextID::NPC_ANIMATION,  NPCAnimation, NPCSetAnim, TextID::NPC_ANIMATION_NOTE, MenuEntryId::NpcAnimation), {
 			NamedHotkey(Key::L | Key::B, TextID::NPC_ANIMATION_KEY1)
 		});
 		npcAnimEntry->SetSavedValueApplyCallback(NPCSetAnimApplySaved);
 		NPCC->Append(npcAnimEntry);
 		NPCC->Append(EntryWithHotkey(CreateEntry(TextID::NPC_COORDINATE, NPCCoordinates, TextID::NPC_COORDINATE_NOTE, MenuEntryId::NpcCoordinate), {
-			NamedHotkey(Key::L, TextID::NPC_COORDINATE_KEY1),
-			NamedHotkey(Key::DPadRight, TextID::NPC_COORDINATE_KEY2),
-			NamedHotkey(Key::DPadLeft, TextID::NPC_COORDINATE_KEY3),
-			NamedHotkey(Key::DPadDown, TextID::NPC_COORDINATE_KEY4),
-			NamedHotkey(Key::DPadUp, TextID::NPC_COORDINATE_KEY5)
+			NamedHotkey(Key::L | Key::DPadRight, TextID::NPC_COORDINATE_KEY2),
+			NamedHotkey(Key::L | Key::DPadLeft, TextID::NPC_COORDINATE_KEY3),
+			NamedHotkey(Key::L | Key::DPadDown, TextID::NPC_COORDINATE_KEY4),
+			NamedHotkey(Key::L | Key::DPadUp, TextID::NPC_COORDINATE_KEY5)
 		}));
 		NPCC->Append(EntryWithHotkey(CreateEntry(TextID::NPC_TELEPORT, NPCTeleportToYou, TextID::NPC_TELEPORT_NOTE, MenuEntryId::NpcTeleport), {
 			NamedHotkey(Key::L | Key::Y, TextID::NPC_TELEPORT_KEY1)
@@ -475,6 +476,8 @@ namespace CTRPluginFramework {
 		MenuEntry *weatherMod = CreateEntry(TextID::WEATHER_MOD, nullptr, Weathermod , TextID::WEATHER_MOD_NOTE, MenuEntryId::EnvironmentWeatherMod);
 		weatherMod->SetSavedValueApplyCallback(WeatherModApplySaved);
 		ENVC->Append(weatherMod);
+		ENVC->Append(CreateEntry(TextID::SEARCH_REPLACE_NAME, nullptr, SearchReplace, TextID::SEARCH_REPLACE_NOTE, MenuEntryId::ExtraSearchReplace)),
+		ENVC->Append(CreateEntry(TextID::REMOVE_MAP_ITEMS_NAME, nullptr, RemoveItemsCheat, TextID::REMOVE_MAP_ITEMS_NOTE, MenuEntryId::ExtraRemoveMapItems)),
 		ENVC->Append(CreateEntry(TextID::WATER_FLOWERS_NAME, nullptr, WaterAllFlowers, TextID::WATER_FLOWERS_NOTE, MenuEntryId::EnvironmentWaterFlowers));
 		ENVC->Append(CreateEntry(TextID::WEED_REMOVER_NAME, nullptr, weedremover, TextID::WEED_REMOVER_NOTE, MenuEntryId::EnvironmentWeedRemover));
 		ENVC->Append(EntryWithHotkey(CreateEntry(TextID::GRASS_EDITOR, grasseditor, grasscomplete, TextID::GRASS_EDITOR_NOTE, MenuEntryId::EnvironmentGrassEditor), {
@@ -497,12 +500,6 @@ namespace CTRPluginFramework {
 	/////////////////////
 		MenuFolder *CHAC = CreateFolder(FolderType::Extra, SubFolder::Chat);
 		CHAC->Append(CreateEntry(TextID::CHAT_DONT_DISSAPEAR, bubblesDisappear, TextID::CHAT_DONT_DISSAPEAR_NOTE, MenuEntryId::ChatDontDissapear)),
-		CHAC->Append(EntryWithHotkey(CreateEntry(TextID::CHATCOPYPASTE, ChatCopyPaste, TextID::CHATCOPYPASTE_NOTE, MenuEntryId::ChatCopyPaste), {
-			NamedHotkey(Key::L | Key::DPadRight, TextID::CHATCOPYPASTE_KEY1),
-			NamedHotkey(Key::L | Key::DPadUp, TextID::CHATCOPYPASTE_KEY2),
-			NamedHotkey(Key::L | Key::DPadDown, TextID::CHATCOPYPASTE_KEY3),
-			NamedHotkey(Key::L | Key::DPadLeft, TextID::CHATCOPYPASTE_KEY4)
-		})),
 		CHAC->Append(EntryWithHotkey(CreateEntry(TextID::FORCE_CHAT, Forcesendchat, TextID::FORCE_CHAT_NOTE, MenuEntryId::ChatForce), {
 			NamedHotkey(Key::R, TextID::FORCE_CHAT)
 		})),
@@ -534,6 +531,9 @@ namespace CTRPluginFramework {
 		FUNC->Append(EntryWithHotkey(CreateEntry(TextID::ULTIMATE_POPPER, partypopper, TextID::ULTIMATE_POPPER_NOTE, MenuEntryId::FunUltimatePopper), {
 			NamedHotkey(Key::B | Key::DPadLeft, TextID::ULTIMATE_POPPER_KEY1)
 		})),
+		FUNC->Append(EntryWithHotkey(CreateEntry(TextID::BEANS_PARTICLE, BeansParticleChanger, TextID::BEANS_PARTICLE_NOTE, MenuEntryId::MiscBeansParticle), {
+			NamedHotkey(Key::L | Key::DPadLeft, TextID::BEANS_PARTICLE)
+		})),
 	    FUNC->Append(CreateEntry(TextID::CAMERA_MOD, cameramod, TextID::CAMERA_MOD_NOTE, MenuEntryId::FunCameraMod)),
 		EXTC->Append(FUNC);
 		EXTC->Append(CreateEntry(TextID::SHOP_ALWAYS_OPEN_NAME, ShopsAlwaysOpen, TextID::SHOP_ALWAYS_OPEN_NOTE, MenuEntryId::ExtraShopsAlwaysOpen)),
@@ -541,9 +541,6 @@ namespace CTRPluginFramework {
 		EXTC->Append(CreateEntry(TextID::DISABLE_ITEM_LOCKS, bypass, TextID::DISABLE_ITEM_LOCKS_NOTE, MenuEntryId::ExtraDisableItemLocks)),
 		EXTC->Append(CreateEntry(TextID::CANT_FALL_HOLE, noTrap, TextID::CANT_FALL_HOLE_NOTE, MenuEntryId::ExtraCantFallHole)),
 		EXTC->Append(CreateEntry(TextID::SET_SPOT_STATE_NAME, nullptr, SetSpotState, TextID::SET_SPOT_STATE_NOTE, MenuEntryId::ExtraSetSpotState)),
-		EXTC->Append(CreateEntry(TextID::SEARCH_REPLACE_NAME, nullptr, SearchReplace, TextID::SEARCH_REPLACE_NOTE, MenuEntryId::ExtraSearchReplace)),
-		EXTC->Append(CreateEntry(TextID::REMOVE_MAP_ITEMS_NAME, nullptr, RemoveItemsCheat, TextID::REMOVE_MAP_ITEMS_NOTE, MenuEntryId::ExtraRemoveMapItems)),
-		EXTC->Append(CreateEntry(TextID::EDIT_PATTERN_NAME, editpattern, TextID::EDIT_PATTERN_NOTE, MenuEntryId::ExtraEditPattern)),
 		EXTC->Append(CreateEntry(TextID::AMIIBO_SPOOFER, AmiiboSpoofer, TextID::AMIIBO_SPOOFER_NOTE, MenuEntryId::ExtraAmiiboSpoofer)),
 		EXTC->Append(EntryWithHotkey(CreateEntry(TextID::TIME_TRAVEL, TimeTravel, TTKeyboard, TextID::TIME_TRAVEL_NOTE, MenuEntryId::ExtraTimeTravel), {
 			NamedHotkey(Key::R | Key::DPadRight, TextID::TIME_FORWARD),
@@ -556,11 +553,6 @@ namespace CTRPluginFramework {
 	/////////////////////
 		MenuFolder *MISC = CreateFolder(FolderType::Misc);
 		{
-			MenuEntry *toolAnimEntry = CreateEntry(TextID::TOOL_ANIM, nullptr, tooltype, TextID::TOOL_ANIM_NOTE, MenuEntryId::MiscToolAnim);
-			toolAnimEntry->SetSavedValueApplyCallback(ToolTypeApplySaved);
-			MISC->Append(toolAnimEntry);
-		}
-		{
 			MenuEntry *gameTypeEntry = CreateEntry(TextID::GAME_TYPE, nullptr, mgtype, TextID::GAME_TYPE_NOTE, MenuEntryId::MiscGameType);
 			gameTypeEntry->SetSavedValueApplyCallback(GameTypeApplySaved);
 			MISC->Append(gameTypeEntry);
@@ -570,9 +562,6 @@ namespace CTRPluginFramework {
 		MISC->Append(CreateEntry(TextID::LARGE_FOV, fovlarge, TextID::LARGE_FOV_NOTE, MenuEntryId::MiscLargeFov)),
 		MISC->Append(CreateEntry(TextID::MOVE_FURN, roomSeeder, TextID::MOVE_FURN_NOTE, MenuEntryId::MiscMoveFurn)),
 		MISC->Append(CreateEntry(TextID::WALK_TALK, walktalkentry, TextID::WALK_TALK_NOTE, MenuEntryId::MiscWalkTalk)),
-		MISC->Append(EntryWithHotkey(CreateEntry(TextID::BEANS_PARTICLE, BeansParticleChanger, TextID::BEANS_PARTICLE_NOTE, MenuEntryId::MiscBeansParticle), {
-			NamedHotkey(Key::L | Key::DPadLeft, TextID::BEANS_PARTICLE)
-		})),
 		MISC->Append(CreateEntry(TextID::FAST_MODE, fast, TextID::FAST_MODE_NOTE, MenuEntryId::MiscFastMode)),
 		MISC->Append(CreateEntry(TextID::FAST_TEXT_SPEED, fasttalk, TextID::FAST_TEXT_SPEED_NOTE, MenuEntryId::MiscFastTextSpeed)),
 		MISC->Append(CreateEntry(TextID::FAST_GAME_SPEED, speedentry, TextID::FAST_GAME_SPEED_NOTE, MenuEntryId::MiscFastGameSpeed)),

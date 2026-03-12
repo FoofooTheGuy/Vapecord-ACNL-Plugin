@@ -1,6 +1,8 @@
 {
   "name": "Deutsch",
   "entries": {
+    "KEY_OPTION_SIZE_CODES": "Choose what to resize:",
+    "KEY_OPTION_SIZE_CODES_CHOOSE": "Choose a size for %s:",
     "QR_MACHINE_DISABLE_SUCCESS": "QR-Maschine erfolgreich deaktiviert.",
     "QR_MACHINE_ENABLE_SUCCESS": "QR-Maschine erfolgreich aktiviert.",
     "KEY_QR_MACHINE_CHOOSE_ACTION": "Wähle eine QR-Maschinen-Aktion:",
@@ -840,7 +842,6 @@
     "NPC_ANIMATION_KEY1": "Animation ausführen",
     "NPC_COORDINATE": "Dorfbewohner Koordinaten ändern",
     "NPC_COORDINATE_NOTE": "Ermöglicht es ausgewählte Dorbewohner herumzubewegen.",
-    "NPC_COORDINATE_KEY1": "start",
     "NPC_COORDINATE_KEY2": "nach rechts",
     "NPC_COORDINATE_KEY3": "nach links",
     "NPC_COORDINATE_KEY4": "nach unten",

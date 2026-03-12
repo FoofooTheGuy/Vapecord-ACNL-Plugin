@@ -112,7 +112,7 @@ namespace CTRPluginFramework {
 
 		float size = 0.0;
 
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), sizeopt);
+		Keyboard optKb(Language::getInstance()->get(TextID::KEY_OPTION_SIZE_CODES), sizeopt);
 
 		int op = optKb.Open();
 		if(op < 0) {
@@ -126,11 +126,13 @@ namespace CTRPluginFramework {
 			}
 
 			optKb.Populate(sizesopt);
+			optKb.GetMessage() = Utils::Format(Language::getInstance()->get(TextID::KEY_OPTION_SIZE_CODES_CHOOSE).c_str(), sizeopt[op].c_str());
 			int op2 = optKb.Open();
 			if(op2 < 0) {
 				return;
 			}
 			else if(op2 == 3) {
+				optKb.GetMessage() = Utils::Format(Language::getInstance()->get(TextID::KEY_OPTION_SIZE_CODES_CHOOSE).c_str(), sizeopt[op].c_str());
 				if(optKb.Open(size, size) >= 0) {
 					GetSizeAddressByIndex(op).WriteFloat(size);
 
@@ -291,6 +293,22 @@ namespace CTRPluginFramework {
 
 			hook1.Disable();
 			hook2.Disable();
+		}
+	}
+
+	//Beans Particle Changer
+	void BeansParticleChanger(MenuEntry *entry) {
+		static Address beans(0x673E0C);
+        static u16 input = 0;
+
+        if(entry->Hotkeys[0].IsDown()) {
+			if(PluginUtils::Input::PromptNumber<u16>({ Language::getInstance()->get(TextID::BEANS_PARTICLE_ENTER_ID), true, 3, 0 }, input)) {
+				beans.Patch(input);
+			}
+		}
+
+		if(!entry->IsActivated()) {
+			beans.Unpatch();
 		}
 	}
 

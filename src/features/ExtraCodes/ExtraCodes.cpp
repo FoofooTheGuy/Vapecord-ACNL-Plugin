@@ -167,65 +167,6 @@ namespace CTRPluginFramework {
 		}
 	}
 
-//search and replace
-	void SearchReplace(MenuEntry *entry) {
-		if(!PlayerClass::GetInstance()->IsLoaded()) {
-			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
-			return;
-		}
-
-		u32 x = 0, y = 0;
-		u32 count = 0;
-		Item ItemToSearch = {0x7FFE, 0};
-		Item ItemToReplace = {0x7FFE, 0};
-
-		if(!PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::QUICK_MENU_SEARCH_REPLACE_SEARCH), true, 8, 0x7FFE }, *(u32 *)&ItemToSearch)) {
-			return;
-		}
-
-		if(!PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::QUICK_MENU_SEARCH_REPLACE_REPLACE), true, 8, *(u32 *)&ItemToReplace }, *(u32 *)&ItemToReplace)) {
-			return;
-		}
-
-		if(!ItemToReplace.isValid()) {
-			OSD::NotifySysFont(Language::getInstance()->get(TextID::INVALID_ITEM), Color::Red);
-			return;
-		}
-
-		int res = Dropper::Search_Replace(300, { ItemToSearch }, ItemToReplace, 0x3D, true, Language::getInstance()->get(TextID::SEARCH_REPLACE_ITEMS_REPLACED), true);
-		if(res == -1) {
-			OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
-			return;
-		}
-		else if(res == -2) {
-			OSD::NotifySysFont(Language::getInstance()->get(TextID::ONLY_OUTDOORS), Color::Red);
-			return;
-		}
-	}
-
-//remove all town items
-	void RemoveItemsCheat(MenuEntry *entry) {
-		if(!PlayerClass::GetInstance()->IsLoaded()) {
-			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
-			return;
-		}
-
-		if((MessageBox(Language::getInstance()->get(TextID::REMOVE_ITEM_WARNING), DialogType::DialogYesNo)).SetClear(ClearScreen::Top)()) {
-			Game::RemoveItems(true, 0, 0, 0xFF, 0xFF, true, true);
-		}
-	}
-
-//Edit Every Pattern
-	void editpattern(MenuEntry *entry) {
-		for(int i = 0; i < 10; ++i) {
-			Player::StealDesign(i);
-		}
-
-		OSD::NotifySysFont(Language::getInstance()->get(TextID::PATTERN_STOLEN), Color::Orange);
-
-		entry->Disable();
-	}
-
 	const int TimeMax[5] = { 60, 24, 30, 12, 50 };
 	static int CurrTime = 0;
 

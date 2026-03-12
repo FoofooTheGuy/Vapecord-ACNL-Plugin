@@ -8,6 +8,10 @@
 #include "core/game_api/AnimData.hpp"
 #include "core/game_api/Player.hpp"
 
+extern "C" void PATCH_ToolAnim(void);
+
+u8 toolTypeAnimID = 6;
+
 namespace CTRPluginFramework {
 //Wrapper Stuff
 	u8 a_AnimID = 6;
@@ -392,6 +396,52 @@ namespace CTRPluginFramework {
 		if(!entry->Hotkeys[2].IsDown()) {
             doonall1.Unpatch();
 			doonall2.Unpatch();
+		}
+	}
+
+	namespace {
+		Hook g_toolTypeHook;
+		bool g_toolTypeHookInitialized = false;
+
+		void EnsureToolTypeHookInitialized(void) {
+			if(g_toolTypeHookInitialized) {
+				return;
+			}
+
+			g_toolTypeHook.Initialize(Address(0x64DB90).addr + 0x10, (u32)PATCH_ToolAnim);
+			g_toolTypeHook.SetFlags(USE_LR_TO_RETURN);
+			g_toolTypeHookInitialized = true;
+		}
+
+		void ApplyToolTypeAnimId(u8 animId) {
+			toolTypeAnimID = animId;
+
+			if(toolTypeAnimID == 0) {
+				if(g_toolTypeHookInitialized) {
+					g_toolTypeHook.Disable();
+				}
+				return;
+			}
+
+			if(!IDChecks::AnimationValid(toolTypeAnimID)) {
+				toolTypeAnimID = 6;
+			}
+
+			EnsureToolTypeHookInitialized();
+			g_toolTypeHook.Enable();
+		}
+	}
+
+	void ToolTypeApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		ApplyToolTypeAnimId(static_cast<u8>(savedValue & 0xFF));
+	}
+
+//Change Tool Animation
+	void tooltype(MenuEntry *entry) {
+		if(PluginUtils::Input::PromptNumber<u8>({ Language::getInstance()->get(TextID::TOOL_ANIM_ENTER_ANIM), true, 2, toolTypeAnimID }, toolTypeAnimID)) {
+			ApplyToolTypeAnimId(toolTypeAnimID);
+			entry->SetSavedValue(toolTypeAnimID);
 		}
 	}
 }

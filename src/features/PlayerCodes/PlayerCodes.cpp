@@ -684,4 +684,12 @@ namespace CTRPluginFramework {
 			antiBedHead.Unpatch();
 		}
 	}
+
+	void editpattern(MenuEntry *entry) {
+		for(int i = 0; i < 10; ++i) {
+			Player::StealDesign(i);
+		}
+
+		MessageBox(Color::Orange << Language::getInstance()->get(TextID::PATTERN_STOLEN)).SetClear(ClearScreen::Top)();
+	}
 }

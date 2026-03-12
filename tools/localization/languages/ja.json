@@ -1,6 +1,8 @@
 {
   "name": "日本語",
   "entries": {
+    "KEY_OPTION_SIZE_CODES": "Choose what to resize:",
+    "KEY_OPTION_SIZE_CODES_CHOOSE": "Choose a size for %s:",
     "QR_MACHINE_DISABLE_SUCCESS": "Successfully disabled the QR machine.",
     "QR_MACHINE_ENABLE_SUCCESS": "Successfully enabled the QR machine.",
     "KEY_QR_MACHINE_CHOOSE_ACTION": "Choose a QR machine action:",
@@ -841,7 +843,6 @@
     "NPC_ANIMATION_KEY1": "アニメーションの実行",
     "NPC_COORDINATE": "NPC座標移動",
     "NPC_COORDINATE_NOTE": "選択したNPCを移動できる。",
-    "NPC_COORDINATE_KEY1": "初期化キー",
     "NPC_COORDINATE_KEY2": "右",
     "NPC_COORDINATE_KEY3": "左",
     "NPC_COORDINATE_KEY4": "下",

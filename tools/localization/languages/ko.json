@@ -1,6 +1,8 @@
 {
   "name": "한국어",
   "entries": {
+    "KEY_OPTION_SIZE_CODES": "Choose what to resize:",
+    "KEY_OPTION_SIZE_CODES_CHOOSE": "Choose a size for %s:",
     "QR_MACHINE_DISABLE_SUCCESS": "Successfully disabled the QR machine.",
     "QR_MACHINE_ENABLE_SUCCESS": "Successfully enabled the QR machine.",
     "KEY_QR_MACHINE_CHOOSE_ACTION": "Choose a QR machine action:",
@@ -838,7 +840,6 @@
     "NPC_ANIMATION_KEY1": "애니메이션 실행",
     "NPC_COORDINATE": "NPC 이동 치트",
     "NPC_COORDINATE_NOTE": "NPC가 당신으로 가게 만듭니다.",
-    "NPC_COORDINATE_KEY1": "초기 버튼",
     "NPC_COORDINATE_KEY2": "우측으로 이동",
     "NPC_COORDINATE_KEY3": "좌측으로 이동",
     "NPC_COORDINATE_KEY4": "남측으로 이동",

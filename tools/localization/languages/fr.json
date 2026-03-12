@@ -1,6 +1,8 @@
 {
   "name": "Français",
   "entries": {
+    "KEY_OPTION_SIZE_CODES": "Choose what to resize:",
+    "KEY_OPTION_SIZE_CODES_CHOOSE": "Choose a size for %s:",
     "QR_MACHINE_DISABLE_SUCCESS": "Successfully disabled the QR machine.",
     "QR_MACHINE_ENABLE_SUCCESS": "Successfully enabled the QR machine.",
     "KEY_QR_MACHINE_CHOOSE_ACTION": "Choose a QR machine action:",
@@ -840,7 +842,6 @@
     "NPC_ANIMATION_KEY1": "Lancer l'animation",
     "NPC_COORDINATE": "Modificateur de coordonnées PNJ",
     "NPC_COORDINATE_NOTE": "Vous permet de vous déplacer les PNJ sélectionnés.",
-    "NPC_COORDINATE_KEY1": "Bouton initial",
     "NPC_COORDINATE_KEY2": "Déplacer à droite",
     "NPC_COORDINATE_KEY3": "Déplacer à gauche",
     "NPC_COORDINATE_KEY4": "Déplacer vers le bas",

@@ -1,6 +1,8 @@
 {
   "name": "繁體中文",
   "entries": {
+    "KEY_OPTION_SIZE_CODES": "Choose what to resize:",
+    "KEY_OPTION_SIZE_CODES_CHOOSE": "Choose a size for %s:",
     "QR_MACHINE_DISABLE_SUCCESS": "Successfully disabled the QR machine.",
     "QR_MACHINE_ENABLE_SUCCESS": "Successfully enabled the QR machine.",
     "KEY_QR_MACHINE_CHOOSE_ACTION": "Choose a QR machine action:",
@@ -832,7 +834,6 @@
     "NPC_ANIMATION_KEY1": "執行動畫",
     "NPC_COORDINATE": "NPC坐標修改器",
     "NPC_COORDINATE_NOTE": "允許您移動選定的 NPC。",
-    "NPC_COORDINATE_KEY1": "還原初始位置",
     "NPC_COORDINATE_KEY2": "右移",
     "NPC_COORDINATE_KEY3": "左移",
     "NPC_COORDINATE_KEY4": "下移",

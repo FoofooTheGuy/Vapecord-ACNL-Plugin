@@ -183,7 +183,6 @@ namespace CTRPluginFramework {
 	void bubblesDisappear(MenuEntry *entry);
 	void Forcesendchat(MenuEntry *entry);
 	void chatCommands(MenuEntry *entry);
-	void ChatCopyPaste(MenuEntry *entry);
 	void ChatButton(MenuEntry *entry);
 	void ChatTranslationOptions(MenuEntry *entry);
 

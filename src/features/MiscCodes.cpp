@@ -13,56 +13,8 @@
 #include "Color.h"
 
 extern "C" void PATCH_MoveFurnButton(void);
-extern "C" void PATCH_ToolAnim(void);
-
-u8 toolTypeAnimID = 6;
 
 namespace CTRPluginFramework {
-	namespace {
-		Hook g_toolTypeHook;
-		bool g_toolTypeHookInitialized = false;
-
-		void EnsureToolTypeHookInitialized(void) {
-			if(g_toolTypeHookInitialized) {
-				return;
-			}
-
-			g_toolTypeHook.Initialize(Address(0x64DB90).addr + 0x10, (u32)PATCH_ToolAnim);
-			g_toolTypeHook.SetFlags(USE_LR_TO_RETURN);
-			g_toolTypeHookInitialized = true;
-		}
-
-		void ApplyToolTypeAnimId(u8 animId) {
-			toolTypeAnimID = animId;
-
-			if(toolTypeAnimID == 0) {
-				if(g_toolTypeHookInitialized) {
-					g_toolTypeHook.Disable();
-				}
-				return;
-			}
-
-			if(!IDChecks::AnimationValid(toolTypeAnimID)) {
-				toolTypeAnimID = 6;
-			}
-
-			EnsureToolTypeHookInitialized();
-			g_toolTypeHook.Enable();
-		}
-	}
-
-	void ToolTypeApplySaved(MenuEntry *entry, u32 savedValue) {
-		(void)entry;
-		ApplyToolTypeAnimId(static_cast<u8>(savedValue & 0xFF));
-	}
-
-//Change Tool Animation
-	void tooltype(MenuEntry *entry) {
-		if(PluginUtils::Input::PromptNumber<u8>({ Language::getInstance()->get(TextID::TOOL_ANIM_ENTER_ANIM), true, 2, toolTypeAnimID }, toolTypeAnimID)) {
-			ApplyToolTypeAnimId(toolTypeAnimID);
-			entry->SetSavedValue(toolTypeAnimID);
-		}
-	}
 //Change Gametype
 	void GameTypeApplySaved(MenuEntry *entry, u32 savedValue) {
 		(void)entry;
@@ -271,22 +223,6 @@ namespace CTRPluginFramework {
 		}
 		else if(!entry->IsActivated()) {
 			walktalk.Unpatch();
-		}
-	}
-
-//Beans Particle Changer
-	void BeansParticleChanger(MenuEntry *entry) {
-		static Address beans(0x673E0C);
-        static u16 input = 0;
-
-        if(entry->Hotkeys[0].IsDown()) {
-			if(PluginUtils::Input::PromptNumber<u16>({ Language::getInstance()->get(TextID::BEANS_PARTICLE_ENTER_ID), true, 3, 0 }, input)) {
-				beans.Patch(input);
-			}
-		}
-
-		if(!entry->IsActivated()) {
-			beans.Unpatch();
 		}
 	}
 
