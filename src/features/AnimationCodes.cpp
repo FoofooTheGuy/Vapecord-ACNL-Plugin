@@ -65,10 +65,13 @@ namespace CTRPluginFramework {
 			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
 		};
 
+		std::vector<bool> validPlayerOption = { false, false, false, false };
+
 		if(entry->Hotkeys[0].IsPressed()) {
 			for(int i = 0; i <= 3; ++i) {
 				if(PlayerClass::GetInstance(i)->IsLoaded()) {
 					pV[i] = Player::GetColor(i) << Language::getInstance()->get(TextID::PLAYER_SELECTOR_PLAYER) << std::to_string(i + 1);
+					validPlayerOption[i] = true;
 				}
 			}
 
@@ -76,7 +79,7 @@ namespace CTRPluginFramework {
 
 			int pChoice = pKB.Open();
 			if(pChoice >= 0) {
-				if(pV[pChoice] != Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY)) {
+				if(validPlayerOption[pChoice]) {
 					TogglePlayerSelect(pChoice);
 					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_ENABLED).c_str(), pChoice + 1));
 				}

@@ -642,28 +642,34 @@ namespace CTRPluginFramework {
 	}
 
 	int SelectPlayerToEditHouse() {
-		std::vector<std::string> pV = {
+		std::vector<std::string> playerOptions = {
 			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
 			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
 			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
 			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
 		};
 
+		std::vector<bool> validPlayerOption = { false, false, false, false };
+
 		for(int i = 0; i <= 3; ++i) {
-			ACNL_Player *player = Player::GetSaveData(i);
-			if(player) {
-				if(Player::SaveExists(player)) {
-					std::string str = "";
-					Convert::U16_TO_STR(player->PlayerInfo.PlayerData.PlayerName, str);
-					pV[i] = Player::GetColor(i) << str;
-				}
+			ACNL_Player *loadedPlayer = Player::GetSaveData(i);
+			if(loadedPlayer && Player::SaveExists(loadedPlayer)) {
+				std::string playerName = "";
+				Convert::U16_TO_STR(loadedPlayer->PlayerInfo.PlayerData.PlayerName, playerName);
+				playerOptions[i] = Player::GetColor(i) << playerName;
+				validPlayerOption[i] = true;
 			}
 		}
 
-		Keyboard pKB(Language::getInstance()->get(TextID::KEY_SELECT_PLAYER), pV);
+		Keyboard pKB(Language::getInstance()->get(TextID::KEY_SELECT_PLAYER), playerOptions);
 
 		int pChoice = pKB.Open();
-		if((pChoice < 0) || (pV[pChoice] == Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY))) {
+		if(pChoice < 0) {
+			return -1;
+		}
+
+		if(!validPlayerOption[pChoice]) {
+			MessageBox(Language::getInstance()->get(TextID::PLAYER_SELECT_PLAYER_NOT_EXISTS)).SetClear(ClearScreen::Top)();
 			return -1;
 		}
 
@@ -1267,26 +1273,27 @@ namespace CTRPluginFramework {
 			0, 0x43, 0x8B, 0xA9, 0xF1, 0x10A
 		};
 
-		std::vector<std::string> pV = {
-			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
-			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
-			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
-			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
-		};
-
 		const std::vector<std::string> musOpt = {
 			Language::getInstance()->get(TextID::VECTOR_ENZY_FILL),
 			Language::getInstance()->get(TextID::VECTOR_ENZY_CLEAR),
 		};
 
+		std::vector<std::string> playerOptions = {
+			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
+			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
+			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
+			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
+		};
+
+		std::vector<bool> validPlayerOption = { false, false, false, false };
+
 		for(int i = 0; i <= 3; ++i) {
-			ACNL_Player *player = Player::GetSaveData(i);
-			if(player) {
-				if(Player::SaveExists(player)) {
-					std::string str = "";
-					Convert::U16_TO_STR(player->PlayerInfo.PlayerData.PlayerName, str);
-					pV[i] = Player::GetColor(i) << str;
-				}
+			ACNL_Player *loadedPlayer = Player::GetSaveData(i);
+			if(loadedPlayer && Player::SaveExists(loadedPlayer)) {
+				std::string playerName = "";
+				Convert::U16_TO_STR(loadedPlayer->PlayerInfo.PlayerData.PlayerName, playerName);
+				playerOptions[i] = Player::GetColor(i) << playerName;
+				validPlayerOption[i] = true;
 			}
 		}
 
@@ -1298,9 +1305,14 @@ namespace CTRPluginFramework {
 
 		else if(state == 0) {
 			optKb.GetMessage() = Language::getInstance()->get(TextID::KEY_MUSEUM_SELECT_PLAYER);
-			optKb.Populate(pV);
+			optKb.Populate(playerOptions);
 			int player = optKb.Open();
-			if(player < 0 || pV[player] == (Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY))) {
+			if(player < 0) {
+				return;
+			}
+
+			if(!validPlayerOption[player]) {
+				MessageBox(Language::getInstance()->get(TextID::PLAYER_SELECT_PLAYER_NOT_EXISTS)).SetClear(ClearScreen::Top)();
 				return;
 			}
 

@@ -444,12 +444,12 @@ namespace CTRPluginFramework {
 				auto* lang = Language::getInstance();
 				const std::vector<std::string> options = {
 					lang->get(TextID::FISH_THROWER_OPTION_ITEM),
-					lang->get(TextID::FISH_THROWER_OPTION_RANDOM) + ": " + (random ? lang->get(TextID::STATE_ON) : lang->get(TextID::STATE_OFF)),
+					lang->get(TextID::FISH_THROWER_OPTION_RANDOM) + ": " + (random ? Color::Green << lang->get(TextID::STATE_ON) : Color::Red << lang->get(TextID::STATE_OFF)),
 					lang->get(TextID::FISH_THROWER_OPTION_DISTANCE) + Utils::Format(": %.1f", distance),
-					lang->get(TextID::FISH_THROWER_OPTION_PUT_IN_HAND) + ": " + (putInHand ? lang->get(TextID::STATE_ON) : lang->get(TextID::STATE_OFF)),
+					lang->get(TextID::FISH_THROWER_OPTION_PUT_IN_HAND) + ": " + (putInHand ? Color::Green << lang->get(TextID::STATE_ON) : Color::Red << lang->get(TextID::STATE_OFF)),
 				};
 
-				Keyboard KB(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), options);
+				Keyboard KB(Language::getInstance()->get(TextID::FISH_THROWER_CHOOSE_ACTION), options);
 				if (int choice = KB.Open(); choice == 0) {
 					u32 id = item;
 					if (PluginUtils::Input::PromptNumber<u32>({ lang->get(TextID::ENTER_ID), true, 8, id, TextItemChange }, id)) {
