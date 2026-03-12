@@ -332,12 +332,32 @@ namespace CTRPluginFramework {
         u16 difference = 0x1000 * delta.AsSeconds();
 
 		float *coord = Camera::GetCoordinates();
+		u32 cameraInstance = Camera::GetInstance();
 
 		if(entry->WasJustActivated()) {
 			camerapan.Patch(0xE3A00000); //disables camera panning
 		}
 
-        if(Camera::GetInstance() != 0) {
+		if(!entry->IsActivated()) {
+			if(coord != nullptr) {
+				coord = PlayerClass::GetInstance()->GetCoordinates();
+			}
+
+			Animation::ExecuteAnimationWrapper(4, 6, {0, 0}, 0, 0, 0, 0, 0, 0, 0); //idles player
+			cameraAsm.Unpatch();
+			rotationAsm.Unpatch();
+			rotationAsm2.Unpatch();
+			camerapan.Unpatch();
+			if(cameraInstance != 0) {
+				*(u16 *)(cameraInstance + 0x12C) = OrigVal[0];
+				*(u16 *)(cameraInstance + 0x12E) = OrigVal[1];
+			}
+			isPatched = false;
+			isOn = false;
+			return;
+		}
+
+        if(cameraInstance != 0) {
         //check if you're outside
             if(!Player::IsIndoors()) {
                 if(Game::IsGameInRoom(1)) {
@@ -356,19 +376,19 @@ namespace CTRPluginFramework {
 
             if(Controller::IsKeyDown(Key::R)) {
                 if(Controller::IsKeyDown(Key::CPadUp)) {
-					*(u16 *)(Camera::GetInstance() + 0x12C) += difference;
+					*(u16 *)(cameraInstance + 0x12C) += difference;
 				}
 
                 if(Controller::IsKeyDown(Key::CPadDown)) {
-					*(u16 *)(Camera::GetInstance() + 0x12C) -= difference;
+					*(u16 *)(cameraInstance + 0x12C) -= difference;
 				}
 
                 if(Controller::IsKeyDown(Key::CPadLeft)) {
-					*(u16 *)(Camera::GetInstance() + 0x12E) += difference;
+					*(u16 *)(cameraInstance + 0x12E) += difference;
 				}
 
                 if(Controller::IsKeyDown(Key::CPadRight)) {
-					*(u16 *)(Camera::GetInstance() + 0x12E) -= difference;
+					*(u16 *)(cameraInstance + 0x12E) -= difference;
 				}
             }
 		//Stop/follow camera from moving
@@ -451,21 +471,6 @@ namespace CTRPluginFramework {
                 isPatched = false;
             }
         }
-
-		if(!entry->IsActivated()) {
-			if(coord != nullptr) {
-				coord = PlayerClass::GetInstance()->GetCoordinates();
-			}
-
-			Animation::ExecuteAnimationWrapper(4, 6, {0, 0}, 0, 0, 0, 0, 0, 0, 0); //idles player
-			cameraAsm.Unpatch();
-			rotationAsm.Unpatch();
-            rotationAsm2.Unpatch();
-			camerapan.Unpatch();
-			*(u16 *)(Camera::GetInstance() + 0x12C) = OrigVal[0];
-			*(u16 *)(Camera::GetInstance() + 0x12E) = OrigVal[1];
-			return;
-		}
     }
 
 	extern "C" void SetEyeExpression(void);
