@@ -225,142 +225,143 @@ namespace CTRPluginFramework {
 		}
 	}
 
-	void RestoreIsland(std::vector<Item> &fileData) {
-		bool ItemSequenceWasON = false;
+	static constexpr u32 IslandGridStart = 0x10;
+	static constexpr u32 IslandGridEnd = 0x2F;
+	static constexpr size_t IslandGridWidth = IslandGridEnd - IslandGridStart + 1;
+	static constexpr size_t IslandTileCount = IslandGridWidth * IslandGridWidth;
+
+	void RestoreIsland(const std::vector<Item> &fileData) {
+		bool itemSequenceWasOn = false;
 
 		if(ItemSequence::Enabled()) {
-			ItemSequenceWasON = true;
+			itemSequenceWasOn = true;
 			ItemSequence::Switch(false);
 		}
 
-		if(!bypassing) {
+		const bool changedDropLock = !bypassing;
+		if(changedDropLock) {
 			Dropper::DropItemLock(true);
 		}
 
-		u32 count = 0;
-		u32 x = 0x10, y = 0x10;
-		s32 nextItem = -1;
+		auto restoreState = [&]() {
+			if(changedDropLock) {
+				Dropper::DropItemLock(false);
+			}
 
-		bool res = true;
-		while(res) {
-			while(res) {
-				if(Game::GetItemAtWorldCoords(x, y)) {
-					nextItem++;
-					if(*Game::GetItemAtWorldCoords(x, y) != fileData[nextItem]) {
-						if(Dropper::PlaceItemWrapper(1, ReplaceEverything, &fileData[nextItem], &fileData[nextItem], x, y, 0, 0, 0, 0, 0, 0x3D, 0xA5, false)) {
-							count++;
-							if(count % 300 == 0) {
-								Sleep(Milliseconds(500));
-							}
+			if(itemSequenceWasOn) {
+				ItemSequence::Switch(true);
+			}
+		};
+
+		if(fileData.size() != IslandTileCount) {
+			restoreState();
+			OSD::NotifySysFont("Invalid island backup.", Color::Red);
+			return;
+		}
+
+		u32 count = 0;
+		size_t tileIndex = 0;
+
+		for(u32 x = IslandGridStart; x <= IslandGridEnd; ++x) {
+			for(u32 y = IslandGridStart; y <= IslandGridEnd; ++y, ++tileIndex) {
+				Item *currentItem = Game::GetItemAtWorldCoords(x, y);
+				if(currentItem == nullptr) {
+					continue;
+				}
+
+				if (!currentItem->isValid()) {
+					continue;
+				}
+
+				Item desiredItem = fileData[tileIndex];
+				if(*currentItem != desiredItem) {
+					if(Dropper::PlaceItemWrapper(1, ReplaceEverything, &desiredItem, &desiredItem, x, y, 0, 0, 0, 0, 0, 0x3D, 0xA5, false)) {
+						count++;
+						if(count % 300 == 0) {
+							Sleep(Milliseconds(500));
 						}
 					}
 				}
-				else {
-					res = false;
-				}
-
-				y++;
-			}
-			res = true;
-
-			y = 0x10;
-			x++;
-			if(!Game::GetItemAtWorldCoords(x, y)) {
-				res = false;
 			}
 		}
 
 		OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::ISLAND_RESTORE_PLACED_COUNT).c_str(), count));
-
-	//OFF
-		if(!bypassing) {
-			Dropper::DropItemLock(false);
-		}
-
-		if(ItemSequenceWasON) {
-			ItemSequence::Switch(true);
-		}
+		restoreState();
 	}
 
 	void IslandSaver(MenuEntry *entry) {
-		if(Controller::IsKeysPressed(entry->Hotkeys[0].GetKeys())) {
-			if(!PlayerClass::GetInstance()->IsLoaded()) {
-				MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
-				return;
-			}
-			if(!Game::IsGameInRoom(0x68)) {
-				MessageBox(Language::getInstance()->get(TextID::ISLAND_SAVER_NO)).SetClear(ClearScreen::Top)();
-				return;
-			}
+		if(!PlayerClass::GetInstance()->IsLoaded()) {
+			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
+			return;
+		}
+		if(!Game::IsGameInRoom(0x68)) {
+			MessageBox(Language::getInstance()->get(TextID::ISLAND_SAVER_NO)).SetClear(ClearScreen::Top)();
+			return;
+		}
 
-			const std::vector<std::string> options = {
-				Language::getInstance()->get(TextID::ISLAND_SAVER_BACKUP_ISLAND),
-				Language::getInstance()->get(TextID::ISLAND_SAVER_RESTORE_ISLAND),
-				Language::getInstance()->get(TextID::FILE_DELETE)
-			};
+		const std::vector<std::string> options = {
+			Language::getInstance()->get(TextID::ISLAND_SAVER_BACKUP_ISLAND),
+			Language::getInstance()->get(TextID::ISLAND_SAVER_RESTORE_ISLAND),
+			Language::getInstance()->get(TextID::FILE_DELETE)
+		};
 
-			Keyboard KB(Language::getInstance()->get(TextID::ISLAND_SAVER_DUMPER_DUMP), options);
-			int index = KB.Open();
-			switch(index) {
-				default: break;
-				case 0: {
-					std::vector<u32> dumpVec;
+		Keyboard KB(Language::getInstance()->get(TextID::ISLAND_SAVER_DUMPER_DUMP), options);
+		int index = KB.Open();
+		switch(index) {
+			default: break;
+			case 0: {
+				std::vector<u32> dumpVec;
+				dumpVec.reserve(IslandTileCount);
 
-					for (u32 x = 0x10; x <= 0x2F; x++)
-						for (u32 y = 0x10; y <= 0x2F; y++) {
-							Item* atCoords = Game::GetItemAtWorldCoords(x, y);
-							dumpVec.push_back((atCoords->Flags * 0x10000) ^ atCoords->ID);
-						}
-
-					MemoryRange backupLoc = MemoryRange{ dumpVec.data(), static_cast<int>(dumpVec.size() * sizeof(u32)) };
-
-					std::string filename = "";
-					Keyboard KB(Language::getInstance()->get(TextID::ISLAND_SAVER_NAME_BACKUP));
-
-					if(KB.Open(filename) == -1) {
-						return;
+				for (u32 x = IslandGridStart; x <= IslandGridEnd; ++x) {
+					for (u32 y = IslandGridStart; y <= IslandGridEnd; ++y) {
+						Item* atCoords = Game::GetItemAtWorldCoords(x, y);
+						dumpVec.push_back(atCoords ? static_cast<u32>(*atCoords) : 0);
 					}
+				}
 
-					PluginUtils::Backup::DumpMemory(
+				MemoryRange backupLoc = MemoryRange{ dumpVec.data(), static_cast<int>(dumpVec.size() * sizeof(u32)) };
+
+				std::string filename = "";
+				Keyboard KB(Language::getInstance()->get(TextID::ISLAND_SAVER_NAME_BACKUP));
+
+				if(KB.Open(filename) == -1) {
+					return;
+				}
+
+				PluginUtils::Backup::DumpMemory(
+					Utils::Format(PATH_ISLAND, Address::regionName.c_str()),
+					filename,
+					".dat",
+					{ backupLoc }
+				);
+			} break;
+
+			case 1: {
+				u32 fileData[IslandTileCount];
+				std::vector<Item> IslandItems;
+				IslandItems.reserve(IslandTileCount);
+				MemoryRange restoreLoc = MemoryRange{ fileData, static_cast<int>(sizeof(fileData)) };
+
+				if (PluginUtils::Backup::RestoreMemory(
 						Utils::Format(PATH_ISLAND, Address::regionName.c_str()),
-						filename,
 						".dat",
-						{ backupLoc }
-					);
-				} break;
-
-				case 1: {
-					size_t arrSize = 0x400; //number of elements in array
-					u32 fileData[arrSize];
-					std::vector<Item> IslandItems;
-					if (!fileData) {
-						OSD::NotifySysFont(Language::getInstance()->get(TextID::ISLAND_SAVE_FAILED_ALLOCATE));
-						return;
+						Language::getInstance()->get(TextID::SAVE_RESTORE_SELECT),
+						{ restoreLoc },
+						PluginUtils::Backup::RestoreOptions{ nullptr, false }
+					) == OperationResult::Success) {
+					for(size_t i = 0; i < IslandTileCount; ++i) {
+						IslandItems.push_back({ static_cast<u16>(fileData[i] & 0xFFFF), static_cast<u16>(fileData[i] >> 16) });
 					}
-
-					std::string filename = "restoredump";
-					MemoryRange restoreLoc = MemoryRange{ fileData, static_cast<int>(arrSize * sizeof(u32)) };
-
-					if (PluginUtils::Backup::RestoreMemory(
-							Utils::Format(PATH_ISLAND, Address::regionName.c_str()),
-							".dat",
-							Language::getInstance()->get(TextID::SAVE_RESTORE_SELECT),
-							{ restoreLoc },
-							PluginUtils::Backup::RestoreOptions{ nullptr, false }
-						) == OperationResult::Success) {
-						for(size_t i = 0; i < arrSize; i++) {
-							IslandItems.push_back({ static_cast<u16>(fileData[i] & 0xFFFF), static_cast<u16>(fileData[i] >> 16) });
-						}
-						RestoreIsland(IslandItems);
-					}
-				} break;
-				case 2: {
-					PluginUtils::Backup::DeleteBackup(
-						Utils::Format(PATH_ISLAND, Address::regionName.c_str()),
-						".dat"
-					);
-				} break;
-			}
+					RestoreIsland(IslandItems);
+				}
+			} break;
+			case 2: {
+				PluginUtils::Backup::DeleteBackup(
+					Utils::Format(PATH_ISLAND, Address::regionName.c_str()),
+					".dat"
+				);
+			} break;
 		}
 	}
 }

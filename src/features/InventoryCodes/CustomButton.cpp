@@ -14,12 +14,75 @@ namespace CTRPluginFramework {
 		bool active;
 	};
 
-	std::vector<ItemButtonSettings> citemsettings = { 
-		{ TextID::CUSTOM_BUTTON_DUPLICATE, false }, 
-		{ TextID::CUSTOM_BUTTON_WRAP, false }, 
-		{ TextID::CUSTOM_BUTTON_PUT_IN_STORAGE, false }, 
+	extern std::vector<ItemButtonSettings> citemsettings;
+	u32 SetNameCall(u32 DataPointer, u32 *stack, char *SYS_2D_UI, u16 sysID);
+	void SetCustomButtonData(u32 *data, u32 sys2dUi);
+	int SetCustomButtonFunctions(int param1);
+
+	namespace {
+		u32 BuildCustomButtonMask(void) {
+			u32 mask = 0;
+
+			for(u32 i = 0; i < citemsettings.size() && i < 32; ++i) {
+				if(citemsettings[i].active) {
+					mask |= (1u << i);
+				}
+			}
+
+			return mask;
+		}
+
+		void ApplyCustomButtonSettingsState(u32 mask) {
+			for(u32 i = 0; i < citemsettings.size() && i < 32; ++i) {
+				citemsettings[i].active = (mask & (1u << i)) != 0;
+			}
+		}
+
+		void ApplyCustomButtonHooksFromCurrentState(void) {
+			static Hook hook;
+			static Hook hook2;
+			static Hook hook3;
+			static Address buttonDataFunc(0x19C440);
+			static Address buttonDataFuncReturn = buttonDataFunc.MoveOffset(0x48);
+			static Address buttonFunctionFunc(0x19EE20);
+			static Address sysNameFunc(0x5D5860);
+
+			const bool anyActive = BuildCustomButtonMask() != 0;
+
+			if(anyActive) {
+				hook.Initialize(buttonDataFunc.addr, (u32)SetCustomButtonData);
+				hook.SetFlags(USE_LR_TO_RETURN);
+				hook.SetReturnAddress(buttonDataFuncReturn.addr);
+
+				hook2.InitializeForMitm(buttonFunctionFunc.addr, (u32)SetCustomButtonFunctions);
+
+				hook3.Initialize(sysNameFunc.addr, (u32)SetNameCall);
+				hook3.SetFlags(USE_LR_TO_RETURN);
+
+				hook.Enable();
+				hook2.Enable();
+				hook3.Enable();
+				return;
+			}
+
+			hook.Disable();
+			hook2.Disable();
+			hook3.Disable();
+		}
+	}
+
+	std::vector<ItemButtonSettings> citemsettings = {
+		{ TextID::CUSTOM_BUTTON_DUPLICATE, false },
+		{ TextID::CUSTOM_BUTTON_WRAP, false },
+		{ TextID::CUSTOM_BUTTON_PUT_IN_STORAGE, false },
 		{ TextID::CUSTOM_BUTTON_PAY_DEBT, false }
 	};
+
+	void CustomButtonApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		ApplyCustomButtonSettingsState(savedValue);
+		ApplyCustomButtonHooksFromCurrentState();
+	}
 
 	void CustomButton::DuplicateItem(u32 ItemData) {
 		static Address getItem(0x7250B8);
@@ -47,17 +110,17 @@ namespace CTRPluginFramework {
 		static Address getItem(0x7250B8);
 		u32 itemSlot = *(u32 *)(ItemData + 0xCC);
 		Item *item = getItem.Call<Item*>(ItemData + 0x1EC0, itemSlot);
-		
+
 		u8 closetslot;
 		if(Inventory::GetNextClosetItem({0x7FFE, 0}, closetslot)) {
-			Inventory::WriteSlot(itemSlot, {0x7FFE, 0});	
+			Inventory::WriteSlot(itemSlot, {0x7FFE, 0});
 
 			ACNL_Player *player = Player::GetSaveData();
 			player->Dressers[closetslot] = *item;
 		}
 	}
 
-	void CustomButton::PayDebt(u32 ItemData) {	
+	void CustomButton::PayDebt(u32 ItemData) {
 		static Address GetMoneyFunc(0x3055C8);
 		static Address CallSound(0x58DDF8);
 
@@ -68,16 +131,16 @@ namespace CTRPluginFramework {
 		ACNL_Player *player = Player::GetSaveData();
 
 		if(player) {
-			if(IDChecks::IsInRange(item->ID, 0x20AC, 0x2117)) { 
+			if(IDChecks::IsInRange(item->ID, 0x20AC, 0x2117)) {
 				int money = GetMoneyFunc.Call<int>(&player->Inventory[itemSlot]);
-					
+
 				int debt = Game::DecryptValue(&player->DebtAmount);
 			//if you try to store more money than you need to, the rest will be set to your bank acc
 				if(money >= debt) {
 					int diff = std::abs(money - debt);
-					
+
 					int bank = Game::DecryptValue(&player->BankAmount);
-				//if money that goes to the bank will not fill it it up completely	
+				//if money that goes to the bank will not fill it it up completely
 					if((bank + diff) <= 999999999) {
 						Game::EncryptValue(&player->BankAmount, bank + diff);
 					}
@@ -88,7 +151,7 @@ namespace CTRPluginFramework {
 							Game::EncryptValue(&player->BankAmount, diff);
 						}
 					}
-					
+
 					money = debt; //make money the exact debt
 				}
 
@@ -97,7 +160,7 @@ namespace CTRPluginFramework {
 				while(item->ID > 0x20AC) {
 					CallSound.Call<void>(0x1000491);
 					item->ID--;
-					Inventory::WriteSlot(itemSlot, *item);	
+					Inventory::WriteSlot(itemSlot, *item);
 				}
 
 				Game::PlaySound(0x492);
@@ -148,7 +211,7 @@ namespace CTRPluginFramework {
 
 	void SetButtonData(ButtonData *data, u32 stringContext, u32 stringId, u32 u0, u32 u1, u32 functionId, u8 u2) {
 		data->flag = 1;
-		
+
 		data->zero0 = 0;
 
 		data->stringContext = stringContext;
@@ -169,37 +232,49 @@ namespace CTRPluginFramework {
 	*/
 	void SetCustomButtonData(u32 *data, u32 sys2dUi) {
 		register u32 optionCount asm("r4");
+		register u32 menuData asm("r5");
+
+		static Address finalizeButtonLayout(0x5E5490);
+		static Address copyButtonData(0x5E5464);
+		static Address commitButtonLayout(0x5E5458);
 
 		register u32 itemOffset asm("r6");
 		Item itemId = *(Item *)itemOffset;
 		Item_Category category = Game::GetItemCategory(itemId);
 
+		const u32 originalOptionCount = optionCount;
+		ButtonData *buttonStackBase = reinterpret_cast<ButtonData *>(data) - originalOptionCount;
 		int addedOptions = 0;
 
-		if (citemsettings[0].active && (optionCount + (addedOptions + 1)) < 5) {
+		if (citemsettings[0].active && (originalOptionCount + (addedOptions + 1)) < 5) {
 			SetButtonData((ButtonData *)(data + (addedOptions * 8)), sys2dUi, 0x250, 0, 0, 0x40, 7); //Duplicate
 			addedOptions++;
 		}
-		if (citemsettings[1].active && (optionCount + (addedOptions + 1)) < 5) {
+		if (citemsettings[1].active && (originalOptionCount + (addedOptions + 1)) < 5) {
 			SetButtonData((ButtonData *)(data + (addedOptions * 8)), sys2dUi, 0x251, 0, 0, 0x41, 7); //Wrap It
 			addedOptions++;
 		}
-		if (citemsettings[2].active && (optionCount + (addedOptions + 1)) < 5) {
+		if (citemsettings[2].active && (originalOptionCount + (addedOptions + 1)) < 5) {
 			SetButtonData((ButtonData *)(data + (addedOptions * 8)), sys2dUi, 0x252, 0, 0, 0x42, 7); //Put in Storage
 			addedOptions++;
 		}
-		if (citemsettings[3].active && category == Item_Category::Bells && (optionCount + (addedOptions + 1)) < 5) {
+		if (citemsettings[3].active && category == Item_Category::Bells && (originalOptionCount + (addedOptions + 1)) < 5) {
 			SetButtonData((ButtonData *)(data + (addedOptions * 8)), sys2dUi, 0x253, 0, 0, 0x43, 7); //Pay Debt
 			addedOptions++;
 		}
 
-		static Address buttonDataFunc(0x19C440);
-		static Address buttonDataFuncOption1 = buttonDataFunc.MoveOffset(4);
-		static Address buttonDataFuncOption2 = buttonDataFunc.MoveOffset(8);
-		buttonDataFuncOption1.Patch(0xE2846001 + addedOptions);
-		buttonDataFuncOption2.Patch(0xE2842000 + addedOptions);
+		const u32 quitIndex = originalOptionCount + addedOptions;
+		const u32 totalOptionCount = quitIndex + 1;
 
 		SetButtonData((ButtonData *)(data + (addedOptions * 8)), sys2dUi, 0xB, 0, 0, 0x29, 1); //Quit Button
+
+		finalizeButtonLayout.Call<void>(menuData + 0xE0, totalOptionCount, quitIndex);
+
+		for(u32 i = 0; i < totalOptionCount; ++i) {
+			copyButtonData.Call<void>(menuData + 0xE0, i, buttonStackBase + i);
+		}
+
+		commitButtonLayout.Call<void>(menuData + 0xE0);
 	}
 
 	using FuncType = u32(*)(u32*);
@@ -283,117 +358,85 @@ namespace CTRPluginFramework {
 	}
 
 	void SettingsButton(MenuEntry *entry) {
-		static Hook hook, hook2, hook3;
-		static Address buttonDataFunc(0x19C440);
-		static Address buttonDataFuncOption1 = buttonDataFunc.MoveOffset(4);
-		static Address buttonDataFuncOption2 = buttonDataFunc.MoveOffset(8);
-		static Address buttonFunctionFunc(0x19EE20);
-		static Address buttonFunctionFuncEnd = buttonFunctionFunc.MoveOffset(4);
-		static Address SYSNameFunc(0x5D5860);
-
 		std::vector<std::string> options;
-		for (ItemButtonSettings &setting : citemsettings) {
-			if (setting.active) {
+		for(ItemButtonSettings &setting : citemsettings) {
+			if(setting.active) {
 				options.push_back(Color::Green << Language::getInstance()->get(setting.textId));
-			} else {
+			}
+			else {
 				options.push_back(Color::Red << Language::getInstance()->get(setting.textId));
 			}
 		}
 
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION));
+		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_CUSTOM_BUTTONS));
 		optKb.Populate(options);
-		int op = optKb.Open();
-		if(op < 0) {
+		const int op = optKb.Open();
+		if(op < 0 || op >= static_cast<int>(citemsettings.size())) {
 			return;
 		}
 
 		citemsettings[op].active = !citemsettings[op].active;
 
-		bool anyActive = false;
-		for (ItemButtonSettings &setting : citemsettings) {
-			if (setting.active) {
-				anyActive = true;
-			}
-		}
-		
-		if (anyActive) {
-			hook.Initialize(buttonDataFunc.addr, (u32)SetCustomButtonData);
-			hook.SetFlags(USE_LR_TO_RETURN);
-			hook.Enable();
-
-			hook2.Initialize(buttonFunctionFunc.addr, (u32)SetCustomButtonFunctions);
-			hook2.SetFlags(USE_LR_TO_RETURN);
-			hook2.Enable();
-			buttonFunctionFuncEnd.Patch(0xE12FFF1E); //BX LR
-			
-			hook3.Initialize(SYSNameFunc.addr, (u32)SetNameCall);
-			hook3.SetFlags(USE_LR_TO_RETURN);
-			hook3.Enable();
-		} else {
-			hook.Disable();
-			hook2.Disable();
-			hook3.Disable();
-
-			buttonFunctionFuncEnd.Unpatch();
-			buttonDataFuncOption1.Unpatch();
-			buttonDataFuncOption2.Unpatch();
-		}
+		const u32 mask = BuildCustomButtonMask();
+		ApplyCustomButtonSettingsState(mask);
+		ApplyCustomButtonHooksFromCurrentState();
+		entry->SetSavedValue(mask);
 
 		SettingsButton(entry);
 	}
 
 	/*void CustomButton::RandomOutfit(u32 ItemData) {
-		Player::WriteOutfit(4, (Item)Utils::Random(0x280B, 0x28F3), 
-							   (Item)Utils::Random(0x28F5, 0x295B), 
-							   (Item)Utils::Random(0x2493, 0x26F5), 
-							   (Item)Utils::Random(0x26F8, 0x2776), 
-							   (Item)Utils::Random(0x2777, 0x279E), 
+		Player::WriteOutfit(4, (Item)Utils::Random(0x280B, 0x28F3),
+							   (Item)Utils::Random(0x28F5, 0x295B),
+							   (Item)Utils::Random(0x2493, 0x26F5),
+							   (Item)Utils::Random(0x26F8, 0x2776),
+							   (Item)Utils::Random(0x2777, 0x279E),
 							   (Item)Utils::Random(0x279F, 0x27E5));
-		
+
 		Address(0x19D2A0).Call<void>(*(u32 *)(Game::BaseInvPointer() + 0xC));
 	}
 
 	void claim(void) {
 		u32 DesignData = *(u32 *)(GameHelper::BaseInvPointer() + 0xC) + 0x464; //0x32DC4E1C
-		
+
 		const u32 GetSlot = 0x724214;
 		Process::Write32((u32)&FUN, GetSlot);
 		u8 DesignSlot = FUN(DesignData);
-		
-		u32 Design = Player::GetSaveOffset(4) + 0x548C;		
+
+		u32 Design = Player::GetSaveOffset(4) + 0x548C;
 		u8 correctslot = *(u8 *)(Design + (0x1 * DesignSlot));
-		
+
 		std::string PlayerName = "", TownName = "";
 		Process::ReadString(PlayerPTR::Pointer(0x55A8), PlayerName, 0x10, StringFormat::Utf16);
 		Process::ReadString(PlayerPTR::Pointer(0x55BE), TownName, 0x10, StringFormat::Utf16);
-		
+
 		Player::SetDesign(correctslot, "", *(u16 *)PlayerPTR::Pointer(0x55A6), PlayerName, *(u8 *)PlayerPTR::Pointer(0x55BA), *(u16 *)PlayerPTR::Pointer(0x55BC), TownName, *(u32 *)PlayerPTR::Pointer(0x55D0), 0xFF, 0xFF);
-	
+
 		FUN_008188a0(iParm1 + 0xa4,PTR_FUN_00852d64,DAT_00852d68);
 	}
 
 	void claimdesignbutton(MenuEntry *entry) {
 		static Hook hook;
-		
+
 		const u32 AlwaysWear = 0x258E58;
 		const u32 AlwaysUmbrella = 0x2585B8;
-		
-		if(entry->WasJustActivated()) {	
+
+		if(entry->WasJustActivated()) {
 			Process::Write32(AlwaysWear, 0xE1A00000);
 			Process::Write32(AlwaysUmbrella, 0xE1A00000);
-		
+
 			u32 HookOff = 0x25A0A4;
 			hook.Initialize(HookOff, (u32)claim);
 			hook.SetFlags(0);
 			hook.Enable();
 		}
-		
+
 		if(GameHelper::BaseInvPointer() != 0) {
 			if(!Inventory::Opened())
 				return;
-			
+
 			u32 Designs = *(u32 *)(*(u32 *)(GameHelper::BaseInvPointer() + 0xC) + 0x22C0);
-			
+
 			for(int i = 0; i < 6; i++) {
 				u32 CurrDesign = Designs + (0xAC * i);
 			//If ID is Wear
@@ -401,19 +444,19 @@ namespace CTRPluginFramework {
 					Process::WriteString((CurrDesign + 0x20), "Claim Design", 0x28, StringFormat::Utf16);
 			}
 		}
-		
-		if(!entry->IsActivated()) {	
+
+		if(!entry->IsActivated()) {
 			Process::Write32(AlwaysWear, 0x1A000010);
 			Process::Write32(AlwaysUmbrella, 0x0A000009);
 		    hook.Disable();
 		}
 	}
-		
 
-	const std::vector<std::string> coutfitsettings = { 
-		"Random Outfit", "Disable", 
+
+	const std::vector<std::string> coutfitsettings = {
+		"Random Outfit", "Disable",
 	};
-	
+
 	void SettingsButtonASD(MenuEntry *entry) {
 	//3rd Custom button | replaces remove wet suit button
 		static const Address WetSuitButton(0x19DBA4);

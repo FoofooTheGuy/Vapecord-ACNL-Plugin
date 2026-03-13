@@ -5,20 +5,32 @@
 #include <functional>
 
 namespace CTRPluginFramework {
-	void ToggleWithOptionKeyboard(const std::function<void(bool)>& fn) {
-        const std::vector<std::string> cmnOpt =  {
-			Language::getInstance()->get(TextID::VECTOR_ENABLE),
-			Language::getInstance()->get(TextID::VECTOR_DISABLE)
-		};
+	static std::string FormatToggleStateOption(bool isEnabled) {
+		return (isEnabled ? Color::Green : Color::Red)
+			<< Language::getInstance()->get(isEnabled ? TextID::VECTOR_ENABLED : TextID::VECTOR_DISABLED);
+	}
+
+	static bool ConfirmDefaultCodesDisable(void) {
+		return MessageBox(
+			Language::getInstance()->get(TextID::DEFAULT_CODES_DISABLE_WARNING),
+			DialogType::DialogYesNo
+		)();
+	}
+
+	void ToggleWithOptionKeyboard(bool isEnabled, const std::function<void(bool)>& fn) {
+		const std::vector<std::string> cmnOpt = { FormatToggleStateOption(isEnabled) };
 
 		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), cmnOpt);
-        int res = optKb.Open();
-		if (res < 0) {
+		if (optKb.Open() < 0) {
 			return;
 		}
 
-		fn(res == 0); // 0 = enable, 1 = disable
-    }
+		if (isEnabled && !ConfirmDefaultCodesDisable()) {
+			return;
+		}
+
+		fn(!isEnabled);
+	}
 
 	void SeedItemLegitimacy(bool enable) {
 		static Address skipSeedItemCheck(0x6BAC8C);
@@ -231,46 +243,46 @@ namespace CTRPluginFramework {
 	}
 
 	void SeedItemLegitimacyEntry(MenuEntry *entry) {
-		ToggleWithOptionKeyboard(SeedItemLegitimacy);
+		ToggleWithOptionKeyboard(Address(0x6BAC8C).IsPatched(), SeedItemLegitimacy);
 	}
 
 	void OnlineDropLagRemoverEntry(MenuEntry *entry) {
-		ToggleWithOptionKeyboard(OnlineDropLagRemover);
+		ToggleWithOptionKeyboard(Address(0x5A1454).IsPatched(), OnlineDropLagRemover);
 	}
 
 	void ChangeRockbreakParticleEntry(MenuEntry *entry) {
-		ToggleWithOptionKeyboard(ChangeRockbreakParticle);
+		ToggleWithOptionKeyboard(Address(0x5A2D20).IsPatched(), ChangeRockbreakParticle);
 	}
 
 	void DropItemsEverywhereEntry(MenuEntry *entry) {
-		ToggleWithOptionKeyboard(DropItemsEverywhere);
+		ToggleWithOptionKeyboard(Address(0x1655EC).IsPatched(), DropItemsEverywhere);
 	}
 
 	void IdleAfterTreeShakeOrCutEntry(MenuEntry *entry) {
-		ToggleWithOptionKeyboard(IdleAfterTreeShakeOrCut);
+		ToggleWithOptionKeyboard(Address(0x660600).IsPatched(), IdleAfterTreeShakeOrCut);
 	}
 
 	void DontMoveNPCBackToOriginalPositionEntry(MenuEntry *entry) {
-		ToggleWithOptionKeyboard(DontMoveNPCBackToOriginalPosition);
+		ToggleWithOptionKeyboard(Address(0x57B9C0).IsPatched(), DontMoveNPCBackToOriginalPosition);
 	}
 
 	void ReplaceDropFunctionsEntry(MenuEntry *entry) {
-		ToggleWithOptionKeyboard(ReplaceDropFunctions);
+		ToggleWithOptionKeyboard(Address(0x5A0F54).IsPatched(), ReplaceDropFunctions);
 	}
 
 	void PreventParticleCrashEntry(MenuEntry *entry) {
-		ToggleWithOptionKeyboard(PreventParticleCrash);
+		ToggleWithOptionKeyboard(Address(0x721418).IsPatched(), PreventParticleCrash);
 	}
 
 	void BypassGameChecksEntry(MenuEntry *entry) {
-		ToggleWithOptionKeyboard(BypassGameChecks);
+		ToggleWithOptionKeyboard(Address(0x1D43A4).IsPatched(), BypassGameChecks);
 	}
 
 	void DisableNonSeedItemCheckEntry(MenuEntry *entry) {
-		ToggleWithOptionKeyboard(DisableNonSeedItemCheck);
+		ToggleWithOptionKeyboard(Address(0x76A894).IsPatched(), DisableNonSeedItemCheck);
 	}
 
 	void PatchDropFunctionEntry(MenuEntry *entry) {
-		ToggleWithOptionKeyboard(PatchDropFunction);
+		ToggleWithOptionKeyboard(Address(0x59FCA4).IsPatched(), PatchDropFunction);
 	}
 }

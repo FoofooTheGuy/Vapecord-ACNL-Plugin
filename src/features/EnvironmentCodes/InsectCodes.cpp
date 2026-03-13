@@ -82,6 +82,11 @@ namespace CTRPluginFramework {
 
     static u8 insectId = 0x51;
 
+    void InsectSetIdApplySaved(MenuEntry *entry, u32 savedValue) {
+        (void)entry;
+        insectId = static_cast<u8>(savedValue & 0xFF);
+    }
+
 	void SpawnInsect() {
 		static Address spawnInsect(0x2AC924);
 		static Address dataPointer(0x950534);
@@ -210,6 +215,7 @@ namespace CTRPluginFramework {
         if (choice == 0) {
             if (PluginUtils::Input::PromptNumber<u16>({ "", true, 4, itemInsectId, TextItemChange }, itemInsectId)) {
                 insectId = ConvertItemIdToInsectId(itemInsectId);
+				entry->SetSavedValue(insectId);
             }
         } else {
             std::vector<std::string> insectList;
@@ -226,6 +232,7 @@ namespace CTRPluginFramework {
                 return;
             }
             insectId = insectChoice;
+			entry->SetSavedValue(insectId);
         }
 	}
 

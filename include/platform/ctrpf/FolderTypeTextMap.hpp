@@ -24,6 +24,26 @@ namespace CTRPluginFramework {
         }
     }
 
+    inline TextID GetFolderNoteTextId(FolderType type) {
+        switch (type) {
+            case FolderType::Save:        return TextID::SAVE_CODES_NOTE;
+            case FolderType::Movement:    return TextID::MOVEMENT_CODES_NOTE;
+            case FolderType::Inventory:   return TextID::INVENTORY_CODES_NOTE;
+            case FolderType::Player:      return TextID::PLAYER_CODES_NOTE;
+            case FolderType::Animation:   return TextID::ANIMATION_CODES_NOTE;
+            case FolderType::Seeding:     return TextID::SEEDING_CODES_NOTE;
+            case FolderType::Money:       return TextID::MONEY_CODES_NOTE;
+            case FolderType::Island:      return TextID::ISLAND_CODES_NOTE;
+            case FolderType::NPC:         return TextID::NPC_CODES_NOTE;
+            case FolderType::Environment: return TextID::ENV_CODES_NOTE;
+            case FolderType::Extra:       return TextID::EXTRA_CODES_NOTE;
+            case FolderType::Misc:        return TextID::MISC_CODES_NOTE;
+            case FolderType::Default:     return TextID::DEFAULT_CODES_NOTE;
+            case FolderType::Dev:         return TextID::DEV_CODES_NOTE;
+            default:                      return TextID::NONE;
+        }
+    }
+
     inline TextID GetSubFolderTextId(FolderType parent, SubFolder sub) {
         if (sub == SubFolder::None)
             return TextID::NONE;
@@ -55,6 +75,48 @@ namespace CTRPluginFramework {
                 switch (sub) {
                     case SubFolder::Chat: return TextID::CHAT_CODES;
                     case SubFolder::Fun: return TextID::FUN_CODES;
+                    default: break;
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        return TextID::NONE;
+    }
+
+    inline TextID GetSubFolderNoteTextId(FolderType parent, SubFolder sub) {
+        if (sub == SubFolder::None)
+            return TextID::NONE;
+
+        switch (parent) {
+            case FolderType::Player:
+                if (sub == SubFolder::PlayerSave)
+                    return TextID::PLAYER_SAVE_CODES_NOTE;
+                break;
+
+            case FolderType::Seeding:
+                switch (sub) {
+                    case SubFolder::Seed: return TextID::SEED_CODES_NOTE;
+                    case SubFolder::Drop: return TextID::DROP_CODES_NOTE;
+                    case SubFolder::Tree: return TextID::TREE_CODES_NOTE;
+                    default: break;
+                }
+                break;
+
+            case FolderType::Environment:
+                switch (sub) {
+                    case SubFolder::Fish: return TextID::FISH_CODES_NOTE;
+                    case SubFolder::Insect: return TextID::INSECT_CODES_NOTE;
+                    default: break;
+                }
+                break;
+
+            case FolderType::Extra:
+                switch (sub) {
+                    case SubFolder::Chat: return TextID::CHAT_CODES_NOTE;
+                    case SubFolder::Fun: return TextID::FUN_CODES_NOTE;
                     default: break;
                 }
                 break;

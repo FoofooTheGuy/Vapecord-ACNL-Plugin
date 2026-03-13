@@ -7,6 +7,7 @@
 #include "core/infrastructure/PluginUtils.hpp"
 #include "core/game_api/Dropper.hpp"
 #include "Color.h"
+#include <cstring>
 
 extern "C" void SetWalkParticleID(void);
 
@@ -27,33 +28,73 @@ namespace CTRPluginFramework {
 
 //Definition for Coordinate Mod Speed
 	float cspeed = 5.0;
+
+	static u32 EncodeFloatValue(float value) {
+		u32 raw = 0;
+		std::memcpy(&raw, &value, sizeof(raw));
+		return raw;
+	}
+
+	static float DecodeFloatValue(u32 raw, float fallback) {
+		float value = fallback;
+		std::memcpy(&value, &raw, sizeof(value));
+		return value;
+	}
+
+	void CoordSpeedApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		const float value = DecodeFloatValue(savedValue, 5.0f);
+		if(value > 0.0f && value <= 99.0f) {
+			cspeed = value;
+		}
+	}
 //Coordinate Mod Speed Changer Keyboard
 	void coordspeed(MenuEntry *entry) {
-		Keyboard kb(Language::getInstance()->get(TextID::ENTER_ID));
-		kb.GetMessage() = Utils::Format(Language::getInstance()->get(TextID::COORD_MOD_ENTER_SPEED).c_str(), 5);
+		Keyboard kb(Utils::Format(Language::getInstance()->get(TextID::COORD_MOD_ENTER_SPEED).c_str(), 5));
 		kb.IsHexadecimal(false);
 		kb.SetMaxLength(2);
-		kb.Open(cspeed);
+		if(kb.Open(cspeed) >= 0) {
+			entry->SetSavedValue(EncodeFloatValue(cspeed));
+		}
 	}
 
 //Coordinate Modifier
 	void coordinate(MenuEntry *entry) {
-		if(entry->Hotkeys[0].IsDown()) {//A
-			float *pCoords = PlayerClass::GetInstance()->GetCoordinates();
-			if(pCoords != nullptr && !MapEditorActive) { // if not in tile selection mode & valid player obj
-				if(entry->Hotkeys[1].IsDown()) {
-					pCoords[0] += cspeed; //DPadRight
-				}
-				if(entry->Hotkeys[2].IsDown()) {
-					pCoords[0] -= cspeed; //DPadLeft
-				}
-				if(entry->Hotkeys[3].IsDown()) {
-					pCoords[2] += cspeed; //DPadDown
-				}
-				if(entry->Hotkeys[4].IsDown()) {
-					pCoords[2] -= cspeed; //DPadUp
-				}
+		float *pCoords = PlayerClass::GetInstance()->GetCoordinates();
+		if(pCoords != nullptr && !MapEditorActive) { // if not in tile selection mode & valid player obj
+			if(entry->Hotkeys[0].IsDown()) {
+				pCoords[0] += cspeed; //DPadRight
 			}
+			if(entry->Hotkeys[1].IsDown()) {
+				pCoords[0] -= cspeed; //DPadLeft
+			}
+			if(entry->Hotkeys[2].IsDown()) {
+				pCoords[2] += cspeed; //DPadDown
+			}
+			if(entry->Hotkeys[3].IsDown()) {
+				pCoords[2] -= cspeed; //DPadUp
+			}
+		}
+	}
+
+	void cStickCoordinate(MenuEntry *entry) {
+		const u16 max_pos = 146; //seems to be the max value
+
+		circlePosition pos{0, 0};
+		hidCstickRead(&pos);
+
+		float *pCoords = PlayerClass::GetInstance()->GetCoordinates();
+
+		if(pCoords != nullptr && !MapEditorActive) {
+			//(circlePosition / max_pos) * 100 = percent_pushed
+			float percent_pushedx = (float)pos.dx / max_pos * 100;
+			float percent_pushedy = (float)pos.dy / max_pos * 100;
+			//(percent_pushed / 100) * cspeed = speed
+			float speedx = (percent_pushedx / 100) * cspeed;
+			float speedy = (percent_pushedy / 100) * cspeed;
+
+			pCoords[0] += speedx;
+			pCoords[2] += (speedy * -1); //negate y
 		}
 	}
 
@@ -211,7 +252,7 @@ namespace CTRPluginFramework {
 				pos = -1;
 			}
 
-			OSD::NotifySysFont(allforce ? Language::getInstance()->get(TextID::PLAYER_TELEPORT_ALL) : Utils::Format(Language::getInstance()->get(TextID::PLAYER_TELEPORT_PLAYER).c_str(), pos));
+			OSD::NotifySysFont(allforce ? Language::getInstance()->get(TextID::PLAYER_TELEPORT_ALL) : Utils::Format(Language::getInstance()->get(TextID::PLAYER_TELEPORT_PLAYER).c_str(), pos + 1));
 		}
 
 		else if(entry->Hotkeys[1].IsPressed()) {
@@ -219,7 +260,7 @@ namespace CTRPluginFramework {
 			if(PlayerClass::GetInstance()->GetWorldCoords(&x, &y)) {
 				if(!allforce && pos >= 0) {
 					Animation::ExecuteAnimationWrapper(pos, 0x34, {1, 0}, 1, 1, 1, 0, x, y, true);
-					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_TELEPORT_PLAYER_TELEPORTED).c_str(), pos));
+					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_TELEPORT_PLAYER_TELEPORTED).c_str(), pos + 1));
 				}
 				else {
 					for(u8 i = 0; i < 4; ++i) {
@@ -313,12 +354,21 @@ namespace CTRPluginFramework {
 	}
 //Player Speed Changer Keyboard
 	void menuSpeedMod(MenuEntry *entry) {
-		Keyboard kb(Language::getInstance()->get(TextID::ENTER_ID));
-		kb.GetMessage() = Utils::Format(Language::getInstance()->get(TextID::SPEED_MOD_SPEED).c_str(), 1);
+		Keyboard kb(Utils::Format(Language::getInstance()->get(TextID::SPEED_MOD_SPEED).c_str(), 1));
 		kb.IsHexadecimal(false);
 		kb.SetMaxLength(7);
 		kb.OnKeyboardEvent(SpeedCheck);
-		kb.Open(walkSpeed);
+		if(kb.Open(walkSpeed) >= 0) {
+			entry->SetSavedValue(EncodeFloatValue(walkSpeed));
+		}
+	}
+
+	void SpeedModApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		const float value = DecodeFloatValue(savedValue, 1.0f);
+		if(value > 0.0f && value < 15.0f) {
+			walkSpeed = value;
+		}
 	}
 
 //InputChangeEvent for Room Warper

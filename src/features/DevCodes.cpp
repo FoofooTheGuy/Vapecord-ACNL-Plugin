@@ -152,7 +152,7 @@ namespace CTRPluginFramework {
 						break;
 
 						case 0x33333333:
-							p[i] = *Game::GetCurrentMap();
+							p[i] = Game::GetCurrentMap();
 						break;
 					}
 				}

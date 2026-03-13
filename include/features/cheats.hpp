@@ -32,7 +32,9 @@ namespace CTRPluginFramework {
 //Movement Codes Folder
 	void noPush(MenuEntry *entry);
 	void coordspeed(MenuEntry *entry);
+	void CoordSpeedApplySaved(MenuEntry *entry, u32 savedValue);
 	void coordinate(MenuEntry *entry);
+	void cStickCoordinate(MenuEntry *entry);
 	void moonjump(MenuEntry *entry);
 	void tch_warp(MenuEntry *entry);
 	void walkOver(MenuEntry *entry);
@@ -42,6 +44,7 @@ namespace CTRPluginFramework {
 	void onlineplayermod(MenuEntry *entry);
 	void speedMod(MenuEntry *entry);
 	void menuSpeedMod(MenuEntry *entry);
+	void SpeedModApplySaved(MenuEntry *entry, u32 savedValue);
 	void roomWarp(MenuEntry *entry);
 	void shovelknockback(MenuEntry *entry);
 
@@ -51,10 +54,13 @@ namespace CTRPluginFramework {
 	void duplication(MenuEntry *entry);
 	void catalog(MenuEntry *entry);
 	void itemsettings(MenuEntry *entry);
+	void ItemSettingsApplySaved(MenuEntry *entry, u32 savedValue);
 	void MenuChanger(MenuEntry *entry);
+	void MenuChangerApplySaved(MenuEntry *entry, u32 savedValue);
 	void ClearInventory(MenuEntry *entry);
 	void getset(MenuEntry *entry);
 	void SettingsButton(MenuEntry *entry);
+	void CustomButtonApplySaved(MenuEntry *entry, u32 savedValue);
 	void chatt2i(MenuEntry *entry);
 
 //Player Codes Folder
@@ -74,7 +80,6 @@ namespace CTRPluginFramework {
 	void playerbackup(MenuEntry *entry);
 	void unlockqrmachine(MenuEntry *entry);
 
-	void neckentry(MenuEntry *entry);
 	void debug(MenuEntry *entry);
 	void hatz(MenuEntry *entry);
 	void Faint(MenuEntry *entry);
@@ -82,14 +87,13 @@ namespace CTRPluginFramework {
 	void map(MenuEntry *entry);
 	void NeverBedHead(MenuEntry *entry);
 	void SaveColor(MenuEntry *entry);
-	void App_ColorMod(MenuEntry *entry);
+	void AppColorModApplySaved(MenuEntry *entry, u32 savedValue);
 
 //Animation Codes Folder
 	void playerSelector(MenuEntry *entry);
 	void execAnim(MenuEntry *entry);
 	void inf_expression(MenuEntry *entry);
 	void idle(MenuEntry *entry);
-	void slmoanms(MenuEntry *entry);
 	void doonall(MenuEntry *entry);
 	void anticheat(MenuEntry *entry);
 
@@ -104,6 +108,7 @@ namespace CTRPluginFramework {
 	void everythingseeder(MenuEntry *entry);
 	//Drop Codes
 	void Entry_itemsequence(MenuEntry *entry);
+	void ItemSequencerApplySaved(MenuEntry *entry, u32 savedValue);
 	void dropMod(MenuEntry *entry);
 	void instantDrop(MenuEntry *entry);
 	void autoDrop(MenuEntry *entry);
@@ -139,6 +144,7 @@ namespace CTRPluginFramework {
 
 //Fun Codes
 	void sizecodes(MenuEntry *entry);
+	void SizeCodesApplySaved(MenuEntry *entry, u32 savedValue);
 	void tposeentry(MenuEntry *entry);
 	void freezeframe(MenuEntry *entry);
 	void maxturbo(MenuEntry *entry);
@@ -156,6 +162,7 @@ namespace CTRPluginFramework {
 
 	//Insect Codes
 	void SetInsectIdEntry(MenuEntry *entry);
+	void InsectSetIdApplySaved(MenuEntry *entry, u32 savedValue);
 	void SpawnInsectEntry(MenuEntry *entry);
 	void InsectsCantBeScared(MenuEntry *entry);
 
@@ -163,6 +170,7 @@ namespace CTRPluginFramework {
 	void auroralights(MenuEntry *entry);
 	void unbreakableflower(MenuEntry *entry);
 	void Weathermod(MenuEntry *entry);
+	void WeatherModApplySaved(MenuEntry *entry, u32 savedValue);
 	void WaterAllFlowers(MenuEntry *entry);
 	void weedremover(MenuEntry *entry);
 	void grasscomplete(MenuEntry *entry);
@@ -176,7 +184,6 @@ namespace CTRPluginFramework {
 	void bubblesDisappear(MenuEntry *entry);
 	void Forcesendchat(MenuEntry *entry);
 	void chatCommands(MenuEntry *entry);
-	void ChatCopyPaste(MenuEntry *entry);
 	void ChatButton(MenuEntry *entry);
 	void ChatTranslationOptions(MenuEntry *entry);
 
@@ -196,7 +203,9 @@ namespace CTRPluginFramework {
 
 //Misc Codes
 	void tooltype(MenuEntry *entry);
+	void ToolTypeApplySaved(MenuEntry *entry, u32 savedValue);
 	void mgtype(MenuEntry *entry);
+	void GameTypeApplySaved(MenuEntry *entry, u32 savedValue);
 	void radioPlayer(MenuEntry *entry);
 	void ReloadRoomCheat(MenuEntry *entry);
 	void morenumberisland(MenuEntry *entry);
@@ -226,6 +235,7 @@ namespace CTRPluginFramework {
 //NPC Codes
 	void NPCFunction(MenuEntry *entry);
 	void NPCSetAnim(MenuEntry *entry);
+	void NPCSetAnimApplySaved(MenuEntry *entry, u32 savedValue);
 	void NPCAnimation(MenuEntry *entry);
 	void NPCCoordinates(MenuEntry *entry);
 	void NPCTeleportToYou(MenuEntry *entry);

@@ -62,16 +62,16 @@ jobs:
         path: Vapecord_Public.elf
 
     - name: Check For Unused Text
-      run: python3 tools/validation/CheckForUnusedText.py
+      run: python3 tools/validation/check_unused_text.py
 
     - name: Check If Addresses Are Ported
-      run: python3 tools/validation/CheckIfAddressesArePorted.py
+      run: python3 tools/validation/check_addresses_are_ported.py
 
     - name: Check If Text Is Translated
-      run: python3 tools/validation/CheckIfTextIsTranslated.py
+      run: python3 tools/validation/check_text_translated.py
 
     - name: Check For Unused Addresses
-      run: python3 tools/validation/CheckForUnusedAddresses.py
+      run: python3 tools/validation/check_unused_addresses.py
 
 
 

@@ -13,54 +13,39 @@
 #include "Color.h"
 
 extern "C" void PATCH_MoveFurnButton(void);
-extern "C" void PATCH_ToolAnim(void);
-
-u8 toolTypeAnimID = 6;
 
 namespace CTRPluginFramework {
-//Change Tool Animation
-	void tooltype(MenuEntry *entry) {
-		static Hook hook;
-		if(PluginUtils::Input::PromptNumber<u8>({ Language::getInstance()->get(TextID::TOOL_ANIM_ENTER_ANIM), true, 2, toolTypeAnimID }, toolTypeAnimID)) {
-			if(toolTypeAnimID == 0) { //if switched OFF
-				hook.Disable();
+//Change Gametype
+	void GameTypeApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		if(savedValue < 4) {
+			Game::ChangeGameMode((Game::GameMode)savedValue);
+		}
+	}
+
+	void mgtype(MenuEntry *entry) {
+		while(true) {
+			std::vector<std::string> gametype = {
+				Language::getInstance()->get(TextID::VECTOR_GAMETYPE_OFFLINE),
+				Language::getInstance()->get(TextID::VECTOR_GAMETYPE_ONLINE1),
+				Language::getInstance()->get(TextID::VECTOR_GAMETYPE_ONLINE2),
+				Language::getInstance()->get(TextID::VECTOR_GAMETYPE_DREAM),
+			};
+
+			for(int i = 0; i < 4; ++i) {
+				const bool isOn = Game::GetGameMode() == i;
+				gametype[i] = (isOn ? Color(pGreen) : Color(pRed)) << gametype[i];
+			}
+
+			Keyboard keyboard(Language::getInstance()->get(TextID::GAME_TYPE_CHOOSE), gametype);
+			const int gametchoice = keyboard.Open();
+			if(gametchoice < 0 || gametchoice > 3) {
 				return;
 			}
 
-			if(!IDChecks::AnimationValid(toolTypeAnimID)) {
-				toolTypeAnimID = 6;
-			}
-
-			hook.Initialize(Address(0x64DB90).addr + 0x10, (u32)PATCH_ToolAnim);
-			hook.SetFlags(USE_LR_TO_RETURN);
-			hook.Enable();
+			Game::ChangeGameMode((Game::GameMode)gametchoice);
+			entry->SetSavedValue((u32)gametchoice);
 		}
-	}
-//Change Gametype
-	void mgtype(MenuEntry *entry) {
-		std::vector<std::string> gametype = {
-			Language::getInstance()->get(TextID::VECTOR_GAMETYPE_OFFLINE),
-			Language::getInstance()->get(TextID::VECTOR_GAMETYPE_ONLINE1),
-			Language::getInstance()->get(TextID::VECTOR_GAMETYPE_ONLINE2),
-			Language::getInstance()->get(TextID::VECTOR_GAMETYPE_DREAM),
-		};
-
-		bool IsON;
-
-		for(int i = 0; i < 4; ++i) {
-			IsON = Game::GetGameMode() == i;
-			gametype[i] = (IsON ? Color(pGreen) : Color(pRed)) << gametype[i];
-		}
-
-        Keyboard keyboard(Language::getInstance()->get(TextID::GAME_TYPE_CHOOSE), gametype);
-
-        int gametchoice = keyboard.Open();
-        if(gametchoice < 0)	{
-			return;
-		}
-
-		Game::ChangeGameMode((Game::GameMode)gametchoice);
-		mgtype(entry);
     }
 
 	void ShowPlayingMusic(u32 musicData, u32 r1, u32 r2, u32 r3) {
@@ -238,22 +223,6 @@ namespace CTRPluginFramework {
 		}
 		else if(!entry->IsActivated()) {
 			walktalk.Unpatch();
-		}
-	}
-
-//Beans Particle Changer
-	void BeansParticleChanger(MenuEntry *entry) {
-		static Address beans(0x673E0C);
-        static u16 input = 0;
-
-        if(entry->Hotkeys[0].IsDown()) {
-			if(PluginUtils::Input::PromptNumber<u16>({ Language::getInstance()->get(TextID::BEANS_PARTICLE_ENTER_ID), true, 3, 0 }, input)) {
-				beans.Patch(input);
-			}
-		}
-
-		if(!entry->IsActivated()) {
-			beans.Unpatch();
 		}
 	}
 

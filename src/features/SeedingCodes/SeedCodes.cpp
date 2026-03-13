@@ -8,6 +8,7 @@
 #include "core/game_api/Game.hpp"
 #include "core/game_api/GameStructs.hpp"
 #include "core/RuntimeContext.hpp"
+#include "platform/ctrpf/FolderTypeTextMap.hpp"
 
 extern "C" void PATCH_EverythingSeed(void);
 extern "C" void PATCH_SnakeSpeed(void);
@@ -22,6 +23,17 @@ CTRPluginFramework::Item EverythingSeederItemID = {0x7FFE, 0x8000};
 CTRPluginFramework::Item PickupSeederItemID = {0x7FFE, 0};
 
 namespace CTRPluginFramework {
+	static std::string BuildSeederFolderNote(FolderType folderType, SubFolder subFolder, const std::string &seederInfo) {
+		TextID noteKey = subFolder != SubFolder::None ? GetSubFolderNoteTextId(folderType, subFolder) : GetFolderNoteTextId(folderType);
+		std::string baseNote = noteKey != TextID::NONE ? Language::getInstance()->get(noteKey) : "";
+
+		if(baseNote.empty()) {
+			return seederInfo;
+		}
+
+		return baseNote + "\n\n" + seederInfo;
+	}
+
 	bool SetSeederInfos(void) {
 		PluginMenu *menu = PluginMenu::GetRunningInstance();
 		if (!menu) {
@@ -42,14 +54,14 @@ namespace CTRPluginFramework {
 			SubFolder subFolderType;
 
 			if (TryGetFolderInfo(folder, folderType, subFolderType) && folderType == FolderType::Seeding) {
-				folder->Note() = seederInfo;
+				folder->Note() = BuildSeederFolderNote(folderType, subFolderType, seederInfo);
 
 				for (MenuFolder *subFolder : folder->GetFolderList()) {
 					FolderType subFolderParentType;
 					SubFolder subFolderSubType;
 
 					if (TryGetFolderInfo(subFolder, subFolderParentType, subFolderSubType) && subFolderParentType == FolderType::Seeding)
-						subFolder->Note() = seederInfo;
+						subFolder->Note() = BuildSeederFolderNote(subFolderParentType, subFolderSubType, seederInfo);
 				}
 			}
 		}
@@ -409,7 +421,7 @@ namespace CTRPluginFramework {
 				DPadKeyPressedTicks = 0;
 			}
 
-			if(entry->Hotkeys[5].IsDown()) { //Cycle Size (R)
+			if(entry->Hotkeys[5].IsPressed()) { //Cycle Size (R)
 				size++;
 				if(size >= 4) {
 					size = 0;

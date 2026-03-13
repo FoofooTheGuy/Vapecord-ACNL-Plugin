@@ -20,19 +20,71 @@ u32 c_eyeID = 0;
 u32 c_mouthID = 0;
 
 namespace CTRPluginFramework {
+	namespace {
+		static constexpr u32 kSizeSlotCount = 10;
+		static constexpr u8 kSizeModeUnset = 3;
+
+		Address &GetSizeAddressByIndex(int index) {
+			static Address player(0x1ACE00);
+			static Address bug(0x1F557C);
+			static Address npc(0x2042BC);
+			static Address effect(0x550A80);
+			static Address shadow(0x28F3A4);
+			static Address town(0x52E9D0);
+			static Address horplayer(0x5680F8);
+			static Address vertplayer(0x567FF4);
+			static Address head(0x568064);
+			static Address corrupt(0x47E3F0);
+
+			static Address *sizeAddresses[10] = {
+				&player, &bug, &npc, &effect, &shadow,
+				&town, &horplayer, &vertplayer, &head, &corrupt
+			};
+
+			return *sizeAddresses[index];
+		}
+
+		u32 EncodeSizeModes(const u8 modes[kSizeSlotCount]) {
+			u32 packed = 0;
+
+			for(u32 i = 0; i < kSizeSlotCount; ++i) {
+				packed |= (static_cast<u32>(modes[i] & 0x3) << (i * 2));
+			}
+
+			return packed;
+		}
+
+		void DecodeSizeModes(u32 packed, u8 modes[kSizeSlotCount]) {
+			for(u32 i = 0; i < kSizeSlotCount; ++i) {
+				modes[i] = static_cast<u8>((packed >> (i * 2)) & 0x3);
+			}
+		}
+
+		u32 LoadOrCreateSizeModes(MenuEntry *entry, u8 modes[kSizeSlotCount]) {
+			static constexpr u32 allUnset = 0xFFFFF; // 10 slots * 2 bits, each slot set to 0b11
+			const u32 saved = entry->GetSavedValue(allUnset);
+			DecodeSizeModes(saved, modes);
+			return saved;
+		}
+	}
+
+	void SizeCodesApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+
+		static constexpr float sizes[3] = { 2.0f, 1.0f, 0.5f };
+		u8 modes[kSizeSlotCount] = { 0 };
+		DecodeSizeModes(savedValue, modes);
+
+		for(u32 i = 0; i < kSizeSlotCount; ++i) {
+			const u8 mode = modes[i];
+			if(mode < 3) {
+				GetSizeAddressByIndex(i).WriteFloat(sizes[mode]);
+			}
+		}
+	}
+
 //Size Codes
 	void sizecodes(MenuEntry *entry) {
-		static Address player(0x1ACE00);
-		static Address bug(0x1F557C);
-		static Address npc(0x2042BC);
-		static Address effect(0x550A80);
-		static Address shadow(0x28F3A4);
-		static Address town(0x52E9D0);
-		static Address horplayer(0x5680F8);
-		static Address vertplayer(0x567FF4);
-		static Address head(0x568064);
-		static Address corrupt(0x47E3F0);
-
 		const std::vector<std::string> sizeopt = {
 			Language::getInstance()->get(TextID::VECTOR_SIZE_PLAYER),
 			Language::getInstance()->get(TextID::VECTOR_SIZE_BUGFISH),
@@ -54,18 +106,13 @@ namespace CTRPluginFramework {
 			Language::getInstance()->get(TextID::SIZE_CODES_CUSTOM)
 		};
 
-		static Address sizeAddresses[10] = {
-			player, bug, npc, effect, shadow,
-			town, horplayer, vertplayer, head, corrupt
-		};
-
 		static constexpr float sizes[3] = { 2.0, 1.0, 0.5 };
 
 		bool IsON;
 
 		float size = 0.0;
 
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), sizeopt);
+		Keyboard optKb(Language::getInstance()->get(TextID::KEY_OPTION_SIZE_CODES), sizeopt);
 
 		int op = optKb.Open();
 		if(op < 0) {
@@ -74,22 +121,34 @@ namespace CTRPluginFramework {
 
 		else if(op <= 9) {
 			for(int i = 0; i < 3; ++i) {
-				IsON = *(float *)sizeAddresses[op].addr == sizes[i];
+				IsON = *(float *)GetSizeAddressByIndex(op).addr == sizes[i];
 				sizesopt[i] = IsON ? (Color(pGreen) << sizesopt[i]) : (Color(pRed) << sizesopt[i]);
 			}
 
 			optKb.Populate(sizesopt);
+			optKb.GetMessage() = Utils::Format(Language::getInstance()->get(TextID::KEY_OPTION_SIZE_CODES_CHOOSE).c_str(), sizeopt[op].c_str());
 			int op2 = optKb.Open();
 			if(op2 < 0) {
 				return;
 			}
 			else if(op2 == 3) {
+				optKb.GetMessage() = Utils::Format(Language::getInstance()->get(TextID::KEY_OPTION_SIZE_CODES_CHOOSE).c_str(), sizeopt[op].c_str());
 				if(optKb.Open(size, size) >= 0) {
-					sizeAddresses[op].WriteFloat(size);
+					GetSizeAddressByIndex(op).WriteFloat(size);
+
+					u8 modes[kSizeSlotCount] = { 0 };
+					LoadOrCreateSizeModes(entry, modes);
+					modes[op] = kSizeModeUnset; // custom float cannot be represented in preset-only persistence
+					entry->SetSavedValue(EncodeSizeModes(modes));
 				}
 			}
 			else {
-				sizeAddresses[op].WriteFloat(sizes[op2]);
+				GetSizeAddressByIndex(op).WriteFloat(sizes[op2]);
+
+				u8 modes[kSizeSlotCount] = { 0 };
+				LoadOrCreateSizeModes(entry, modes);
+				modes[op] = static_cast<u8>(op2);
+				entry->SetSavedValue(EncodeSizeModes(modes));
 			}
 
 			sizecodes(entry);
@@ -97,8 +156,9 @@ namespace CTRPluginFramework {
 		}
 		else if(op == 10) {
 			for(int i = 0; i < 10; i++) {
-				sizeAddresses[i].Unpatch();
+				GetSizeAddressByIndex(i).Unpatch();
 			}
+			entry->ClearSavedValue();
 		}
     }
 //T-Pose
@@ -236,6 +296,22 @@ namespace CTRPluginFramework {
 		}
 	}
 
+	//Beans Particle Changer
+	void BeansParticleChanger(MenuEntry *entry) {
+		static Address beans(0x673E0C);
+        static u16 input = 0;
+
+        if(entry->Hotkeys[0].IsDown()) {
+			if(PluginUtils::Input::PromptNumber<u16>({ Language::getInstance()->get(TextID::BEANS_PARTICLE_ENTER_ID), true, 3, 0 }, input)) {
+				beans.Patch(input);
+			}
+		}
+
+		if(!entry->IsActivated()) {
+			beans.Unpatch();
+		}
+	}
+
 	void cameramod(MenuEntry *entry) {
     //pointers & addresses
 		static Address cameraAsm(0x764504);
@@ -256,12 +332,32 @@ namespace CTRPluginFramework {
         u16 difference = 0x1000 * delta.AsSeconds();
 
 		float *coord = Camera::GetCoordinates();
+		u32 cameraInstance = Camera::GetInstance();
 
 		if(entry->WasJustActivated()) {
 			camerapan.Patch(0xE3A00000); //disables camera panning
 		}
 
-        if(Camera::GetInstance() != 0) {
+		if(!entry->IsActivated()) {
+			if(coord != nullptr) {
+				coord = PlayerClass::GetInstance()->GetCoordinates();
+			}
+
+			Animation::ExecuteAnimationWrapper(4, 6, {0, 0}, 0, 0, 0, 0, 0, 0, 0); //idles player
+			cameraAsm.Unpatch();
+			rotationAsm.Unpatch();
+			rotationAsm2.Unpatch();
+			camerapan.Unpatch();
+			if(cameraInstance != 0) {
+				*(u16 *)(cameraInstance + 0x12C) = OrigVal[0];
+				*(u16 *)(cameraInstance + 0x12E) = OrigVal[1];
+			}
+			isPatched = false;
+			isOn = false;
+			return;
+		}
+
+        if(cameraInstance != 0) {
         //check if you're outside
             if(!Player::IsIndoors()) {
                 if(Game::IsGameInRoom(1)) {
@@ -280,19 +376,19 @@ namespace CTRPluginFramework {
 
             if(Controller::IsKeyDown(Key::R)) {
                 if(Controller::IsKeyDown(Key::CPadUp)) {
-					*(u16 *)(Camera::GetInstance() + 0x12C) += difference;
+					*(u16 *)(cameraInstance + 0x12C) += difference;
 				}
 
                 if(Controller::IsKeyDown(Key::CPadDown)) {
-					*(u16 *)(Camera::GetInstance() + 0x12C) -= difference;
+					*(u16 *)(cameraInstance + 0x12C) -= difference;
 				}
 
                 if(Controller::IsKeyDown(Key::CPadLeft)) {
-					*(u16 *)(Camera::GetInstance() + 0x12E) += difference;
+					*(u16 *)(cameraInstance + 0x12E) += difference;
 				}
 
                 if(Controller::IsKeyDown(Key::CPadRight)) {
-					*(u16 *)(Camera::GetInstance() + 0x12E) -= difference;
+					*(u16 *)(cameraInstance + 0x12E) -= difference;
 				}
             }
 		//Stop/follow camera from moving
@@ -375,21 +471,6 @@ namespace CTRPluginFramework {
                 isPatched = false;
             }
         }
-
-		if(!entry->IsActivated()) {
-			if(coord != nullptr) {
-				coord = PlayerClass::GetInstance()->GetCoordinates();
-			}
-
-			Animation::ExecuteAnimationWrapper(4, 6, {0, 0}, 0, 0, 0, 0, 0, 0, 0); //idles player
-			cameraAsm.Unpatch();
-			rotationAsm.Unpatch();
-            rotationAsm2.Unpatch();
-			camerapan.Unpatch();
-			*(u16 *)(Camera::GetInstance() + 0x12C) = OrigVal[0];
-			*(u16 *)(Camera::GetInstance() + 0x12E) = OrigVal[1];
-			return;
-		}
     }
 
 	extern "C" void SetEyeExpression(void);

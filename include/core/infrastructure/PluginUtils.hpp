@@ -41,7 +41,7 @@ namespace CTRPluginFramework {
 		namespace Backup {
 			struct DumpOptions {
 				bool showMessages{true};
-				bool showRangeNotifications{true};
+				bool showRangeNotifications{false};
 			};
 
 			struct RestoreOptions {

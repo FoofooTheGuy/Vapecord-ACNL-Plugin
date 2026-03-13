@@ -3,6 +3,7 @@
 #include "core/hooks/Checks.hpp"
 #include "core/game_api/Game.hpp"
 #include "core/infrastructure/Language.hpp"
+#include <initializer_list>
 
 extern "C" void SetProperParticle(void);
 
@@ -18,14 +19,46 @@ namespace CTRPluginFramework {
 		hook.Enable();
 	}
 
-    int OptionKeyboard(void) {
-        const std::vector<std::string> cmnOpt =  {
-			Language::getInstance()->get(TextID::VECTOR_ENABLE),
-			Language::getInstance()->get(TextID::VECTOR_DISABLE)
-		};
+    static std::string FormatToggleStateOption(bool isEnabled) {
+        return (isEnabled ? Color::Green : Color::Red)
+            << Language::getInstance()->get(isEnabled ? TextID::VECTOR_ENABLED : TextID::VECTOR_DISABLED);
+    }
 
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), cmnOpt);
-        return optKb.Open();
+    static bool ConfirmDefaultCodesDisable(void) {
+        return MessageBox(
+            Language::getInstance()->get(TextID::DEFAULT_CODES_DISABLE_WARNING),
+            DialogType::DialogYesNo
+        )();
+    }
+
+    int OptionKeyboard(bool isEnabled) {
+        const std::vector<std::string> cmnOpt = { FormatToggleStateOption(isEnabled) };
+
+        Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), cmnOpt);
+        if (optKb.Open() < 0) {
+            return -1;
+        }
+
+        if (isEnabled && !ConfirmDefaultCodesDisable()) {
+            return -1;
+        }
+
+        return isEnabled ? 0 : 1;
+    }
+
+    void SetHooksEnabled(bool enable, std::initializer_list<Hook *> hooks) {
+        for (Hook *hook : hooks) {
+            if (hook == nullptr) {
+                continue;
+            }
+
+            if (enable) {
+                hook->Enable();
+            }
+            else {
+                hook->Disable();
+            }
+        }
     }
 
     static Hook CheckInvalidBadgeHook1, CheckInvalidBadgeHook2;
@@ -122,250 +155,148 @@ namespace CTRPluginFramework {
     }
 
     void CheckInvalidBadgeEntry(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(CheckInvalidBadgeHook1.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            CheckInvalidBadgeHook1.Enable();
-            CheckInvalidBadgeHook2.Enable();
-        }
-        else {
-            CheckInvalidBadgeHook1.Disable();
-            CheckInvalidBadgeHook2.Disable();
-        }
+        SetHooksEnabled(res == 1, { &CheckInvalidBadgeHook1, &CheckInvalidBadgeHook2 });
     }
 
     void DisableOpenSaveMenuWithStartButton(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(SaveButtonCheck.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            SaveButtonCheck.Enable();
-        }
-        else {
-            SaveButtonCheck.Disable();
-        }
+        SetHooksEnabled(res == 1, { &SaveButtonCheck });
     }
 
     void DisableCatalogSearchFunction(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(CatalogPHook1.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            CatalogPHook1.Enable();
-            CatalogPHook2.Enable();
-        }
-        else {
-            CatalogPHook1.Disable();
-            CatalogPHook2.Disable();
-        }
+        SetHooksEnabled(res == 1, { &CatalogPHook1, &CatalogPHook2 });
     }
 
     void FixInvalidPickupCrash(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(IPHook.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            IPHook.Enable();
-        }
-        else {
-            IPHook.Disable();
-        }
+        SetHooksEnabled(res == 1, { &IPHook });
     }
 
     void FixInvalidDropPlantCrash(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(InvDropHook.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            InvDropHook.Enable();
-            InvPlantHook.Enable();
-        }
-        else {
-            InvDropHook.Disable();
-            InvPlantHook.Disable();
-        }
+        SetHooksEnabled(res == 1, { &InvDropHook, &InvPlantHook });
     }
 
     void FixInvalidSpriteCrash(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(ISHook.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            ISHook.Enable();
-        }
-        else {
-            ISHook.Disable();
-        }
+        SetHooksEnabled(res == 1, { &ISHook });
     }
 
     void FixInvalidGiveItemCrash(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(InvalidGiveItemHook.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            InvalidGiveItemHook.Enable();
-        }
-        else {
-            InvalidGiveItemHook.Disable();
-        }
+        SetHooksEnabled(res == 1, { &InvalidGiveItemHook });
     }
 
     void FixInvalidHoleCrash(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(IHHook.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            IHHook.Enable();
-        }
-        else {
-            IHHook.Disable();
-        }
+        SetHooksEnabled(res == 1, { &IHHook });
     }
 
     void FixInvalidItemCrash(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(IIHook.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            IIHook.Enable();
-        }
-        else {
-            IIHook.Disable();
-        }
+        SetHooksEnabled(res == 1, { &IIHook });
     }
 
     void ConvertFlowerFromSeedItemToNormalItem(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(CFHook.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            CFHook.Enable();
-        }
-        else {
-            CFHook.Disable();
-        }
+        SetHooksEnabled(res == 1, { &CFHook });
     }
 
     void SetSeedItemNames(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(HoveredNameHook.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            HoveredNameHook.Enable();
-            NameHook.Enable();
-        }
-        else {
-            HoveredNameHook.Disable();
-            NameHook.Disable();
-        }
+        SetHooksEnabled(res == 1, { &HoveredNameHook, &NameHook });
     }
 
     void SetItemReplacementRules(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(ReplaceHook.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            ReplaceHook.Enable();
-        }
-        else {
-            ReplaceHook.Disable();
-        }
+        SetHooksEnabled(res == 1, { &ReplaceHook });
     }
 
     void SetDropRules(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(DropHook1.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            DropHook1.Enable();
-            DropHook2.Enable();
-            DropHook3.Enable();
-            DropHook4.Enable();
-        }
-        else {
-            DropHook1.Disable();
-            DropHook2.Disable();
-            DropHook3.Disable();
-            DropHook4.Disable();
-        }
+        SetHooksEnabled(res == 1, { &DropHook1, &DropHook2, &DropHook3, &DropHook4 });
     }
 
     void SetPlantRules(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(PlantHook1.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            PlantHook1.Enable();
-            PlantHook2.Enable();
-            PlantHook3.Enable();
-            PlantHook4.Enable();
-        }
-        else {
-            PlantHook1.Disable();
-            PlantHook2.Disable();
-            PlantHook3.Disable();
-            PlantHook4.Disable();
-        }
+        SetHooksEnabled(res == 1, { &PlantHook1, &PlantHook2, &PlantHook3, &PlantHook4 });
     }
 
     void FixParticlesInPuzzleLeague(MenuEntry *entry) {
-		int res = OptionKeyboard();
+		int res = OptionKeyboard(ParticleHook1.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            ParticleHook1.Enable();
-            ParticleHook2.Enable();
-        }
-        else {
-            ParticleHook1.Disable();
-            ParticleHook2.Disable();
-        }
+        SetHooksEnabled(res == 1, { &ParticleHook1, &ParticleHook2 });
     }
 
     /*Not SeedItems*/
     void SetCustomSpritesForProDesigns(MenuEntry *entry) {
-        int res = OptionKeyboard();
+        int res = OptionKeyboard(OnProDesignHook.IsEnabled());
         if(res < 0) {
             return;
         }
 
-        if (res == 0) {
-            OnProDesignHook.Enable();
-        }
-        else {
-            OnProDesignHook.Disable();
-        }
+        SetHooksEnabled(res == 1, { &OnProDesignHook });
     }
 
     /*
@@ -407,19 +338,19 @@ namespace CTRPluginFramework {
 
 		static FUNCTION func(KeyCheck);
 		iVar1 = func.Call<int>();
-		
+
 		if(iVar1 == 0) {
 			static const u32 KeyPointer(0x9762F4, 0, 0, 0, 0, 0, 0, 0);
-			if(*(u32 *)(*(u32 *)(KeyPointer) + 0xD0) == 0) 
+			if(*(u32 *)(*(u32 *)(KeyPointer) + 0xD0) == 0)
 				iVar1 = 0;
-			else 
+			else
 				iVar1 = **(u32 **)(*(u32 *)(KeyPointer) + 0xD8);
 
 			key = *(u32 *)(iVar1 + 0x110) & key;
-			if(key != 0) 
+			if(key != 0)
 				key = 1;
 		}
-		else 
+		else
 			key = 0;
 
 		return key;

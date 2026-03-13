@@ -15,7 +15,6 @@
 
 namespace CTRPluginFramework {
 	void itemsearch(MenuEntry *entry) {
-		Item val;
 		ACNL_Player *player = Player::GetSaveData();
 
 		if(!player) {
@@ -36,24 +35,58 @@ namespace CTRPluginFramework {
 			return;
 		}
 
-		std::vector<std::string> names;
-		for (const auto& e : itemEntries) {
-			names.push_back(e.name);
+		const int resultCount = static_cast<int>(itemEntries.size());
+		const int pageSize = MAXCOUNT;
+		const int totalPages = (resultCount + pageSize - 1) / pageSize;
+		int currentPage = 0;
+		int selectedIndex = -1;
+
+		while(true) {
+			const int pageStart = currentPage * pageSize;
+			const int pageEnd = std::min(pageStart + pageSize, resultCount);
+			std::vector<std::string> pageOptions;
+			const bool hasPreviousPage = currentPage > 0;
+			const bool hasNextPage = currentPage + 1 < totalPages;
+
+			if(hasPreviousPage) {
+				pageOptions.emplace_back(Color(0x5AA9FFFF) << Language::getInstance()->get(TextID::TEXT_2_ITEM_SEARCH_PREVIOUS_PAGE));
+			}
+
+			for(int index = pageStart; index < pageEnd; ++index) {
+				pageOptions.push_back(itemEntries[index].name);
+			}
+
+			if(hasNextPage) {
+				pageOptions.emplace_back(Color(0xFFC857FF) << Language::getInstance()->get(TextID::TEXT_2_ITEM_SEARCH_NEXT_PAGE));
+			}
+
+			std::string keyboardTitle = Utils::Format(
+				Language::getInstance()->get(TextID::TEXT_2_ITEM_SEARCH_PAGE_TITLE).c_str(),
+				currentPage + 1,
+				totalPages
+			);
+
+			Keyboard selectKB(keyboardTitle, pageOptions);
+			const int pageChoice = selectKB.Open();
+			if(pageChoice < 0) {
+				return;
+			}
+
+			if(hasPreviousPage && pageChoice == 0) {
+				--currentPage;
+				continue;
+			}
+
+			if(hasNextPage && pageChoice == static_cast<int>(pageOptions.size()) - 1) {
+				++currentPage;
+				continue;
+			}
+
+			selectedIndex = pageStart + pageChoice - (hasPreviousPage ? 1 : 0);
+			break;
 		}
 
-		int size = itemEntries.size();
-		if(size > MAXCOUNT) {
-			MessageBox(Utils::Format(Language::getInstance()->get(TextID::TEXT_2_ITEM_SEARCH_ERR4).c_str(), size), Color::Red).SetClear(ClearScreen::Top)();
-			return;
-		}
-
-		Keyboard selectKB(Language::getInstance()->get(TextID::TEXT_2_ITEM_SEARCH_KB), names);
-		int result = selectKB.Open();
-		if(result < 0) {
-			return;
-		}
-
-		Item item(itemEntries[result].ID);
+		Item item(itemEntries[selectedIndex].ID);
 
 		u8 slot = 0;
 		if(!Inventory::GetNextItem({0x7FFE, 0}, slot)) {
@@ -67,7 +100,7 @@ namespace CTRPluginFramework {
 		}
 
 		Inventory::WriteSlot(slot, item);
-		MessageBox(Utils::Format(Language::getInstance()->get(TextID::INVENTORY_SEARCH_SET).c_str(), item.ID, slot)).SetClear(ClearScreen::Top)();
+		MessageBox(Utils::Format(Language::getInstance()->get(TextID::INVENTORY_SEARCH_SET).c_str(), item.ID, slot + 1)).SetClear(ClearScreen::Top)();
 	}
 
 //Text to Item
@@ -81,9 +114,14 @@ namespace CTRPluginFramework {
 				return;
 			}
 
-			Inventory::ReadSlot(0, val);
+			u8 slot = 0;
+			if(!Inventory::GetNextItem({0x7FFE, 0}, slot)) {
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::INVENTORY_SEARCH_INV_FULL), Color::Red);
+				return;
+			}
+
 			if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_ID), true, 8, *(u32 *)&val, TextItemChange }, *(u32 *)&val)) {
-				Inventory::WriteSlot(0, val);
+				Inventory::WriteSlot(slot, val);
 			}
 		}
 
@@ -93,25 +131,17 @@ namespace CTRPluginFramework {
 				return;
 			}
 
-			if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::TEXT_2_ITEM_SET), true, 8, 0x7FFE, TextItemChange }, *(u32 *)&val)) {
-				for(u16 i = 0; i < 0x10; ++i) {
-					Item item = {(u16)(val.ID + i), 0};
-					Inventory::WriteSlot(i, item);
-				}
-			}
-		}
-
-		else if(entry->Hotkeys[2].IsPressed()) {
-			if(!player) {
-				OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
-				return;
-			}
-
 			u32 x, y;
 			if(PlayerClass::GetInstance()->GetWorldCoords(&x, &y)) {
 				Item *item = Game::GetItemAtWorldCoords(x, y);
 				if(item) {
-					Inventory::WriteSlot(0, *item);
+					u8 slot = 0;
+					if(!Inventory::GetNextItem({0x7FFE, 0}, slot)) {
+						OSD::NotifySysFont(Language::getInstance()->get(TextID::INVENTORY_SEARCH_INV_FULL), Color::Red);
+						return;
+					}
+
+					Inventory::WriteSlot(slot, *item);
 					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::INVENTORY_T2I_SET).c_str(), *(u32 *)item));
 				}
 			}
@@ -273,234 +303,194 @@ namespace CTRPluginFramework {
 	}
 
 //Item Settings
-	void itemsettings(MenuEntry *entry) {
+	static void ApplyItemSettingsMask(u32 mask) {
 		static Address showoff(0x19BA78);
 		static Address infinite1(0x19C574);
 		static Address infinite2(0x19C4D0);
 		static Address eat(0x19C1F0);
 
-		std::vector<std::string> itemsettopt = {
-			Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_SHOWOFF),
-			Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_INFINITE),
-			Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_EAT),
-		};
-
-		static Address settings[3] = {
-			showoff, infinite1, eat
-		};
-
-		bool IsON;
-
-		for(int i = 0; i < 3; ++i) {
-			IsON = *(u32 *)settings[i].addr != settings[i].origVal;
-			itemsettopt[i] = IsON ? (Color(pGreen) << itemsettopt[i]) : (Color(pRed) << itemsettopt[i]);
-		}
-
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), itemsettopt);
-
-		int op = optKb.Open();
-		if(op < 0) {
-			return;
-		}
-		else if(op == 0) {
-			if (*(u32 *)showoff.addr == showoff.origVal) {
-				showoff.Patch(0xE1A00000);
-			}
-			else {
-				showoff.Unpatch();
-			}
-			itemsettings(entry);
-			return;
-		}
-		else if(op == 1) {
-			if (*(u32 *)infinite1.addr == infinite1.origVal) {
-				infinite1.Patch(0xE2805A00);
-				infinite2.Patch(0xE2805A00);
-			}
-			else {
-				infinite1.Unpatch();
-				infinite2.Unpatch();
-			}
-			itemsettings(entry);
-			return;
-		}
-		else if(op == 2) {
-			if (*(u32 *)eat.addr == eat.origVal) {
-				eat.Patch(0xE1A00000);
-			}
-			else {
-				eat.Unpatch();
-			}
-			itemsettings(entry);
-			return;
-		}
-	}
-
-	static bool IsMenuPatchOpen = false;
-	static u8 CurrentMenu = 0xFF;
-	const u8 Menus[8] = {
-		0x2E, 0x37, 0x38, 0x3D, 0x79, 0x89, 0x00, 0xFF
-	};
-
-	void Callback_MenuPatch(void) {
-		if(Inventory::GetCurrent() == CurrentMenu && !IsMenuPatchOpen) {
-			IsMenuPatchOpen = true;
-		}
-
-		if(Inventory::GetCurrent() != CurrentMenu && IsMenuPatchOpen) {
-			Animation::Idle();
-			IsMenuPatchOpen = false;
-			PluginMenu *menu = PluginMenu::GetRunningInstance();
-			*menu -= Callback_MenuPatch; //delete itself
-		}
-	}
-
-	void Hook_MenuPatch(u32 r0, u32 r1, u32 r3) {
-		u8 roomId = Player::GetRoom(4);
-		if (roomId == 0xA1 || roomId == 0xA2 || (roomId >= 0x92 && roomId <= 0x97)) {
-			OSD::NotifySysFont(Language::getInstance()->get(TextID::MENU_CHANGER_INVALID_ROOM), Color::Red);
-
-			const HookContext &curr = HookContext::GetCurrent();
-			static Address func = Address::decodeARMBranch(curr.targetAddress, curr.overwrittenInstr);
-			func.Call<void>(r0, r1, r3);
+		if(mask & 0x1) {
+			showoff.Patch(0xE1A00000);
 		}
 		else {
-			Game::OpenMenu(CurrentMenu);
-			PluginMenu *menu = PluginMenu::GetRunningInstance();
-			*menu += Callback_MenuPatch;
+			showoff.Unpatch();
+		}
+
+		if(mask & 0x2) {
+			infinite1.Patch(0xE2805A00);
+			infinite2.Patch(0xE2805A00);
+		}
+		else {
+			infinite1.Unpatch();
+			infinite2.Unpatch();
+		}
+
+		if(mask & 0x4) {
+			eat.Patch(0xE1A00000);
+		}
+		else {
+			eat.Unpatch();
 		}
 	}
 
-//Menu Changer
-	void MenuChanger(MenuEntry *entry) {
-		static Hook hook;
+	static u32 GetItemSettingsMask(void) {
+		static Address showoff(0x19BA78);
+		static Address infinite1(0x19C574);
+		static Address eat(0x19C1F0);
 
-		std::vector<std::string> menuopt = {
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_DATETIME),
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_BELLPOINT_DEPO),
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_BELLPOINT_WITHDRAW),
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_LOCKER),
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_TOWNTUNE),
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_HOUSESTORAGE),
-			Language::getInstance()->get(TextID::VECTOR_SAVEMENU_CUSTOM),
-			Language::getInstance()->get(TextID::VECTOR_DISABLE)
-		};
-
-		bool IsON;
-
-		for(int i = 0; i < 6; ++i) {
-			IsON = CurrentMenu == Menus[i];
-			menuopt[i] = (IsON ? Color(pGreen) :  Color(pRed)) << menuopt[i];
+		u32 mask = 0;
+		if(*(u32 *)showoff.addr != showoff.origVal) {
+			mask |= 0x1;
+		}
+		if(*(u32 *)infinite1.addr != infinite1.origVal) {
+			mask |= 0x2;
+		}
+		if(*(u32 *)eat.addr != eat.origVal) {
+			mask |= 0x4;
 		}
 
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), menuopt);
-
-		int dChoice = optKb.Open();
-		if(dChoice < 0) {
-			return;
-		}
-
-		hook.Initialize(Address(0x1A0980).addr + 8, (u32)Hook_MenuPatch);
-		hook.SetFlags(USE_LR_TO_RETURN);
-
-	//If Custom Menu is chosen
-		if(dChoice == 6) {
-			if(PluginUtils::Input::PromptNumber<u8>({ Language::getInstance()->get(TextID::SAVE_MENU_CHANGER_ENTER_ID), true, 2, 0 }, CurrentMenu)) {
-				if(IDChecks::MenuValid(CurrentMenu)) {
-					hook.Enable();
-				}
-				else {
-					hook.Disable();
-					MessageBox(Language::getInstance()->get(TextID::INVALID_ID)).SetClear(ClearScreen::Top)();
-				}
-			}
-			return;
-		}
-
-		CurrentMenu = Menus[dChoice];
-		if(CurrentMenu == 0xFF) {
-			hook.Disable();
-			return;
-		}
-
-		hook.Enable();
-		MenuChanger(entry);
+		return mask;
 	}
 
-	void GetCustomView(Keyboard& keyboard, KeyboardEvent& event) {
-		if(event.type != KeyboardEvent::SelectionChanged) {
-			return;
-		}
+	void ItemSettingsApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		ApplyItemSettingsMask(savedValue & 0x7);
+	}
 
-		int index = event.selectedIndex;
+	void itemsettings(MenuEntry *entry) {
+		while(true) {
+			u32 currentMask = GetItemSettingsMask();
 
-		std::vector<std::string> f_file, f_Dir, f_all;
-		std::vector<bool> isDir;
-		File file;
+			std::vector<std::string> itemsettopt = {
+				Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_SHOWOFF),
+				Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_INFINITE),
+				Language::getInstance()->get(TextID::VECTOR_ITEMSETTINGS_EAT),
+			};
 
-		if(PluginUtils::Backup::restoreDirectory.ListDirectories(f_Dir) == Directory::OPResult::NOT_OPEN) {
-			return;
-		}
+			itemsettopt[0] = ((currentMask & 0x1) ? Color(pGreen) : Color(pRed)) << itemsettopt[0];
+			itemsettopt[1] = ((currentMask & 0x2) ? Color(pGreen) : Color(pRed)) << itemsettopt[1];
+			itemsettopt[2] = ((currentMask & 0x4) ? Color(pGreen) : Color(pRed)) << itemsettopt[2];
 
-		if(PluginUtils::Backup::restoreDirectory.ListFiles(f_file, ".inv") == Directory::OPResult::NOT_OPEN)  {
-			return;
-		}
-
-		if(f_Dir.empty() && f_file.empty()) {
-			return;
-		}
-
-		for(const std::string& str : f_Dir) {
-			f_all.push_back(str);
-			isDir.push_back(true);
-		}
-
-		for(const std::string& str : f_file) {
-			f_all.push_back(str);
-			isDir.push_back(false);
-		}
-
-		if(index == -1) {
-			return;
-		}
-
-		std::string& input = keyboard.GetMessage();
-		input.clear();
-
-	//if directory return
-		if(isDir[index]) {
-			return;
-		}
-
-		if(PluginUtils::Backup::restoreDirectory.OpenFile(file, f_all[index], File::READ) != 0) {
-			return; //error opening file
-		}
-
-		std::string Sets[16];
-		Item SetItem[16];
-		std::vector<Item> OnlyItem;
-		file.Read(&SetItem, sizeof(SetItem));
-
-		for(int i = 0; i < 16; ++i) {
-			if(SetItem[i].ID != 0x7FFE) {
-				OnlyItem.push_back(SetItem[i]);
-			}
-		}
-
-		for(int i = 0; i < 11; ++i) {
-			if(i >= OnlyItem.size()) {
+			Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_ITEM_SETTINGS), itemsettopt);
+			const int op = optKb.Open();
+			if(op < 0 || op > 2) {
 				return;
 			}
 
-			Sets[i] = OnlyItem[i].GetName();
-
-			input += Color(0x40FF40FF) << Utils::Format("%08X | ", OnlyItem[i]) << Color(0xFFFDD0FF) << Sets[i] << "\n";
+			u32 nextMask = currentMask ^ (1u << op);
+			ApplyItemSettingsMask(nextMask);
+			entry->SetSavedValue(nextMask);
 		}
-		input += "etc...";
-		file.Flush();
-		file.Close();
 	}
-//Get Set
+
+	namespace {
+		void GetCustomView(Keyboard& keyboard, KeyboardEvent& event) {
+			if(event.type != KeyboardEvent::SelectionChanged) {
+				return;
+			}
+
+			int index = event.selectedIndex;
+
+			std::vector<std::string> f_file, f_Dir, f_all;
+			std::vector<bool> isDir;
+			File file;
+
+			if(PluginUtils::Backup::restoreDirectory.ListDirectories(f_Dir) == Directory::OPResult::NOT_OPEN) {
+				return;
+			}
+
+			if(PluginUtils::Backup::restoreDirectory.ListFiles(f_file, ".inv") == Directory::OPResult::NOT_OPEN)  {
+				return;
+			}
+
+			if(f_Dir.empty() && f_file.empty()) {
+				return;
+			}
+
+			for(const std::string& str : f_Dir) {
+				f_all.push_back(str);
+				isDir.push_back(true);
+			}
+
+			for(const std::string& str : f_file) {
+				f_all.push_back(str);
+				isDir.push_back(false);
+			}
+
+			if(index == -1) {
+				return;
+			}
+
+			std::string& input = keyboard.GetMessage();
+
+		//if directory return
+			if(isDir[index]) {
+				return;
+			}
+
+			input.clear();
+
+			if(PluginUtils::Backup::restoreDirectory.OpenFile(file, f_all[index], File::READ) != 0) {
+				return; //error opening file
+			}
+
+			std::string Sets[16];
+			Item SetItem[16];
+			std::vector<Item> OnlyItem;
+			file.Read(&SetItem, sizeof(SetItem));
+
+			for(int i = 0; i < 16; ++i) {
+				if(SetItem[i].ID != 0x7FFE) {
+					OnlyItem.push_back(SetItem[i]);
+				}
+			}
+
+			for(int i = 0; i < 11; ++i) {
+				if(i >= OnlyItem.size()) {
+					return;
+				}
+
+				Sets[i] = OnlyItem[i].GetName();
+
+				input += Color(0x40FF40FF) << Utils::Format("%08X | ", OnlyItem[i]) << Color(0xFFFDD0FF) << Sets[i] << "\n";
+			}
+			input += "etc...";
+			file.Flush();
+			file.Close();
+		}
+
+		static OperationResult RestorePresetSet(const std::vector<MemoryRange> &ranges) {
+			std::vector<std::string> folders;
+			Directory presetDirectory(PATH_PRESET);
+
+			if(presetDirectory.ListDirectories(folders) == Directory::OPResult::NOT_OPEN || folders.empty()) {
+				MessageBox(Language::getInstance()->get(TextID::RESTORE_NOFILES)).SetClear(ClearScreen::Top)();
+				return OperationResult::ListingFailed;
+			}
+
+			Keyboard categoryKb(Language::getInstance()->get(TextID::GET_SET_PRESET_SELECT), folders);
+			const int folderChoice = categoryKb.Open();
+			if(folderChoice < 0 || folderChoice >= static_cast<int>(folders.size())) {
+				return OperationResult::Aborted;
+			}
+
+			return PluginUtils::Backup::RestoreMemory(
+				Utils::Format("%s/%s", PATH_PRESET, folders[folderChoice].c_str()),
+				".inv",
+				Language::getInstance()->get(TextID::GET_SET_PRESET_SELECT),
+				ranges,
+				PluginUtils::Backup::RestoreOptions{ GetCustomView, false }
+			);
+		}
+
+		static bool ConfirmInventorySetRestore(void) {
+			return MessageBox(
+				Language::getInstance()->get(TextID::GET_SET_RESTORE_WARNING),
+				DialogType::DialogYesNo
+			).SetClear(ClearScreen::Top)();
+		}
+	};
+
 	void getset(MenuEntry *entry) {
 		ACNL_Player *player = Player::GetSaveData();
 
@@ -523,25 +513,25 @@ namespace CTRPluginFramework {
 		MemoryRange LocInv = { (u32 *)player->Inventory, sizeof(player->Inventory) };
 		MemoryRange LocLock = { (u32 *)player->InventoryItemLocks, sizeof(player->InventoryItemLocks) };
 
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), setopt);
+		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_INVENTORY_SET_OPTION), setopt);
 
 		switch(optKb.Open()) {
 			default: return;
 			case 0: {
-				PluginUtils::Backup::RestoreMemory(
-						PATH_PRESET,
-						".inv",
-						Language::getInstance()->get(TextID::GET_SET_RESTORE),
-						{ LocInv, LocLock },
-						PluginUtils::Backup::RestoreOptions{ GetCustomView, false }
-				);
-				Inventory::ReloadIcons();
+				if(!ConfirmInventorySetRestore()) {
+					return;
+				}
+
+				if(RestorePresetSet({ LocInv, LocLock }) == OperationResult::Success) {
+					Inventory::ReloadIcons();
+					MessageBox(Language::getInstance()->get(TextID::GET_SET_RESTORE_SUCCESS)).SetClear(ClearScreen::Top)();
+				}
 			} return;
 
 			case 1: {
-				optKb.Populate(custinvopt);
+				Keyboard customKb(Language::getInstance()->get(TextID::KEY_CHOOSE_CUSTOM_SET_ACTION), custinvopt);
 
-				switch(optKb.Open()) {
+				switch(customKb.Open()) {
 					default: return;
 					case 0: {
 						std::string filename = "";
@@ -559,14 +549,20 @@ namespace CTRPluginFramework {
 					} return;
 
 					case 1: {
-						PluginUtils::Backup::RestoreMemory(
+						if(!ConfirmInventorySetRestore()) {
+							return;
+						}
+
+						if(PluginUtils::Backup::RestoreMemory(
 							Utils::Format(PATH_ITEMSET, Address::regionName.c_str()),
 							".inv",
 							Language::getInstance()->get(TextID::GET_SET_RESTORE),
 							{ LocInv, LocLock },
-							PluginUtils::Backup::RestoreOptions{ GetCustomView, true }
-						);
-						Inventory::ReloadIcons();
+							PluginUtils::Backup::RestoreOptions{ GetCustomView, false }
+						) == OperationResult::Success) {
+							Inventory::ReloadIcons();
+							MessageBox(Language::getInstance()->get(TextID::GET_SET_RESTORE_SUCCESS)).SetClear(ClearScreen::Top)();
+						}
 					} return;
 
 					case 2:

@@ -19,14 +19,14 @@ namespace CTRPluginFramework {
 		static Address day2(0x1E6D58);
 		static Address day3(0x4B10AC);
 		static Address day4(0x4B10C8);
-		
+
 		if(entry->WasJustActivated()) {
 			day1.Patch(0xE3A01788);
 			day2.WriteFloat(1.25);
 			day3.Patch(0xE3A00000);
 			day4.Patch(0xE8871015);
 		}
-		
+
 		if(!entry->IsActivated()) {
 			day1.Unpatch();
 			day2.Unpatch();
@@ -63,7 +63,7 @@ namespace CTRPluginFramework {
 	}
 
     //Unbreakable Flowers
-	void unbreakableflower(MenuEntry *entry) { 
+	void unbreakableflower(MenuEntry *entry) {
 		static Address unbreakableFlowerPatch(0x597F64);
 
 		if(entry->WasJustActivated()) {
@@ -74,46 +74,57 @@ namespace CTRPluginFramework {
 		}
 	}
 //Weather Mod
-	void Weathermod(MenuEntry *entry) { 
+	static constexpr u32 WeatherPatches[5] = {
+		0xE3A00000, 0xE3A00002, 0xE3A00003, 0xE3A00004, 0xE3A00005
+	};
+
+	static void ApplyWeatherSelection(u32 selection) {
 		static Address weather(0x62FC30);
-		
-		std::vector<std::string> weatheropt = {
-			Language::getInstance()->get(TextID::VECTOR_WEATHER_SUNNY),
-			Language::getInstance()->get(TextID::VECTOR_WEATHER_CLOUDY),
-			Language::getInstance()->get(TextID::VECTOR_WEATHER_RAINY),
-			Language::getInstance()->get(TextID::VECTOR_WEATHER_STORMY),
-			Language::getInstance()->get(TextID::VECTOR_WEATHER_SNOWY),
-			Language::getInstance()->get(TextID::VECTOR_DISABLE)
-		};
-		
-		static constexpr u32 Weathers[5] = {
-			0xE3A00000, 0xE3A00002, 0xE3A00003, 0xE3A00004, 0xE3A00005
-		};
 
-		bool IsON;
-		
-		for(int i = 0; i < 5; ++i) { 
-			IsON = *(u32 *)weather.addr == Weathers[i];
-			weatheropt[i] = (IsON ? Color(pGreen) : Color(pRed)) << weatheropt[i];
-		}
-		
-		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), weatheropt);
-
-		int op = optKb.Open();
-		if(op < 0) {
-			return;
-		}
-		
-		if(op == 5) {
+		if(selection >= 5) {
 			weather.Unpatch();
 			return;
 		}
-		
-		weather.Patch(Weathers[op]);
-		Weathermod(entry);
+
+		weather.Patch(WeatherPatches[selection]);
 	}
 
-	//Water All Flowers	
+	void WeatherModApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		ApplyWeatherSelection(savedValue);
+	}
+
+	void Weathermod(MenuEntry *entry) {
+		while(true) {
+			static Address weather(0x62FC30);
+
+			std::vector<std::string> weatheropt = {
+				Language::getInstance()->get(TextID::VECTOR_WEATHER_SUNNY),
+				Language::getInstance()->get(TextID::VECTOR_WEATHER_CLOUDY),
+				Language::getInstance()->get(TextID::VECTOR_WEATHER_RAINY),
+				Language::getInstance()->get(TextID::VECTOR_WEATHER_STORMY),
+				Language::getInstance()->get(TextID::VECTOR_WEATHER_SNOWY),
+				Language::getInstance()->get(TextID::VECTOR_DISABLE)
+			};
+
+			for(int i = 0; i < 5; ++i) {
+				const bool isOn = *(u32 *)weather.addr == WeatherPatches[i];
+				weatheropt[i] = (isOn ? Color(pGreen) : Color(pRed)) << weatheropt[i];
+			}
+			weatheropt[5] = (*(u32 *)weather.addr == weather.origVal ? Color(pGreen) : Color(pRed)) << weatheropt[5];
+
+			Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), weatheropt);
+			const int op = optKb.Open();
+			if(op < 0 || op > 5) {
+				return;
+			}
+
+			ApplyWeatherSelection(static_cast<u32>(op));
+			entry->SetSavedValue(static_cast<u32>(op));
+		}
+	}
+
+	//Water All Flowers
 	void WaterAllFlowers(MenuEntry *entry) {
 		if (!MessageBox(Language::getInstance()->get(TextID::WATER_FLOWER_QUESTION), DialogType::DialogYesNo).SetClear(ClearScreen::Both)()) {
 			return;
@@ -121,7 +132,7 @@ namespace CTRPluginFramework {
 
 		u32 x = 0x10, y = 0x10;
 		bool res = true;
-		
+
 		while(res) {
 			while(res) {
 				if(Game::GetItemAtWorldCoords(x, y)) {
@@ -133,7 +144,7 @@ namespace CTRPluginFramework {
 
 				y++;
 			}
-			
+
 			res = true;
 			y = 0x10;
 			x++;
@@ -146,13 +157,13 @@ namespace CTRPluginFramework {
 		MessageBox(Language::getInstance()->get(TextID::WATER_FLOWER_SUCCESS)).SetClear(ClearScreen::Both)();
     }
 //Weed Remover
-	void weedremover(MenuEntry *entry) {	
+	void weedremover(MenuEntry *entry) {
 		if (!MessageBox(Language::getInstance()->get(TextID::REMOVE_WEED_QUESTION), DialogType::DialogYesNo).SetClear(ClearScreen::Both)()) {
 			return;
 		}
-		
+
 		static int size = 300;
-		
+
 		int res = Dropper::Search_Replace(size, { {0x7C, 0}, {0x7D, 0}, {0x7E, 0}, {0x7F, 0}, {0xCC, 0}, {0xF8, 0} }, {0x7FFE, 0}, 0x3D, false, "Weed Removed!", true);
 		if(res == -1) {
 			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Both)();
@@ -177,26 +188,26 @@ namespace CTRPluginFramework {
 /*Calculations copied from the ACNL Web Save Editor, credits goes to the creator*/
 	u32 GetTileOffset(int x, int y) {
 		const int Add = 64 * ((y / 8) * 8 * 2 + (x / 8)) + _GrassTile[(y % 8) * 8 + (x % 8)];
-		const u32 GrassStart = *(u32 *)(*Game::GetCurrentMap() + 0x28);
+		const u32 GrassStart = *(u32 *)(Game::GetCurrentMap() + 0x28);
 		return (GrassStart + Add);
 	}
-	
-	void grasscomplete(MenuEntry *entry) {		
+
+	void grasscomplete(MenuEntry *entry) {
 		const std::vector<std::string> GrassKB {
 			Language::getInstance()->get(TextID::GRASS_EDITOR_FILL),
 			Language::getInstance()->get(TextID::GRASS_EDITOR_CLEAR)
 		};
-		
+
 		if(!Game::IsGameInRoom(0)) {
 			MessageBox(Color::Red << Language::getInstance()->get(TextID::ONLY_TOWN_ERROR)).SetClear(ClearScreen::Top)();
 			return;
 		}
-		
-		const u32 GrassStart = *(u32 *)(*Game::GetCurrentMap() + 0x28);
-		Keyboard KB(Language::getInstance()->get(TextID::GRASS_EDITOR_KB1) << "\n" << Color(0x228B22FF) << 
-					Language::getInstance()->get(TextID::GRASS_EDITOR_KB2)  << "\n" << Color(0xCD853FFF) << 
+
+		const u32 GrassStart = *(u32 *)(Game::GetCurrentMap() + 0x28);
+		Keyboard KB(Language::getInstance()->get(TextID::GRASS_EDITOR_KB1) << "\n" << Color(0x228B22FF) <<
+					Language::getInstance()->get(TextID::GRASS_EDITOR_KB2)  << "\n" << Color(0xCD853FFF) <<
 					Language::getInstance()->get(TextID::GRASS_EDITOR_KB3), GrassKB);
-					
+
 		switch(KB.Open()) {
 			case 0:
 				std::memset((void *)GrassStart, -1, 0x2800);
@@ -209,7 +220,7 @@ namespace CTRPluginFramework {
 			default: break;
 		}
 	}
-	
+
 //remove/add grass!!!! :))))))
 	void grasseditor(MenuEntry *entry) {
 		static bool opt = false;
@@ -220,18 +231,18 @@ namespace CTRPluginFramework {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::GRASS_EDITOR_ONLY_IN_TOWN), Color::Red);
 				return;
 			}
-			
+
 			u32 x, y;
 			if(PlayerClass::GetInstance()->GetWorldCoords(&x, &y)) {
 				Process::Write8(GetTileOffset(x, y), type);
 				OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::GRASS_EDITOR_CHANGED_GRASS).c_str(), (u8)x, (u8)y));
 			}
 		}
-		
+
 		else if(entry->Hotkeys[1].IsPressed()) {
 			Game::ReloadRoom();
 		}
-		
+
 		else if(entry->Hotkeys[2].IsPressed()) {
 			switch(opt) {
 				case 0:
@@ -315,7 +326,7 @@ namespace CTRPluginFramework {
 		return false;
 	}
 
-	u32 NeverWiltSeedItems(u32 *CurrentMap, Item *itemToPlace, u32 x, u32 y, u32 u2, u32 u3) {
+	u32 NeverWiltSeedItems(u32 CurrentMap, Item *itemToPlace, u32 x, u32 y, u32 u2, u32 u3) {
 		register u32 lrReg asm("lr");
 		u32 returnAddress = lrReg & ~1U;
 
@@ -328,7 +339,7 @@ namespace CTRPluginFramework {
 		}
 
 		HookContext& ctx = HookContext::GetCurrent();
-        return ctx.OriginalFunction<u32, u32 *, Item *, u32, u32, u32, u32>(CurrentMap, itemToPlace, x, y, u2, u3);
+        return ctx.OriginalFunction<u32, u32, Item *, u32, u32, u32, u32>(CurrentMap, itemToPlace, x, y, u2, u3);
 	}
 
 	void ItemsDontDissappearOnInvalidPositions(MenuEntry *entry) {
@@ -350,6 +361,54 @@ namespace CTRPluginFramework {
 			itemDeletePatch.Unpatch();
 			neverWiltHook.Disable();
 			dontDeleteSeedItemsOnInvalidPositions.Unpatch();
+		}
+	}
+
+	//search and replace
+	void SearchReplace(MenuEntry *entry) {
+		if(!PlayerClass::GetInstance()->IsLoaded()) {
+			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
+			return;
+		}
+
+		u32 x = 0, y = 0;
+		u32 count = 0;
+		Item ItemToSearch = {0x7FFE, 0};
+		Item ItemToReplace = {0x7FFE, 0};
+
+		if(!PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::QUICK_MENU_SEARCH_REPLACE_SEARCH), true, 8, 0x7FFE }, *(u32 *)&ItemToSearch)) {
+			return;
+		}
+
+		if(!PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::QUICK_MENU_SEARCH_REPLACE_REPLACE), true, 8, *(u32 *)&ItemToReplace }, *(u32 *)&ItemToReplace)) {
+			return;
+		}
+
+		if(!ItemToReplace.isValid()) {
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::INVALID_ITEM), Color::Red);
+			return;
+		}
+
+		int res = Dropper::Search_Replace(300, { ItemToSearch }, ItemToReplace, 0x3D, true, Language::getInstance()->get(TextID::SEARCH_REPLACE_ITEMS_REPLACED), true);
+		if(res == -1) {
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::SAVE_PLAYER_NO), Color::Red);
+			return;
+		}
+		else if(res == -2) {
+			OSD::NotifySysFont(Language::getInstance()->get(TextID::ONLY_OUTDOORS), Color::Red);
+			return;
+		}
+	}
+
+//remove all town items
+	void RemoveItemsCheat(MenuEntry *entry) {
+		if(!PlayerClass::GetInstance()->IsLoaded()) {
+			MessageBox(Language::getInstance()->get(TextID::SAVE_PLAYER_NO)).SetClear(ClearScreen::Top)();
+			return;
+		}
+
+		if((MessageBox(Language::getInstance()->get(TextID::REMOVE_ITEM_WARNING), DialogType::DialogYesNo)).SetClear(ClearScreen::Top)()) {
+			Game::RemoveItems(true, 0, 0, 0xFF, 0xFF, true, true);
 		}
 	}
 }

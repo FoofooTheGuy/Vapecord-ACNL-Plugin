@@ -7,7 +7,7 @@ LANG_DIR = BASE_DIR / "languages"
 OUTPUT_BIN = BASE_DIR / "language.bin"
 ENUM_FILE = BASE_DIR.parents[1] / "include" / "core" / "infrastructure" / "TextID.hpp"
 
-BINARY_VERSION = 310
+BINARY_VERSION = 320
 
 # Load languages
 languages = {}
@@ -21,7 +21,7 @@ for file in sorted(LANG_DIR.glob("*.json")):
 
 # Sort keys
 master_keys = list(languages[next(iter(languages))].keys())
-key_to_id = {key: i for i, key in enumerate(master_keys)}
+key_to_id = {key: i + 1 for i, key in enumerate(master_keys)}
 
 # Build binary for each language
 language_blocks = {}
@@ -76,9 +76,9 @@ with open(ENUM_FILE, "w", encoding="utf-8") as f:
     f.write("#pragma once\n\n")
     f.write("#include <cstdint>\n\n")
     f.write("enum class TextID : uint16_t {\n")
-    for i, key in enumerate(master_keys):
+    f.write("    NONE = 0,\n")
+    for i, key in enumerate(master_keys, start=1):
         f.write(f"    {key} = {i},\n")
-    f.write(f"    NONE = {len(master_keys)},\n")
     f.write("};\n")
 
 print(f"Created {ENUM_FILE.name} with {len(master_keys)} keys")

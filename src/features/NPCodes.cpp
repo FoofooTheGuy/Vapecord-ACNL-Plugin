@@ -10,55 +10,7 @@
 namespace CTRPluginFramework {
     static u32 CurrAddress = 0;
 
-	bool ShowCoords(const Screen &screen) {
-		if(CurrAddress == 0) {
-			return 0;
-		}
-
-		float *coord = (float *)(CurrAddress + 0x14);
-		u16 rotation = *(u16 *)(CurrAddress + 0x2E);
-		if(coord == nullptr) {
-			return 0;
-		}
-
-		Color darkGrey(40, 40, 40, 175);
-
-		if(screen.IsTop) {
-			screen.DrawSysfontWithBackground(Utils::Format("X | %f", coord[0]), 0, 0, Color::White, darkGrey);
-			screen.DrawSysfontWithBackground(Utils::Format("Y | %f", coord[1]), 0, 16, Color::White, darkGrey);
-			screen.DrawSysfontWithBackground(Utils::Format("Z | %f", coord[2]), 0, 32, Color::White, darkGrey);
-			screen.DrawSysfontWithBackground(Utils::Format("R | %04X", rotation), 0, 48, Color::White, darkGrey);
-			screen.DrawSysfontWithBackground(Utils::Format("A | %08X", CurrAddress), 0, 64, Color::White, darkGrey);
-			return 1;
-		}
-
-		return 0;
-	}
-
-	void checkloadstate(void) {
-		if(CurrAddress == 0 || (float *)(CurrAddress + 0x14) == nullptr) {
-			PluginMenu *menu = PluginMenu::GetRunningInstance();
-			*menu -= checkloadstate;
-			OSD::Stop(ShowCoords);
-			return;
-		}
-
-		OSD::Run(ShowCoords);
-	}
-
 	void NPCFunction(MenuEntry *entry) {
-	#if DEVMODE
-		if (!entry->IsActivated()) {
-			PluginMenu *menu = PluginMenu::GetRunningInstance();
-			*menu -= checkloadstate;
-			OSD::Stop(ShowCoords);
-		}
-	#endif
-
-		if(!entry->Hotkeys[0].IsPressed()) {//Key::L + Key::A
-			return;
-		}
-
 		const std::vector<std::string> option = {
 			Language::getInstance()->get(TextID::NPC_FUNC_NORMAL),
 			Language::getInstance()->get(TextID::NPC_RACE_SPECIAL),
@@ -99,16 +51,17 @@ namespace CTRPluginFramework {
 
 		CurrAddress = npc[res][res2].data;
 
-		OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::NPC_FUNC_SELECTED).c_str(), npc[res][res2].name.c_str()));
-
-	#if DEVMODE
-		PluginMenu *menu = PluginMenu::GetRunningInstance();
-		*menu += checkloadstate;
-	#endif
+		MessageBox(Utils::Format(Language::getInstance()->get(TextID::NPC_FUNC_SELECTED).c_str(), npc[res][res2].name.c_str())).SetClear(ClearScreen::Both)();
 	}
 
 	static int mode = 0;
 	static u16 npcID = 0;
+
+	void NPCSetAnimApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		mode = static_cast<int>(savedValue & 0x3);
+		npcID = static_cast<u16>((savedValue >> 16) & 0xFFFF);
+	}
 
 	void NPCSetAnim(MenuEntry *entry) {
 		const std::vector<std::string> vec = {
@@ -127,6 +80,7 @@ namespace CTRPluginFramework {
 
 		if(PluginUtils::Input::PromptNumber<u16>({ Utils::Format(Language::getInstance()->get(TextID::NPC_ANIM_SET).c_str(), vec[op].c_str()), true, 4, npcID }, npcID)) {
 			mode = op;
+			entry->SetSavedValue((static_cast<u32>(npcID) << 16) | static_cast<u32>(mode & 0x3));
 		}
 	}
 
@@ -166,21 +120,19 @@ namespace CTRPluginFramework {
 			return;
 		}
 
-		if(entry->Hotkeys[0].IsDown()) { //L
-			float *pCoords = (float *)(CurrAddress + 0x14);
-			if(pCoords != nullptr && !MapEditorActive) { //if not in tile selection mo
-				if(entry->Hotkeys[1].IsDown()) {//DPadRight
-					pCoords[0] += 5.0;
-				}
-				if(entry->Hotkeys[2].IsDown()) {//DPadLeft
-					pCoords[0] -= 5.0;
-				}
-				if(entry->Hotkeys[3].IsDown()) {//DPadDown
-					pCoords[2] += 5.0;
-				}
-				if(entry->Hotkeys[4].IsDown()) {//DPadUp
-					pCoords[2] -= 5.0;
-				}
+		float *pCoords = (float *)(CurrAddress + 0x14);
+		if(pCoords != nullptr && !MapEditorActive) { //if not in tile selection mo
+			if(entry->Hotkeys[0].IsDown()) {//DPadRight
+				pCoords[0] += 5.0;
+			}
+			if(entry->Hotkeys[1].IsDown()) {//DPadLeft
+				pCoords[0] -= 5.0;
+			}
+			if(entry->Hotkeys[2].IsDown()) {//DPadDown
+				pCoords[2] += 5.0;
+			}
+			if(entry->Hotkeys[3].IsDown()) {//DPadUp
+				pCoords[2] -= 5.0;
 			}
 		}
 	}

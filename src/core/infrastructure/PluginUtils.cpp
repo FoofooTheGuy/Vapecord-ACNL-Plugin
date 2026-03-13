@@ -123,6 +123,12 @@ namespace CTRPluginFramework {
 			Keyboard kb(selectionMessage);
 			kb.Populate(allEntries);
 			kb.OnKeyboardEvent(options.onSelectionChange);
+			if (options.onSelectionChange != nullptr && !allEntries.empty()) {
+				KeyboardEvent event{};
+				event.type = KeyboardEvent::SelectionChanged;
+				event.selectedIndex = 0;
+				options.onSelectionChange(kb, event);
+			}
 
 			int choice = kb.Open();
 			if (choice < 0)
@@ -149,6 +155,12 @@ namespace CTRPluginFramework {
 				}
 
 				kb.Populate(allEntries);
+				if (options.onSelectionChange != nullptr && !allEntries.empty()) {
+					KeyboardEvent event{};
+					event.type = KeyboardEvent::SelectionChanged;
+					event.selectedIndex = 0;
+					options.onSelectionChange(kb, event);
+				}
 				choice = kb.Open();
 				if (choice < 0)
 					continue;

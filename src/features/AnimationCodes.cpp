@@ -8,6 +8,10 @@
 #include "core/game_api/AnimData.hpp"
 #include "core/game_api/Player.hpp"
 
+extern "C" void PATCH_ToolAnim(void);
+
+u8 toolTypeAnimID = 6;
+
 namespace CTRPluginFramework {
 //Wrapper Stuff
 	u8 a_AnimID = 6;
@@ -65,10 +69,13 @@ namespace CTRPluginFramework {
 			Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY),
 		};
 
+		std::vector<bool> validPlayerOption = { false, false, false, false };
+
 		if(entry->Hotkeys[0].IsPressed()) {
 			for(int i = 0; i <= 3; ++i) {
 				if(PlayerClass::GetInstance(i)->IsLoaded()) {
-					pV[i] = Player::GetColor(i) << Language::getInstance()->get(TextID::PLAYER_SELECTOR_PLAYER) << std::to_string(i);
+					pV[i] = Player::GetColor(i) << Language::getInstance()->get(TextID::PLAYER_SELECTOR_PLAYER) << std::to_string(i + 1);
+					validPlayerOption[i] = true;
 				}
 			}
 
@@ -76,9 +83,9 @@ namespace CTRPluginFramework {
 
 			int pChoice = pKB.Open();
 			if(pChoice >= 0) {
-				if(pV[pChoice] != Color::Silver << Language::getInstance()->get(TextID::SAVE_PLAYER_EMPTY)) {
+				if(validPlayerOption[pChoice]) {
 					TogglePlayerSelect(pChoice);
-					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_ENABLED).c_str(), pChoice));
+					OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_ENABLED).c_str(), pChoice + 1));
 				}
 				else {
 					OSD::NotifySysFont(Language::getInstance()->get(TextID::PLAYER_SELECT_PLAYER_NOT_EXISTS), Color::Red);
@@ -88,7 +95,7 @@ namespace CTRPluginFramework {
 
 		else if(entry->Hotkeys[1].IsPressed()) {
 			if(IsPlayerSelectEnabled) {
-				OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_DISABLED).c_str(), *(u8 *)(Address(0x75F010).addr + 0x10)));
+				OSD::NotifySysFont(Utils::Format(Language::getInstance()->get(TextID::PLAYER_SELECT_CONTROLLING_DISABLED).c_str(), *(u8 *)(Address(0x75F010).addr + 0x10) + 1));
 				TogglePlayerSelect(4);
 				return;
 			}
@@ -314,38 +321,7 @@ namespace CTRPluginFramework {
 			Animation::Idle();
 		}
 	}
-//Slow Motion Animations
-	void slmoanms(MenuEntry *entry) {
-		static Address slo1(0x654578);
-		static Address slo2(0x652C10);
-		static Address slo3(0x887880);
 
-		if(entry->Hotkeys[0].IsPressed()) {//Key::L + Key::DPadLeft
-			bool isOrig = *(u32 *)slo1.addr == slo1.origVal;
-
-			Animation::Idle();
-
-			if (isOrig) {
-				slo1.Patch(0xE3A00001);
-				slo1.WriteFloat(8.0);
-				slo1.WriteFloat(6.0);
-
-				OSD::NotifySysFont(Language::getInstance()->get(TextID::SLOW_MO_ANIM) + " " << Color::Green << Language::getInstance()->get(TextID::STATE_ON));
-			} else {
-				slo1.Unpatch();
-				slo2.Unpatch();
-				slo3.Unpatch();
-
-				OSD::NotifySysFont(Language::getInstance()->get(TextID::SLOW_MO_ANIM) + " " << Color::Red << Language::getInstance()->get(TextID::STATE_OFF));
-			}
-		}
-
-		if(!entry->IsActivated()) {
-			slo1.Unpatch();
-			slo2.Unpatch();
-			slo3.Unpatch();
-        }
-	}
 //Set Animation On Everyone
 	void doonall(MenuEntry *entry) {
 		static Address doonall1(0x677504);
@@ -420,6 +396,52 @@ namespace CTRPluginFramework {
 		if(!entry->Hotkeys[2].IsDown()) {
             doonall1.Unpatch();
 			doonall2.Unpatch();
+		}
+	}
+
+	namespace {
+		Hook g_toolTypeHook;
+		bool g_toolTypeHookInitialized = false;
+
+		void EnsureToolTypeHookInitialized(void) {
+			if(g_toolTypeHookInitialized) {
+				return;
+			}
+
+			g_toolTypeHook.Initialize(Address(0x64DB90).addr + 0x10, (u32)PATCH_ToolAnim);
+			g_toolTypeHook.SetFlags(USE_LR_TO_RETURN);
+			g_toolTypeHookInitialized = true;
+		}
+
+		void ApplyToolTypeAnimId(u8 animId) {
+			toolTypeAnimID = animId;
+
+			if(toolTypeAnimID == 0) {
+				if(g_toolTypeHookInitialized) {
+					g_toolTypeHook.Disable();
+				}
+				return;
+			}
+
+			if(!IDChecks::AnimationValid(toolTypeAnimID)) {
+				toolTypeAnimID = 6;
+			}
+
+			EnsureToolTypeHookInitialized();
+			g_toolTypeHook.Enable();
+		}
+	}
+
+	void ToolTypeApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		ApplyToolTypeAnimId(static_cast<u8>(savedValue & 0xFF));
+	}
+
+//Change Tool Animation
+	void tooltype(MenuEntry *entry) {
+		if(PluginUtils::Input::PromptNumber<u8>({ Language::getInstance()->get(TextID::TOOL_ANIM_ENTER_ANIM), true, 2, toolTypeAnimID }, toolTypeAnimID)) {
+			ApplyToolTypeAnimId(toolTypeAnimID);
+			entry->SetSavedValue(toolTypeAnimID);
 		}
 	}
 }
