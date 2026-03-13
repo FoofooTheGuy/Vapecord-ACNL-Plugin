@@ -1,6 +1,7 @@
 {
   "name": "English",
   "entries": {
+    "DEFAULT_CODES_DISABLE_WARNING": "Warning\nDisabling these default codes can cause problems in the plugin or game.\nThis change is not saved. You must disable them again each time you start the plugin.\n\nDo you really want to continue?",
     "TEXT_2_ITEM_SEARCH_PAGE_TITLE": "Choose an item: (Page %d/%d)",
     "TEXT_2_ITEM_SEARCH_PREVIOUS_PAGE": "< Previous page",
     "TEXT_2_ITEM_SEARCH_NEXT_PAGE": "Next page >",
@@ -94,7 +95,6 @@
     "PWP_LOCK_ALL_SUCCESS": "Successfully locked all public works projects!",
     "OPTION_UNLOCK_ALL": "Unlock All",
     "OPTION_LOCK_ALL": "Lock All",
-
     "BUILDING_MOD_NO_DESIGN_STAND_FREE": "You've reached the design stand limit!",
     "PATTERN_STOLEN": "All patterns are now editable.",
     "CHAT_BUTTON_COPY": "Copy",
@@ -521,8 +521,6 @@
     "TEXT_2_ITEM_KEY1": "Spawn Item by ID",
     "TEXT_2_ITEM_KEY3": "Copy Item Below You",
     "TEXT_2_ITEM_SEARCH_ERR3": "No items found. Try a different search.",
-    "TEXT_2_ITEM_SEARCH_ERR4": "Too many matches. Enter more letters.\nMatches: %d",
-    "TEXT_2_ITEM_SEARCH_KB": "Choose an item:",
     "TEXT_2_ITEM_SEARCH_KB2": "Enter an item name:",
     "DUPE_ITEMS": "Duplicate Items",
     "DUPE_ITEMS_NOTE": "Copy the item in slot 1 to slot 2 or to every inventory slot.",
