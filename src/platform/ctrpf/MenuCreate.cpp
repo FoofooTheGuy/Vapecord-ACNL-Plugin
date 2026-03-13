@@ -185,6 +185,13 @@ namespace CTRPluginFramework {
 		});
 		coordModEntry->SetSavedValueApplyCallback(CoordSpeedApplySaved);
 		MOVEC->Append(coordModEntry);
+
+		if (System::IsNew3DS()) {
+			MenuEntry *cStickCoordModEntry = CreateEntry(TextID::CSTICK_COORD_MOD, cStickCoordinate, coordspeed, TextID::CSTICK_COORD_MOD_NOTE, MenuEntryId::MovementCstickCoordMod);
+			cStickCoordModEntry->SetSavedValueApplyCallback(CoordSpeedApplySaved);
+			MOVEC->Append(cStickCoordModEntry);
+		}
+
 		MOVEC->Append(EntryWithHotkey(CreateEntry(TextID::MOON_JUMP, moonjump, TextID::MOON_JUMP_NOTE, MenuEntryId::MovementMoonJump), {
 			NamedHotkey(Key::L | Key::DPadUp, TextID::MOON_JUMP_KEY1),
 			NamedHotkey(Key::L | Key::DPadDown, TextID::MOON_JUMP_KEY2)

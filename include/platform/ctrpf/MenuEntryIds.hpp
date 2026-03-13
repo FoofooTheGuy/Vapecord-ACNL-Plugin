@@ -7,7 +7,7 @@ namespace CTRPluginFramework {
 		// ID policy:
 		// - IDs are append-only. Never renumber existing IDs.
 		// - Menu order is independent from ID order.
-		// - For new entries, use the reserved extension range of the group.
+		// - For new entries, just append a new ID at the end of the relevant group.
 		// - Keep old IDs reserved when removing entries.
 		constexpr u32 GroupSave = 0x01;
 		constexpr u32 GroupMovement = 0x02;
@@ -66,6 +66,7 @@ namespace CTRPluginFramework {
 		constexpr u32 MovementSpeedMod = Make(GroupMovement, 0x000A);
 		constexpr u32 MovementRoomWarping = Make(GroupMovement, 0x000B);
 		constexpr u32 MovementShovelKnockback = Make(GroupMovement, 0x000C);
+		constexpr u32 MovementCstickCoordMod = Make(GroupMovement, 0x000D);
 
 		// Inventory folder
 		constexpr u32 InventoryText2Item = Make(GroupInventory, 0x0001);
@@ -267,30 +268,5 @@ namespace CTRPluginFramework {
 
 		// Plugin entries
 		constexpr u32 PluginSettings = Make(GroupPlugin, 0x0001);
-
-		// Reserved extension ranges for future entries
-		// (use these to add entries without touching existing IDs).
-		constexpr u32 SaveExtBegin = Make(GroupSave, 0x0100);
-		constexpr u32 MovementExtBegin = Make(GroupMovement, 0x0100);
-		constexpr u32 InventoryExtBegin = Make(GroupInventory, 0x0100);
-		constexpr u32 PlayerSaveExtBegin = Make(GroupPlayerSave, 0x0100);
-		constexpr u32 PlayerExtBegin = Make(GroupPlayer, 0x0100);
-		constexpr u32 AnimationExtBegin = Make(GroupAnimation, 0x0100);
-		constexpr u32 SeedExtBegin = Make(GroupSeed, 0x0100);
-		constexpr u32 DropExtBegin = Make(GroupDrop, 0x0100);
-		constexpr u32 TreeExtBegin = Make(GroupTree, 0x0100);
-		constexpr u32 MoneyExtBegin = Make(GroupMoney, 0x0100);
-		constexpr u32 IslandExtBegin = Make(GroupIsland, 0x0100);
-		constexpr u32 NpcExtBegin = Make(GroupNpc, 0x0100);
-		constexpr u32 EnvFishExtBegin = Make(GroupEnvFish, 0x0100);
-		constexpr u32 EnvInsectExtBegin = Make(GroupEnvInsect, 0x0100);
-		constexpr u32 EnvironmentExtBegin = Make(GroupEnvironment, 0x0100);
-		constexpr u32 ChatExtBegin = Make(GroupChat, 0x0100);
-		constexpr u32 FunExtBegin = Make(GroupFun, 0x0100);
-		constexpr u32 ExtraExtBegin = Make(GroupExtra, 0x0100);
-		constexpr u32 MiscExtBegin = Make(GroupMisc, 0x0100);
-		constexpr u32 DefaultExtBegin = Make(GroupDefault, 0x0100);
-		constexpr u32 DevExtBegin = Make(GroupDev, 0x0100);
-		constexpr u32 PluginExtBegin = Make(GroupPlugin, 0x0100);
 	}
 }

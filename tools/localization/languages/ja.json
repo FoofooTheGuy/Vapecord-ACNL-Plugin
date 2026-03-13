@@ -1,6 +1,11 @@
 {
   "name": "日本語",
   "entries": {
+    "TOWN_NAME_SET": "街の名前を %s に設定しました。",
+    "TREESIZE_SET": "街の木の成長段階を %d に設定しました。",
+    "PERMIT_100_SET": "許可承認を100％に設定しました。",
+    "CSTICK_COORD_MOD": "Cスティック座標制御",
+    "CSTICK_COORD_MOD_NOTE": "座標制御と似ていますが、新しい3DSのCスティックを使用します。",
     "DEFAULT_CODES_DISABLE_WARNING": "警告\nこれらのデフォルトコードを無効にすると、プラグインやゲームに問題が発生する可能性があります。\nこの変更は保存されません。プラグインを起動するたびに再度無効化する必要があります。\n\n本当に続行しますか？",
     "TEXT_2_ITEM_SEARCH_PAGE_TITLE": "アイテムを選択：（ページ %d/%d）",
     "TEXT_2_ITEM_SEARCH_PREVIOUS_PAGE": "< 前のページ",

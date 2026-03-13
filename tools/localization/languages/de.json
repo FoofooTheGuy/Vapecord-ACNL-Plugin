@@ -1,6 +1,11 @@
 {
   "name": "Deutsch",
   "entries": {
+    "TOWN_NAME_SET": "Stadtname erfolgreich auf %s gesetzt.",
+    "TREESIZE_SET": "Wachstumsstufe des Stadtrees erfolgreich auf %d gesetzt.",
+    "PERMIT_100_SET": "Genehmigungsfreigabe erfolgreich auf 100% gesetzt.",
+    "CSTICK_COORD_MOD": "C-Stick Koordinatensteuerung",
+    "CSTICK_COORD_MOD_NOTE": "Ähnlich wie die Koordinatensteuerung, aber nutzt den neuen C-Stick des 3DS.",
     "DEFAULT_CODES_DISABLE_WARNING": "Warnung\nDas Deaktivieren dieser Standardcodes kann zu Problemen im Plugin oder Spiel führen.\nDiese Änderung wird nicht gespeichert. Du musst sie bei jedem Plugin-Start erneut deaktivieren.\n\nWillst du wirklich fortfahren?",
     "TEXT_2_ITEM_SEARCH_PAGE_TITLE": "Wähle ein Item: (Seite %d/%d)",
     "TEXT_2_ITEM_SEARCH_PREVIOUS_PAGE": "< Vorherige Seite",

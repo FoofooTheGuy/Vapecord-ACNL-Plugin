@@ -1,6 +1,11 @@
 {
   "name": "简体中文",
   "entries": {
+    "TOWN_NAME_SET": "成功将城镇名称设置为 %s。",
+    "TREESIZE_SET": "成功将城镇树木生长阶段设置为 %d。",
+    "PERMIT_100_SET": "成功将许可批准设置为100%。",
+    "CSTICK_COORD_MOD": "C摇杆坐标控制",
+    "CSTICK_COORD_MOD_NOTE": "类似于坐标控制，但使用新的3DS C摇杆。",
     "DEFAULT_CODES_DISABLE_WARNING": "警告\n禁用这些默认代码可能会导致插件或游戏出现问题。\n此更改不会被保存。每次启动插件时都需要重新禁用它们。\n\n你确定要继续吗？",
     "TEXT_2_ITEM_SEARCH_PAGE_TITLE": "选择一个物品：（第 %d/%d 页）",
     "TEXT_2_ITEM_SEARCH_PREVIOUS_PAGE": "< 上一页",

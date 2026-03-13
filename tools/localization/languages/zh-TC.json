@@ -1,6 +1,11 @@
 {
   "name": "繁體中文",
   "entries": {
+    "TOWN_NAME_SET": "成功將城鎮名稱設定為 %s。",
+    "TREESIZE_SET": "成功將城鎮樹木生長階段設定為 %d。",
+    "PERMIT_100_SET": "成功將許可批准設定為100%。",
+    "CSTICK_COORD_MOD": "C搖桿座標控制",
+    "CSTICK_COORD_MOD_NOTE": "類似座標控制，但使用新的3DS C搖桿。",
     "DEFAULT_CODES_DISABLE_WARNING": "警告\n停用這些預設代碼可能會導致插件或遊戲出現問題。\n此更改不會被儲存。每次啟動插件時都需要再次停用。\n\n你確定要繼續嗎？",
     "TEXT_2_ITEM_SEARCH_PAGE_TITLE": "選擇一個物品：（第 %d/%d 頁）",
     "TEXT_2_ITEM_SEARCH_PREVIOUS_PAGE": "< 上一頁",

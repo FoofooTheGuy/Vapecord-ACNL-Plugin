@@ -1,6 +1,11 @@
 {
   "name": "Français",
   "entries": {
+    "TOWN_NAME_SET": "Nom de la ville défini avec succès sur %s.",
+    "TREESIZE_SET": "Stade de croissance de l'arbre de la ville défini avec succès sur %d.",
+    "PERMIT_100_SET": "Approbation du permis définie avec succès à 100 %.",
+    "CSTICK_COORD_MOD": "Contrôle des coordonnées du stick C",
+    "CSTICK_COORD_MOD_NOTE": "Similaire au contrôle des coordonnées mais utilise le nouveau stick C de la 3DS.",
     "DEFAULT_CODES_DISABLE_WARNING": "Avertissement\nDésactiver ces codes par défaut peut causer des problèmes dans le plugin ou le jeu.\nCe changement n'est pas enregistré. Vous devrez les désactiver à nouveau à chaque démarrage du plugin.\n\nVoulez-vous vraiment continuer ?",
     "TEXT_2_ITEM_SEARCH_PAGE_TITLE": "Choisissez un objet : (Page %d/%d)",
     "TEXT_2_ITEM_SEARCH_PREVIOUS_PAGE": "< Page précédente",

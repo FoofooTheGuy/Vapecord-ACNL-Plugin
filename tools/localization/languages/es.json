@@ -1,6 +1,11 @@
 {
   "name": "Español",
   "entries": {
+    "TOWN_NAME_SET": "Nombre de la ciudad establecido correctamente a %s.",
+    "TREESIZE_SET": "Etapa de crecimiento del árbol de la ciudad establecida correctamente a %d.",
+    "PERMIT_100_SET": "Aprobación del permiso establecida correctamente al 100 %.",
+    "CSTICK_COORD_MOD": "Control de coordenadas del C-Stick",
+    "CSTICK_COORD_MOD_NOTE": "Similar al control de coordenadas pero usa el C-Stick de la nueva 3DS.",
     "DEFAULT_CODES_DISABLE_WARNING": "Advertencia\nDesactivar estos códigos predeterminados puede causar problemas en el plugin o en el juego.\nEste cambio no se guarda. Tendrás que desactivarlos nuevamente cada vez que inicies el plugin.\n\n¿Seguro que quieres continuar?",
     "TEXT_2_ITEM_SEARCH_PAGE_TITLE": "Elige un objeto: (Página %d/%d)",
     "TEXT_2_ITEM_SEARCH_PREVIOUS_PAGE": "< Página anterior",
