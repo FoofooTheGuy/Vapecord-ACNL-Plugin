@@ -15,7 +15,6 @@
 
 namespace CTRPluginFramework {
 	void itemsearch(MenuEntry *entry) {
-		Item val;
 		ACNL_Player *player = Player::GetSaveData();
 
 		if(!player) {
@@ -36,24 +35,58 @@ namespace CTRPluginFramework {
 			return;
 		}
 
-		std::vector<std::string> names;
-		for (const auto& e : itemEntries) {
-			names.push_back(e.name);
+		const int resultCount = static_cast<int>(itemEntries.size());
+		const int pageSize = MAXCOUNT;
+		const int totalPages = (resultCount + pageSize - 1) / pageSize;
+		int currentPage = 0;
+		int selectedIndex = -1;
+
+		while(true) {
+			const int pageStart = currentPage * pageSize;
+			const int pageEnd = std::min(pageStart + pageSize, resultCount);
+			std::vector<std::string> pageOptions;
+			const bool hasPreviousPage = currentPage > 0;
+			const bool hasNextPage = currentPage + 1 < totalPages;
+
+			if(hasPreviousPage) {
+				pageOptions.emplace_back(Color(0x5AA9FFFF) << Language::getInstance()->get(TextID::TEXT_2_ITEM_SEARCH_PREVIOUS_PAGE));
+			}
+
+			for(int index = pageStart; index < pageEnd; ++index) {
+				pageOptions.push_back(itemEntries[index].name);
+			}
+
+			if(hasNextPage) {
+				pageOptions.emplace_back(Color(0xFFC857FF) << Language::getInstance()->get(TextID::TEXT_2_ITEM_SEARCH_NEXT_PAGE));
+			}
+
+			std::string keyboardTitle = Utils::Format(
+				Language::getInstance()->get(TextID::TEXT_2_ITEM_SEARCH_PAGE_TITLE).c_str(),
+				currentPage + 1,
+				totalPages
+			);
+
+			Keyboard selectKB(keyboardTitle, pageOptions);
+			const int pageChoice = selectKB.Open();
+			if(pageChoice < 0) {
+				return;
+			}
+
+			if(hasPreviousPage && pageChoice == 0) {
+				--currentPage;
+				continue;
+			}
+
+			if(hasNextPage && pageChoice == static_cast<int>(pageOptions.size()) - 1) {
+				++currentPage;
+				continue;
+			}
+
+			selectedIndex = pageStart + pageChoice - (hasPreviousPage ? 1 : 0);
+			break;
 		}
 
-		int size = itemEntries.size();
-		if(size > MAXCOUNT) {
-			MessageBox(Utils::Format(Language::getInstance()->get(TextID::TEXT_2_ITEM_SEARCH_ERR4).c_str(), size), Color::Red).SetClear(ClearScreen::Top)();
-			return;
-		}
-
-		Keyboard selectKB(Language::getInstance()->get(TextID::TEXT_2_ITEM_SEARCH_KB), names);
-		int result = selectKB.Open();
-		if(result < 0) {
-			return;
-		}
-
-		Item item(itemEntries[result].ID);
+		Item item(itemEntries[selectedIndex].ID);
 
 		u8 slot = 0;
 		if(!Inventory::GetNextItem({0x7FFE, 0}, slot)) {
