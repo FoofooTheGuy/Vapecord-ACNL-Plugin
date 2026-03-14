@@ -673,9 +673,9 @@ namespace CTRPluginFramework {
 
 		const std::vector<std::string> options = {
 			lang->get(TextID::CHAT_TRANSLATION_OPTION_TRANSLATE_OTHER) + ": " + (TranslateOthersMessages::GetInstance()
-				? lang->get(TextID::STATE_ON) : lang->get(TextID::STATE_OFF)),
+				? Color::Green << lang->get(TextID::STATE_ON) : Color::Red << lang->get(TextID::STATE_OFF)),
 			lang->get(TextID::CHAT_TRANSLATION_OPTION_TRANSLATE_OWN) + ": " + (TranslateOwnMessages::GetInstance()
-				? lang->get(TextID::STATE_ON) : lang->get(TextID::STATE_OFF)),
+				? Color::Green << lang->get(TextID::STATE_ON) : Color::Red << lang->get(TextID::STATE_OFF)),
 			lang->get(TextID::CHAT_TRANSLATION_OPTION_SET_TARGET_LANGUAGE) + ": " + languageCodes[static_cast<u32>(targetLanguage)],
 			lang->get(TextID::CHAT_TRANSLATION_OPTION_SET_OWN_LANGUAGE) + ": " + languageCodes[static_cast<u32>(myLanguage)],
 		};
