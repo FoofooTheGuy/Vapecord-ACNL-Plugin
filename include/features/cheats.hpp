@@ -259,6 +259,7 @@ namespace CTRPluginFramework {
 	void BypassGameChecksEntry(MenuEntry *entry);
 	void DisableNonSeedItemCheckEntry(MenuEntry *entry);
 	void PatchDropFunctionEntry(MenuEntry *entry);
+	void FixPretendoOnlineIslandSessionEntry(MenuEntry *entry);
 
 	void DisableOpenSaveMenuWithStartButton(MenuEntry *entry);
     void DisableCatalogSearchFunction(MenuEntry *entry);

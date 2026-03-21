@@ -253,6 +253,7 @@ namespace CTRPluginFramework {
 		constexpr u32 DefaultSetPlantRules = Make(GroupDefault, 0x0018);
 		constexpr u32 DefaultFixParticlesPuzzleLeague = Make(GroupDefault, 0x0019);
 		constexpr u32 DefaultSetCustomSpritesProDesigns = Make(GroupDefault, 0x001A);
+		constexpr u32 DefaultFixPretendoOnlineIslandSession = Make(GroupDefault, 0x001B);
 
 		// Dev folder
 		constexpr u32 DevCustomDump = Make(GroupDev, 0x0001);

@@ -591,6 +591,7 @@ namespace CTRPluginFramework {
 	DEFAULTC->Append(CreateEntry(TextID::BYPASS_GAME_CHECKS, nullptr, BypassGameChecksEntry, TextID::NONE, MenuEntryId::DefaultBypassGameChecks)),
 	DEFAULTC->Append(CreateEntry(TextID::DISABLE_NON_SEED_ITEM_CHECK, nullptr, DisableNonSeedItemCheckEntry, TextID::NONE, MenuEntryId::DefaultDisableNonSeedItemCheck)),
 	DEFAULTC->Append(CreateEntry(TextID::PATCH_DROP_FUNCTION, nullptr, PatchDropFunctionEntry, TextID::NONE, MenuEntryId::DefaultPatchDropFunction)),
+	DEFAULTC->Append(CreateEntry(TextID::PATCH_DROP_FUNCTION, nullptr, FixPretendoOnlineIslandSessionEntry, TextID::NONE, MenuEntryId::DefaultFixPretendoOnlineIslandSession)),
 
 	DEFAULTC->Append(CreateEntry(TextID::CHECK_INVALID_BADGE, nullptr, CheckInvalidBadgeEntry, TextID::NONE, MenuEntryId::DefaultCheckInvalidBadge)),
 	DEFAULTC->Append(CreateEntry(TextID::DISABLE_OPEN_SAVE_MENU_WITH_START_BUTTON, nullptr, DisableOpenSaveMenuWithStartButton, TextID::NONE, MenuEntryId::DefaultDisableOpenSaveMenuWithStart)),

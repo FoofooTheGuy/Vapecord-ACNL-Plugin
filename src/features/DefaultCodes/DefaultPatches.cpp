@@ -214,6 +214,35 @@ namespace CTRPluginFramework {
 		}
 	}
 
+	void FixPretendoOnlineIslandSession(bool enable) {
+		static Address createOnlineIslandSessionGameMode(0x514ABC);
+		static Address modifySessionAttributeIndex(0x5152D4);
+		static Address modifySessionAttributeValue(modifySessionAttributeIndex.MoveOffset(4));
+
+		if(enable) {
+			//change the game mode to match the one specified at
+			//https://github.com/PretendoNetwork/animal-crossing-new-leaf/blob/8b142ab51d028bba194a55d1914e3bbc0bcaf734/nex/register_common_secure_server_protocols.go#L80
+			//the pretendo server changes it only for sessions created during automatchmaking,
+			//so we need to change it for manually created sessions too.
+			createOnlineIslandSessionGameMode.Patch(33);
+
+			//the server increments the attribute index to account for SQL counting from 1,
+			//https://github.com/PretendoNetwork/nex-protocols-common-go/blob/main/matchmake-extension/database/update_game_attribute.go
+			//but the nex library version used by the game already does this at 0x3B4A20
+			//so we need to decrease it by one.
+			modifySessionAttributeIndex.Patch(0xE3A01001);
+
+			//set the attribute value to match the one at
+			//https://github.com/PretendoNetwork/animal-crossing-new-leaf/blob/8b142ab51d028bba194a55d1914e3bbc0bcaf734/nex/register_common_secure_server_protocols.go#L77
+			modifySessionAttributeValue.Patch(0xE3A02000);
+		}
+		else {
+			createOnlineIslandSessionGameMode.Unpatch();
+			modifySessionAttributeIndex.Unpatch();
+			modifySessionAttributeValue.Unpatch();
+		}
+	}
+
 	void EnableAllPatches() {
 		SeedItemLegitimacy(true);
 		OnlineDropLagRemover(true);
@@ -226,6 +255,7 @@ namespace CTRPluginFramework {
 		BypassGameChecks(true);
 		DisableNonSeedItemCheck(true);
 		PatchDropFunction(true);
+		FixPretendoOnlineIslandSession(true);
 	}
 
 	void DisableAllPatches() {
@@ -240,6 +270,7 @@ namespace CTRPluginFramework {
 		BypassGameChecks(false);
 		DisableNonSeedItemCheck(false);
 		PatchDropFunction(false);
+		FixPretendoOnlineIslandSession(false);
 	}
 
 	void SeedItemLegitimacyEntry(MenuEntry *entry) {
@@ -284,5 +315,9 @@ namespace CTRPluginFramework {
 
 	void PatchDropFunctionEntry(MenuEntry *entry) {
 		ToggleWithOptionKeyboard(Address(0x59FCA4).IsPatched(), PatchDropFunction);
+	}
+
+	void FixPretendoOnlineIslandSessionEntry(MenuEntry *entry) {
+		ToggleWithOptionKeyboard(Address(0x514ABC).IsPatched(), FixPretendoOnlineIslandSession);
 	}
 }
