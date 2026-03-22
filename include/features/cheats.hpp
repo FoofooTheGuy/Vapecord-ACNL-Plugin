@@ -231,6 +231,7 @@ namespace CTRPluginFramework {
 	void acnh(MenuEntry *entry);
 	void player_dumper(MenuEntry *entry);
 	void lightswitch(MenuEntry *entry);
+	void PrivateIsland(MenuEntry *entry);
 
 //NPC Codes
 	void NPCFunction(MenuEntry *entry);

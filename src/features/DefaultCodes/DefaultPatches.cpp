@@ -371,7 +371,7 @@ namespace CTRPluginFramework {
 		ToggleWithOptionKeyboard(Address(0x514ABC).IsPatched(), FixPretendoOnlineIslandSession);
 	}
 
-	void FixPretendoFindSessionByOwnerCallEntry(MenuEntry* entry) {
+	void FixPretendoFindSessionByOwnerCallEntry(MenuEntry *entry) {
 		ToggleWithOptionKeyboard(Address(0x512EB8).IsPatched(), FixPretendoFindSessionByOwnerCall);
 	}
 }

@@ -267,6 +267,7 @@ namespace CTRPluginFramework {
 		constexpr u32 DevWandAbility = Make(GroupDev, 0x0008);
 		constexpr u32 DevLightSwitchToggler = Make(GroupDev, 0x0009);
 		constexpr u32 DevExpressionMod = Make(GroupDev, 0x000A);
+		constexpr u32 DevPrivateIsland = Make(GroupDev, 0x000B);
 
 		// Plugin entries
 		constexpr u32 PluginSettings = Make(GroupPlugin, 0x0001);

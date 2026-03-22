@@ -627,6 +627,7 @@ namespace CTRPluginFramework {
 		DEVC->Append(CreateEntry(TextID::WAND_ABILITY, wandability, TextID::WAND_ABILITY_NOTE, MenuEntryId::DevWandAbility)),
 		DEVC->Append(CreateEntry(TextID::LIGHT_SWITCH_TOGGLER, lightswitch, TextID::LIGHT_SWITCH_TOGGLER_NOTE, MenuEntryId::DevLightSwitchToggler)),
 		DEVC->Append(CreateEntry(TextID::EXPRESSION_MOD, FacialExpressionMod, SetFacialExpression, TextID::EXPRESSION_MOD_NOTE, MenuEntryId::DevExpressionMod)),
+		DEVC->Append(CreateEntry(TextID::EXPRESSION_MOD, PrivateIsland, TextID::NONE, MenuEntryId::DevPrivateIsland)),
 		menu->Append(DEVC);
 	#endif
 
