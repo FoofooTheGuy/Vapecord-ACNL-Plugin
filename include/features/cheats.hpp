@@ -260,6 +260,7 @@ namespace CTRPluginFramework {
 	void DisableNonSeedItemCheckEntry(MenuEntry *entry);
 	void PatchDropFunctionEntry(MenuEntry *entry);
 	void FixPretendoOnlineIslandSessionEntry(MenuEntry *entry);
+	void FixPretendoFindSessionByOwnerCallEntry(MenuEntry* entry);
 
 	void DisableOpenSaveMenuWithStartButton(MenuEntry *entry);
     void DisableCatalogSearchFunction(MenuEntry *entry);

@@ -243,6 +243,54 @@ namespace CTRPluginFramework {
 		}
 	}
 
+	void FixPretendoFindSessionByOwnerCall(bool enable) {
+		static constexpr u32 sessionBufSize = 18;
+		static Address setSessionInfoListBufferSize(0x512EB8);
+		static Address nexSessionSearchCriteriaConstructor(0x40BC10);
+		static Address setMaxParticipants(0x40B358);
+		static Address setMinParticipants(setMaxParticipants.MoveOffset(0x20));
+		static Address searchSessions(0x51173C);
+		static Address joinSessionById(0x514BAC);
+		static Address joinSessionByOwnerCall(0x5179C4);
+		static Hook joinSessionByOwnerCallHook;
+
+		const auto joinSessionByOwner = +[](void* instance, const u32& ownerPrincipalId) {
+			*(u32*)((u8*)instance + 0x20) = ownerPrincipalId;
+
+			u8 searchCriteria[0xa18];
+			nexSessionSearchCriteriaConstructor.Call<void>(searchCriteria);
+			searchCriteria[4] = 2;
+			*(u32*)&searchCriteria[0xc] = sessionBufSize;
+			setMinParticipants.Call<void>(searchCriteria, 1);
+			setMaxParticipants.Call<void>(searchCriteria, 4);
+
+			std::array<u8*, sessionBufSize> sessionInfos;
+			size_t count = searchSessions.Call<size_t>(instance, searchCriteria, sessionInfos.data(), sessionInfos.size());
+			for (size_t i = 0; i < count; i++) {
+				u32 foundHostPrincipalId = *(u32*)(sessionInfos[i] + 0x444);
+				if (ownerPrincipalId == foundHostPrincipalId) {
+					u32 sessionId = *(u32*)(sessionInfos[i] + 0x8);
+					return joinSessionById.Call<unsigned int>(instance, sessionId);
+				}
+			}
+			return 0x80000006;
+		};
+
+		if(enable) {
+			setSessionInfoListBufferSize.Patch(0xe3a01000 + sessionBufSize);
+
+			//matchmaking protocol FindByOwner call isn't implemented on pretendo,
+			//so reimplement it using other means
+			joinSessionByOwnerCallHook.Initialize(joinSessionByOwnerCall.addr, (u32)joinSessionByOwner);
+			joinSessionByOwnerCallHook.SetFlags(USE_LR_TO_RETURN);
+			joinSessionByOwnerCallHook.Enable();
+		}
+		else {
+			setSessionInfoListBufferSize.Unpatch();
+			joinSessionByOwnerCallHook.Disable();
+		}
+	}
+
 	void EnableAllPatches() {
 		SeedItemLegitimacy(true);
 		OnlineDropLagRemover(true);
@@ -256,6 +304,7 @@ namespace CTRPluginFramework {
 		DisableNonSeedItemCheck(true);
 		PatchDropFunction(true);
 		FixPretendoOnlineIslandSession(true);
+		FixPretendoFindSessionByOwnerCall(true);
 	}
 
 	void DisableAllPatches() {
@@ -271,6 +320,7 @@ namespace CTRPluginFramework {
 		DisableNonSeedItemCheck(false);
 		PatchDropFunction(false);
 		FixPretendoOnlineIslandSession(false);
+		FixPretendoFindSessionByOwnerCall(false);
 	}
 
 	void SeedItemLegitimacyEntry(MenuEntry *entry) {
@@ -319,5 +369,9 @@ namespace CTRPluginFramework {
 
 	void FixPretendoOnlineIslandSessionEntry(MenuEntry *entry) {
 		ToggleWithOptionKeyboard(Address(0x514ABC).IsPatched(), FixPretendoOnlineIslandSession);
+	}
+
+	void FixPretendoFindSessionByOwnerCallEntry(MenuEntry* entry) {
+		ToggleWithOptionKeyboard(Address(0x512EB8).IsPatched(), FixPretendoFindSessionByOwnerCall);
 	}
 }
