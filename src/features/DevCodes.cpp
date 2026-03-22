@@ -1910,8 +1910,8 @@ namespace CTRPluginFramework {
 
 	void PrivateIsland(MenuEntry *entry) {
 		static Address createAutoMatchSessionAttribute4(0x5139B8);
-		static Address searchAutoMatchSessionAttribute4(0x513AB4);
-		static Address createSessionAttribute4(0x514A0C);
+		static Address searchAutoMatchSessionAttribute4(createAutoMatchSessionAttribute4.MoveOffset(0xFC));
+		static Address createSessionAttribute4(createAutoMatchSessionAttribute4.MoveOffset(0x1054));
 
 		if (entry->WasJustActivated()) {
 			createAutoMatchSessionAttribute4.Patch(0xE3A02003);
