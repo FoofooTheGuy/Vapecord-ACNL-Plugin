@@ -22,7 +22,7 @@ namespace CTRPluginFramework {
 
 		if(entry->WasJustActivated()) {
 			day1.Patch(0xE3A01788);
-			day2.WriteFloat(1.25);
+			day2.Write<float>(1.25);
 			day3.Patch(0xE3A00000);
 			day4.Patch(0xE8871015);
 		}
@@ -44,7 +44,7 @@ namespace CTRPluginFramework {
 		if(entry->WasJustActivated()) {
 			auroraPatch1.Patch(0xEA000023); //Makes aurora appear no matter the date or time
 			auroraPatch2.Patch(0xE3A00001); //Makes aurora appear in every season and weather
-			auroraPatch3.WriteFloat(1.0); //Brightness of aurora lights
+			auroraPatch3.Write<float>(1.0); //Brightness of aurora lights
 
 			if(PlayerClass::GetInstance()->IsLoaded()) {
 				OSD::NotifySysFont(Language::getInstance()->get(TextID::AURORALIGHTS_RELOAD_ROOM), Color(0xC430BAFF));

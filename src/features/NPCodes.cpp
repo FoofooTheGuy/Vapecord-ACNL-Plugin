@@ -200,4 +200,100 @@ namespace CTRPluginFramework {
 			*(u16 *)(CurrAddress + 0x2E) = GetRawRotationData();
 		}
 	}
+
+	/*
+	u32 StopNPCMovement(u32 NPCData, u32 u0, u32 u1, u32 u2, u32 u3, u32 u4, u32 u5, u32 u6, u32 u7, u32 u8, u32 u9, u32 u10, u32 u11, u32 u12, u32 u13, u32 u14) {
+		if (NPCData == CurrAddress + 0x78) {
+			return 0;
+		}
+
+		const HookContext &curr = HookContext::GetCurrent();
+        static Address func = Address::decodeARMBranch(curr.targetAddress, curr.overwrittenInstr);
+        return func.Call<u32>(NPCData, u0, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14);
+	}
+
+	void NPCMover(MenuEntry *entry) {
+		const u16 max_pos = 146; //seems to be the max value
+		static Hook hook;
+
+		static Address cameraAsm(0x764504);
+		static Address camerapan(0x1A2058);
+
+		static Address func1(0x6E7D54);
+		static Address func2(0x6EB384);
+
+		static Address stopAnim(0x6EA828);
+
+		static Address data1(0xAE6864);
+        static Address data2(0x8816C4);
+		u32 null[]{ 0 };
+
+		if(CurrAddress == 0) {
+			return;
+		}
+
+		if (entry->IsActivated() && !cameraAsm.IsPatched()) {
+			Animation::ExecuteAnimationWrapper(4, 0xF, {0, 0}, 0, 0, 0, 0, 0, 0, 0);
+			cameraAsm.Patch(0xEA000020);
+			camerapan.Patch(0xE3A00000);
+
+			hook.Initialize(stopAnim.addr, (u32)StopNPCMovement);
+			hook.SetFlags(USE_LR_TO_RETURN);
+			hook.Enable();
+		}
+
+		if (!entry->IsActivated() && cameraAsm.IsPatched()) {
+			Animation::ExecuteAnimationWrapper(4, 6, {0, 0}, 0, 0, 0, 0, 0, 0, 0);
+			cameraAsm.Unpatch();
+			camerapan.Unpatch();
+			hook.Disable();
+		}
+
+		float *pCoords = (float *)(CurrAddress + 0x14);
+		if(pCoords == nullptr || MapEditorActive) {
+			return;
+		}
+
+		float *coord = Camera::GetCoordinates();
+		if(coord == nullptr) {
+			return;
+		}
+
+		coord[0] = pCoords[0];
+		coord[2] = pCoords[2];
+
+		if(Controller::IsKeyDown(Key::CPad)) {
+			float cspeed = 1.5;
+
+			func2.Call<void>(CurrAddress + 0x78, 0, 0xE, 0, 0); //Walking Anim
+
+			if (Controller::IsKeyDown(Key::B)) {
+				cspeed = 2.5;
+				func2.Call<void>(CurrAddress + 0x78, 0, 0xF, 0, 0); //Running Anim
+			}
+
+			*(u16 *)(CurrAddress + 0x2E) = GetRawRotationData();
+
+			shortVector pos = Controller::GetCirclePadPosition();
+
+			//(circlePosition / max_pos) * 100 = percent_pushed
+			float percent_pushedx = (float)pos.x / max_pos * 100;
+			float percent_pushedy = (float)pos.y / max_pos * 100;
+			//(percent_pushed / 100) * cspeed = speed
+			float speedx = (percent_pushedx / 100) * cspeed;
+			float speedy = (percent_pushedy / 100) * cspeed;
+
+			pCoords[0] += speedx;
+			pCoords[2] += (speedy * -1); //negate y
+		}
+
+		//if (Controller::IsKeyPressed(Key::CPad)) {
+		//	func1.Call<void>(CurrAddress + 0x78, 0xD, 0, data1, null, null, 0, data2); //Walking
+		//}
+
+		//if (Controller::IsKeyReleased(Key::CPad)) {
+		//	func1.Call<void>(CurrAddress + 0x78, 6, 0, data1, null, null, 0, data2);
+		//}
+	}
+	*/
 }

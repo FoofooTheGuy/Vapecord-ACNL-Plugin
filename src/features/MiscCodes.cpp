@@ -100,7 +100,7 @@ namespace CTRPluginFramework {
 
 		static float OnOff = 1.0;
 
-		fovlargeMod.WriteFloat(OnOff);
+		fovlargeMod.Write<float>(OnOff);
 
 		if(Game::GetRoom() == 1 || RuntimeContext::getInstance()->isFov()) {
 			OnOff = 1.0;

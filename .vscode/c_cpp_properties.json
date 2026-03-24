@@ -13,7 +13,7 @@
                 "C:/devkitPro/devkitARM/arm-none-eabi/include/**",
                 "C:/devkitPro/devkitARM/lib/**",
                 "C:/devkitPro/libctru/include",
-                "C:/devkitPro/libctrpf/include",
+                "C:/devkitPro/libctrpfforvapecord/include",
                 "C:/devkitPro/portlibs/3ds/bin",
                 "${workspaceFolder}/include"
             ],
@@ -22,7 +22,7 @@
             "browse": {
                 "path": [
                     "${workspaceFolder}/../ctr-plugin-framework-for-vapecord/Library/include/**",
-                    "C:/devkitPro/libctrpf/include/**",
+                    "C:/devkitPro/libctrpfforvapecord/include/**",
                     "C:/devkitPro/libctru/include/**"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
