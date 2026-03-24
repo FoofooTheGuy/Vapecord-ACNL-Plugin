@@ -591,6 +591,8 @@ namespace CTRPluginFramework {
 	DEFAULTC->Append(CreateEntry(TextID::BYPASS_GAME_CHECKS, nullptr, BypassGameChecksEntry, TextID::NONE, MenuEntryId::DefaultBypassGameChecks)),
 	DEFAULTC->Append(CreateEntry(TextID::DISABLE_NON_SEED_ITEM_CHECK, nullptr, DisableNonSeedItemCheckEntry, TextID::NONE, MenuEntryId::DefaultDisableNonSeedItemCheck)),
 	DEFAULTC->Append(CreateEntry(TextID::PATCH_DROP_FUNCTION, nullptr, PatchDropFunctionEntry, TextID::NONE, MenuEntryId::DefaultPatchDropFunction)),
+	DEFAULTC->Append(CreateEntry(TextID::FIX_PRETENO_ISLAND_SESSION, nullptr, FixPretendoOnlineIslandSessionEntry, TextID::NONE, MenuEntryId::DefaultFixPretendoOnlineIslandSession)),
+	DEFAULTC->Append(CreateEntry(TextID::FIX_PRETENDO_FIND_SESSION, nullptr, FixPretendoFindSessionByOwnerCallEntry, TextID::NONE, MenuEntryId::DefaultFixPretendoFindSessionByOwnerCall)),
 
 	DEFAULTC->Append(CreateEntry(TextID::CHECK_INVALID_BADGE, nullptr, CheckInvalidBadgeEntry, TextID::NONE, MenuEntryId::DefaultCheckInvalidBadge)),
 	DEFAULTC->Append(CreateEntry(TextID::DISABLE_OPEN_SAVE_MENU_WITH_START_BUTTON, nullptr, DisableOpenSaveMenuWithStartButton, TextID::NONE, MenuEntryId::DefaultDisableOpenSaveMenuWithStart)),
@@ -625,6 +627,7 @@ namespace CTRPluginFramework {
 		DEVC->Append(CreateEntry(TextID::WAND_ABILITY, wandability, TextID::WAND_ABILITY_NOTE, MenuEntryId::DevWandAbility)),
 		DEVC->Append(CreateEntry(TextID::LIGHT_SWITCH_TOGGLER, lightswitch, TextID::LIGHT_SWITCH_TOGGLER_NOTE, MenuEntryId::DevLightSwitchToggler)),
 		DEVC->Append(CreateEntry(TextID::EXPRESSION_MOD, FacialExpressionMod, SetFacialExpression, TextID::EXPRESSION_MOD_NOTE, MenuEntryId::DevExpressionMod)),
+		DEVC->Append(CreateEntry(TextID::PRIVATE_ISLAND, PrivateIsland, TextID::NONE, MenuEntryId::DevPrivateIsland)),
 		menu->Append(DEVC);
 	#endif
 

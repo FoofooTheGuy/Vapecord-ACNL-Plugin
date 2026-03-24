@@ -253,6 +253,8 @@ namespace CTRPluginFramework {
 		constexpr u32 DefaultSetPlantRules = Make(GroupDefault, 0x0018);
 		constexpr u32 DefaultFixParticlesPuzzleLeague = Make(GroupDefault, 0x0019);
 		constexpr u32 DefaultSetCustomSpritesProDesigns = Make(GroupDefault, 0x001A);
+		constexpr u32 DefaultFixPretendoOnlineIslandSession = Make(GroupDefault, 0x001B);
+		constexpr u32 DefaultFixPretendoFindSessionByOwnerCall = Make(GroupDefault, 0x001C);
 
 		// Dev folder
 		constexpr u32 DevCustomDump = Make(GroupDev, 0x0001);
@@ -265,6 +267,7 @@ namespace CTRPluginFramework {
 		constexpr u32 DevWandAbility = Make(GroupDev, 0x0008);
 		constexpr u32 DevLightSwitchToggler = Make(GroupDev, 0x0009);
 		constexpr u32 DevExpressionMod = Make(GroupDev, 0x000A);
+		constexpr u32 DevPrivateIsland = Make(GroupDev, 0x000B);
 
 		// Plugin entries
 		constexpr u32 PluginSettings = Make(GroupPlugin, 0x0001);

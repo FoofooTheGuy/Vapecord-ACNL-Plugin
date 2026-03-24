@@ -231,6 +231,7 @@ namespace CTRPluginFramework {
 	void acnh(MenuEntry *entry);
 	void player_dumper(MenuEntry *entry);
 	void lightswitch(MenuEntry *entry);
+	void PrivateIsland(MenuEntry *entry);
 
 //NPC Codes
 	void NPCFunction(MenuEntry *entry);
@@ -259,6 +260,8 @@ namespace CTRPluginFramework {
 	void BypassGameChecksEntry(MenuEntry *entry);
 	void DisableNonSeedItemCheckEntry(MenuEntry *entry);
 	void PatchDropFunctionEntry(MenuEntry *entry);
+	void FixPretendoOnlineIslandSessionEntry(MenuEntry *entry);
+	void FixPretendoFindSessionByOwnerCallEntry(MenuEntry* entry);
 
 	void DisableOpenSaveMenuWithStartButton(MenuEntry *entry);
     void DisableCatalogSearchFunction(MenuEntry *entry);
