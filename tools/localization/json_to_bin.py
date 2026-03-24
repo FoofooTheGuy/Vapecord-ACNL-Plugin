@@ -7,7 +7,7 @@ LANG_DIR = BASE_DIR / "languages"
 OUTPUT_BIN = BASE_DIR / "language.bin"
 ENUM_FILE = BASE_DIR.parents[1] / "include" / "core" / "infrastructure" / "TextID.hpp"
 
-BINARY_VERSION = 321
+BINARY_VERSION = 330
 
 # Load languages
 languages = {}
