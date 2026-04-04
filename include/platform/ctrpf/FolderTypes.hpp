@@ -18,6 +18,7 @@ namespace CTRPluginFramework {
         Misc,
         Default,
         Dev,
+        Pretendo,
         None
     };
 
@@ -30,6 +31,8 @@ namespace CTRPluginFramework {
         Insect,
         Chat,
         Fun,
+        PlayersInSession,
+        PIALoggerOptions,
         None
     };
 }

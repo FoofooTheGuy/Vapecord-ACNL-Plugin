@@ -168,26 +168,6 @@ namespace CTRPluginFramework {
 	}
 
 	const int TimeMax[5] = { 60, 24, 30, 12, 50 };
-	static int CurrTime = 0;
-
-	bool CheckTimeInput(const void *input, std::string &error) {
-		const std::string TimeMode[5] = {
-			Language::getInstance()->get(TextID::TIME_MINUTE),
-			Language::getInstance()->get(TextID::TIME_HOUR),
-			Language::getInstance()->get(TextID::TIME_DAY),
-			Language::getInstance()->get(TextID::TIME_MONTH),
-			Language::getInstance()->get(TextID::TIME_YEAR)
-		};
-
-        u16 in = *static_cast<const u16 *>(input);
-        if(in >= TimeMax[CurrTime]) {
-			error = Utils::Format(Language::getInstance()->get(TextID::TIME_ERROR).c_str(), (TimeMax[CurrTime] - 1), TimeMode[CurrTime].c_str());
-            return 0;
-        }
-
-        return 1;
-    }
-
 	void TTKeyboard(MenuEntry *entry) {
 		const std::string TimeMode[5] = {
 			Language::getInstance()->get(TextID::TIME_MINUTE),
@@ -211,10 +191,8 @@ namespace CTRPluginFramework {
 
 		for(int i = 0; i < 5; ++i) {
 			Keyboard KBS(Utils::Format(Language::getInstance()->get(TextID::TIME_KB1).c_str(), TimeMode[i].c_str()));
+			KBS.SetSlider(0, TimeMax[i] - 1);
 			KBS.IsHexadecimal(false);
-			KBS.SetMaxLength(2);
-			CurrTime = i;
-			KBS.SetCompareCallback(CheckTimeInput);
 
 			int cho = KBS.Open(timedat[i]);
 			if(cho < 0) {

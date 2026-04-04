@@ -1,6 +1,14 @@
 {
   "name": "日本語",
   "entries": {
+    "PRETENDO_CODES": "Pretendoコード",
+    "PRETENDO_CODES_NOTE": "接続中のプレイヤーの表示やPIAロガーの状態確認ができるPretendoネットワークツール。",
+    "PLAYERS_IN_SESSION": "セッション中のプレイヤー (PIA)",
+    "PLAYERS_IN_SESSION_NOTE": "現在のオンラインセッションのプレイヤー一覧を名前、フレンドコード、PID、NAT情報付きで表示します。",
+    "PIA_LOGGER_OPTIONS": "PIAロガーオプション",
+    "PIA_LOGGER_OPTIONS_NOTE": "PIAネットワークパターンがメモリ上で検出されたかどうかを表示します。",
+    "PIA_LOGGER_NOT_AVAILABLE": "PIAロガー状態: 利用不可",
+    "PIA_LOGGER_ACTIVE": "PIAロガー状態: アクティブ",
     "TOWN_NAME_SET": "街の名前を %s に設定しました。",
     "TREESIZE_SET": "街の木の成長段階を %d に設定しました。",
     "PERMIT_100_SET": "許可承認を100％に設定しました。",

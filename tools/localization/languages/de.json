@@ -1,6 +1,14 @@
 {
   "name": "Deutsch",
   "entries": {
+    "PRETENDO_CODES": "Pretendo-Codes",
+    "PRETENDO_CODES_NOTE": "Pretendo-Netzwerktools zum Anzeigen verbundener Spieler und Prüfen des PIA-Logger-Status.",
+    "PLAYERS_IN_SESSION": "Spieler in der Sitzung (PIA)",
+    "PLAYERS_IN_SESSION_NOTE": "Zeigt alle Spieler in der aktuellen Online-Sitzung mit Name, Freundescode, PID und NAT-Info.",
+    "PIA_LOGGER_OPTIONS": "PIA-Logger-Optionen",
+    "PIA_LOGGER_OPTIONS_NOTE": "Zeigt an, ob die PIA-Netzwerkmuster im Speicher gefunden wurden.",
+    "PIA_LOGGER_NOT_AVAILABLE": "PIA-Logger-Status: Nicht verfügbar",
+    "PIA_LOGGER_ACTIVE": "PIA-Logger-Status: Aktiv",
     "TOWN_NAME_SET": "Stadtname erfolgreich auf %s gesetzt.",
     "TREESIZE_SET": "Wachstumsstufe des Stadtrees erfolgreich auf %d gesetzt.",
     "PERMIT_100_SET": "Genehmigungsfreigabe erfolgreich auf 100% gesetzt.",

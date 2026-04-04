@@ -1,6 +1,14 @@
 {
   "name": "English",
   "entries": {
+    "PRETENDO_CODES": "Pretendo Codes",
+    "PRETENDO_CODES_NOTE": "Pretendo network tools for viewing connected players and checking PIA logger status.",
+    "PLAYERS_IN_SESSION": "Players in session (PIA)",
+    "PLAYERS_IN_SESSION_NOTE": "Lists all players in the current online session with their name, friend code, PID, and NAT info.",
+    "PIA_LOGGER_OPTIONS": "PIA logger options",
+    "PIA_LOGGER_OPTIONS_NOTE": "Shows whether the PIA networking patterns were found in memory.",
+    "PIA_LOGGER_NOT_AVAILABLE": "PIA logger status: Not available",
+    "PIA_LOGGER_ACTIVE": "PIA logger status: Active",
     "TOWN_NAME_SET": "Successfully set town name to %s.",
     "TREESIZE_SET": "Successfully set town tree growth stage to %d.",
     "PERMIT_100_SET": "Successfully set permit approval to 100%.",

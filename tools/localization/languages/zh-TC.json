@@ -1,6 +1,14 @@
 {
   "name": "繁體中文",
   "entries": {
+    "PRETENDO_CODES": "Pretendo 代碼",
+    "PRETENDO_CODES_NOTE": "Pretendo網路工具，用於查看已連線的玩家和檢查PIA日誌狀態。",
+    "PLAYERS_IN_SESSION": "工作階段中的玩家 (PIA)",
+    "PLAYERS_IN_SESSION_NOTE": "列出目前線上工作階段中的所有玩家，包括名稱、好友代碼、PID和NAT資訊。",
+    "PIA_LOGGER_OPTIONS": "PIA日誌選項",
+    "PIA_LOGGER_OPTIONS_NOTE": "顯示PIA網路特徵是否已在記憶體中找到。",
+    "PIA_LOGGER_NOT_AVAILABLE": "PIA日誌狀態：不可用",
+    "PIA_LOGGER_ACTIVE": "PIA日誌狀態：活躍",
     "TOWN_NAME_SET": "成功將城鎮名稱設定為 %s。",
     "TREESIZE_SET": "成功將城鎮樹木生長階段設定為 %d。",
     "PERMIT_100_SET": "成功將許可批准設定為100%。",

@@ -116,10 +116,18 @@ namespace CTRPluginFramework {
         }
     }
 
+	void AntiDropCheck(const u8 PlayerIndex, const u8* Data) {
+		const u8 DropPlayerIndex = Data[12] & 3;
+		if (DropPlayerIndex != Game::GetActualPlayerIndex()) {
+			HookContext& ctx = HookContext::GetCurrent();
+			ctx.OriginalFunction<void, u8, const u8*>(PlayerIndex, Data);
+		}
+	}
+
 //Disable Force Animation on yourself | Thanks to Gokiro
 	void anticheat(MenuEntry *Entry) {
-        static Hook AnimHook1, AnimHook2, AnimHook3, AnimHook4;
-		static Address anim1(0x185EF8), anim2(0x185F28), anim3(0x185F58), anim4(0x185F88);
+        static Hook AnimHook1, AnimHook2, AnimHook3, AnimHook4, InvalidDropCheckHook;
+		static Address anim1(0x185EF8), anim2(0x185F28), anim3(0x185F58), anim4(0x185F88), drop(0x1832D8);
 
         if (Entry->WasJustActivated()) {
             AnimHook1.InitializeForMitm(anim1.addr, (u32)&AntiAnimCheck);
@@ -131,6 +139,9 @@ namespace CTRPluginFramework {
             AnimHook4.InitializeForMitm(anim4.addr, (u32)&AntiAnimCheck);
             AnimHook4.Enable();
 
+			InvalidDropCheckHook.InitializeForMitm(drop.addr, (u32)AntiDropCheck);
+        	InvalidDropCheckHook.Enable();
+
 			IfForceAllowed = false;
         }
         else if (!Entry->IsActivated()) {
@@ -138,6 +149,7 @@ namespace CTRPluginFramework {
             AnimHook2.Disable();
             AnimHook3.Disable();
             AnimHook4.Disable();
+			InvalidDropCheckHook.Disable();
 
 			IfForceAllowed = true;
         }

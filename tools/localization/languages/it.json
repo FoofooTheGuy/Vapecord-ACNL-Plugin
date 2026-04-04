@@ -1,6 +1,14 @@
 {
   "name": "Italiano",
   "entries": {
+    "PRETENDO_CODES": "Codici Pretendo",
+    "PRETENDO_CODES_NOTE": "Strumenti di rete Pretendo per visualizzare i giocatori connessi e controllare lo stato del registro PIA.",
+    "PLAYERS_IN_SESSION": "Giocatori nella sessione (PIA)",
+    "PLAYERS_IN_SESSION_NOTE": "Elenca tutti i giocatori nella sessione online con nome, codice amico, PID e info NAT.",
+    "PIA_LOGGER_OPTIONS": "Opzioni del registro PIA",
+    "PIA_LOGGER_OPTIONS_NOTE": "Mostra se i pattern di rete PIA sono stati trovati in memoria.",
+    "PIA_LOGGER_NOT_AVAILABLE": "Stato del registro PIA: Non disponibile",
+    "PIA_LOGGER_ACTIVE": "Stato del registro PIA: Attivo",
     "TOWN_NAME_SET": "Nome della città impostato correttamente su %s.",
     "TREESIZE_SET": "Stadio di crescita dell'albero della città impostato correttamente su %d.",
     "PERMIT_100_SET": "Approvazione del permesso impostata correttamente al 100%.",

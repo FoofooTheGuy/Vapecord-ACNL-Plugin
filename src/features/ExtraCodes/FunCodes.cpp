@@ -132,8 +132,10 @@ namespace CTRPluginFramework {
 				return;
 			}
 			else if(op2 == 3) {
-				optKb.GetMessage() = Utils::Format(Language::getInstance()->get(TextID::KEY_OPTION_SIZE_CODES_CHOOSE).c_str(), sizeopt[op].c_str());
-				if(optKb.Open(size, size) >= 0) {
+				Keyboard sizeKb(Utils::Format(Language::getInstance()->get(TextID::KEY_OPTION_SIZE_CODES_CHOOSE).c_str(), sizeopt[op].c_str()));
+				sizeKb.SetSlider(0.1, 5.0, 0.1);
+				sizeKb.SetSliderPrecision(1);
+				if(sizeKb.Open(size, size) >= 0) {
 					GetSizeAddressByIndex(op).Write<float>(size);
 
 					u8 modes[kSizeSlotCount] = { 0 };

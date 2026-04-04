@@ -60,9 +60,9 @@ namespace CTRPluginFramework {
 			return true;
 		}
 
-			bool EnsureCompatibleCustomColors(ACNL_Player *player) {
-				return EnsureCompatibleCustomColorId(player, true) && EnsureCompatibleCustomColorId(player, false);
-			}
+		bool EnsureCompatibleCustomColors(ACNL_Player *player) {
+			return EnsureCompatibleCustomColorId(player, true) && EnsureCompatibleCustomColorId(player, false);
+		}
 
 		std::vector<std::string> strings1 = { "", "", "", "", "", "" };
 

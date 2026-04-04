@@ -411,4 +411,8 @@ namespace CTRPluginFramework {
 			Game::RemoveItems(true, 0, 0, 0xFF, 0xFF, true, true);
 		}
 	}
+
+	void SetFoliageSeason(MenuEntry *entry) {
+		//TODO, implement it
+	}
 }

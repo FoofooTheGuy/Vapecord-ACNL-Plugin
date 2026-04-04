@@ -31,6 +31,7 @@ namespace CTRPluginFramework {
 		constexpr u32 GroupDefault = 0x14;
 		constexpr u32 GroupDev = 0x15;
 		constexpr u32 GroupPlugin = 0x16;
+		constexpr u32 GroupPretendo = 0x17;
 
 		constexpr u32 Make(u32 group, u32 index) {
 			return (group << 16) | (index & 0xFFFF);
@@ -271,5 +272,9 @@ namespace CTRPluginFramework {
 
 		// Plugin entries
 		constexpr u32 PluginSettings = Make(GroupPlugin, 0x0001);
+
+		// Pretendo folder
+		constexpr u32 PretendoPlayersInSession = Make(GroupPretendo, 0x0001);
+		constexpr u32 PretendoPIALoggerOptions = Make(GroupPretendo, 0x0002);
 	}
 }

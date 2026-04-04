@@ -1,6 +1,14 @@
 {
   "name": "Français",
   "entries": {
+    "PRETENDO_CODES": "Codes Pretendo",
+    "PRETENDO_CODES_NOTE": "Outils réseau Pretendo pour voir les joueurs connectés et vérifier l'état du journal PIA.",
+    "PLAYERS_IN_SESSION": "Joueurs dans la session (PIA)",
+    "PLAYERS_IN_SESSION_NOTE": "Liste tous les joueurs de la session en ligne avec leur nom, code ami, PID et infos NAT.",
+    "PIA_LOGGER_OPTIONS": "Options du journal PIA",
+    "PIA_LOGGER_OPTIONS_NOTE": "Indique si les signatures réseau PIA ont été trouvées en mémoire.",
+    "PIA_LOGGER_NOT_AVAILABLE": "État du journal PIA : Non disponible",
+    "PIA_LOGGER_ACTIVE": "État du journal PIA : Actif",
     "TOWN_NAME_SET": "Nom de la ville défini avec succès sur %s.",
     "TREESIZE_SET": "Stade de croissance de l'arbre de la ville défini avec succès sur %d.",
     "PERMIT_100_SET": "Approbation du permis définie avec succès à 100 %.",

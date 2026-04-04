@@ -5,6 +5,7 @@
 #include "platform/ctrpf/Plugin_Color.hpp"
 #include "platform/ctrpf/FolderTypes.hpp"
 #include "platform/ctrpf/FolderTypeTextMap.hpp"
+#include "core/Pretendo/PIALogger.hpp"
 #include "Files.h"
 
 #include <unordered_map>
@@ -632,6 +633,27 @@ namespace CTRPluginFramework {
 	#endif
 
 		menu->Append(CreateEntry(TextID::PLUGIN_SETTINGS, nullptr, pluginSettingsEntry, TextID::NONE, MenuEntryId::PluginSettings));
+	
+	///////////////////
+	/*Pretendo Folder*/
+	///////////////////
+		MenuFolder *PRET = CreateFolder(FolderType::Pretendo);
+	////////////////////////////////
+	/*Players In Session SubFolder*/
+	////////////////////////////////
+		if (getPiaLoggerStatus() == PatternStatus::Active) {
+			MenuFolder *PLAYSESS = CreateFolder(FolderType::Pretendo, SubFolder::PlayersInSession);
+			PLAYSESS->OnAction = onPiaPlayersFolderAction;
+			PRET->Append(PLAYSESS);
+		}
+	////////////////////////////////
+	/*PIA logger Options SubFolder*/
+	////////////////////////////////
+		MenuFolder *PIALOG = CreateFolder(FolderType::Pretendo, SubFolder::PIALoggerOptions);
+	    PIALOG->OnAction = onPiaLoggerOptionsFolderAction;
+		PRET->Append(PIALOG);
+
+		menu->Append(PRET);
 	}
 }
 

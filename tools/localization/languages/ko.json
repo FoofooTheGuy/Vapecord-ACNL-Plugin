@@ -1,6 +1,14 @@
 {
   "name": "한국어",
   "entries": {
+    "PRETENDO_CODES": "Pretendo 코드",
+    "PRETENDO_CODES_NOTE": "연결된 플레이어 확인 및 PIA 로거 상태를 확인할 수 있는 Pretendo 네트워크 도구.",
+    "PLAYERS_IN_SESSION": "세션 내 플레이어 (PIA)",
+    "PLAYERS_IN_SESSION_NOTE": "현재 온라인 세션의 모든 플레이어를 이름, 친구 코드, PID, NAT 정보와 함께 표시합니다.",
+    "PIA_LOGGER_OPTIONS": "PIA 로거 옵션",
+    "PIA_LOGGER_OPTIONS_NOTE": "PIA 네트워크 패턴이 메모리에서 발견되었는지 표시합니다.",
+    "PIA_LOGGER_NOT_AVAILABLE": "PIA 로거 상태: 사용 불가",
+    "PIA_LOGGER_ACTIVE": "PIA 로거 상태: 활성",
     "TOWN_NAME_SET": "마을 이름을 %s(으)로 설정했습니다.",
     "TREESIZE_SET": "마을 나무 성장 단계를 %d로 설정했습니다.",
     "PERMIT_100_SET": "허가 승인율을 100%로 설정했습니다.",

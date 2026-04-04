@@ -51,9 +51,9 @@ namespace CTRPluginFramework {
 //Coordinate Mod Speed Changer Keyboard
 	void coordspeed(MenuEntry *entry) {
 		Keyboard kb(Utils::Format(Language::getInstance()->get(TextID::COORD_MOD_ENTER_SPEED).c_str(), 5));
-		kb.IsHexadecimal(false);
-		kb.SetMaxLength(2);
-		if(kb.Open(cspeed) >= 0) {
+		kb.SetSlider(1.0, 99.0, 1.0);
+		kb.SetSliderPrecision(0);
+		if(kb.Open(cspeed, cspeed) >= 0) {
 			entry->SetSavedValue(EncodeFloatValue(cspeed));
 		}
 	}

@@ -7,6 +7,7 @@
 #include "features/cheats.hpp"
 #include "core/Pretendo/Pretendo.hpp"
 #include "core/Pretendo/PatternManager.hpp"
+#include "core/Pretendo/PIALogger.hpp"
 
 namespace CTRPluginFramework {
 	static const std::string NOTE =
@@ -93,6 +94,7 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 	}
 
 	void InitKeepConnection(void);
+	void LaunchGameKeyboardAsCustomQwerty(Keyboard &keyboard);
 
 	int	main(void) {
 		std::string region = Address::LoadRegion();
@@ -135,8 +137,12 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 		menu->Callback(IndoorsSeedItemCheck);
 		Process::exceptionCallback = CustomExceptionHandler;
 
-	//Patch Pretendo + RCE fix
+	//Set custom keyboard
+		Keyboard::SetCustomQwertyCallback(LaunchGameKeyboardAsCustomQwerty);
+
+	//Patch Pretendo + RCE fix + PIA Logger
         PatternManager pm;
+		initPiaLogger(pm);
         initPretendoPatches(pm);
 
         pm.Perform();
