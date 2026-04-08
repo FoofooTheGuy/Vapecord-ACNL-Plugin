@@ -1,6 +1,12 @@
 {
   "name": "Deutsch",
   "entries": {
+    "SET_FOLIAGE_SEASON": "Laubsaison ändern",
+    "SET_FOLIAGE_SEASON_NOTE": "Ändert die Saison des Laubs in der Stadt. Damit blühen z.B. Büsche außerhalb der Saison oder Bäume zeigen einen anderen saisonalen Zustand.",
+    "SET_SEASON": "Saison setzen",
+    "FOLIAGE_SEASON": "Laubsaison (0-22):",
+    "FOLIAGE_SEASON_SET": "Laubsaison auf %d gesetzt",
+    "FOLIAGE_SEASON_DISABLED": "Laubsaison deaktiviert",
     "PRETENDO_CODES": "Pretendo-Codes",
     "PRETENDO_CODES_NOTE": "Pretendo-Netzwerktools zum Anzeigen verbundener Spieler und Prüfen des PIA-Logger-Status.",
     "PLAYERS_IN_SESSION": "Spieler in der Sitzung (PIA)",

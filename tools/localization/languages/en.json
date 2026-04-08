@@ -1,6 +1,12 @@
 {
   "name": "English",
   "entries": {
+    "SET_FOLIAGE_SEASON": "Set Foliage Season",
+    "SET_FOLIAGE_SEASON_NOTE": "Change the season of the town's foliage. This makes bushes bloom out of season for example, or have trees be in a different seasonal state.",
+    "SET_SEASON": "Set Season",
+    "FOLIAGE_SEASON": "Foliage Season (0-22):",
+    "FOLIAGE_SEASON_SET": "Foliage Season set to %d",
+    "FOLIAGE_SEASON_DISABLED": "Foliage Season disabled",
     "PRETENDO_CODES": "Pretendo Codes",
     "PRETENDO_CODES_NOTE": "Pretendo network tools for viewing connected players and checking PIA logger status.",
     "PLAYERS_IN_SESSION": "Players in session (PIA)",

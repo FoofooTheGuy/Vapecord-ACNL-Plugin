@@ -1,6 +1,12 @@
 {
   "name": "Italiano",
   "entries": {
+    "SET_FOLIAGE_SEASON": "Cambia stagione del fogliame",
+    "SET_FOLIAGE_SEASON_NOTE": "Cambia la stagione del fogliame della città. Ad esempio, i cespugli fioriscono fuori stagione o gli alberi mostrano uno stato stagionale diverso.",
+    "SET_SEASON": "Imposta stagione",
+    "FOLIAGE_SEASON": "Stagione del fogliame (0-22):",
+    "FOLIAGE_SEASON_SET": "Stagione del fogliame impostata su %d",
+    "FOLIAGE_SEASON_DISABLED": "Stagione del fogliame disattivata",
     "PRETENDO_CODES": "Codici Pretendo",
     "PRETENDO_CODES_NOTE": "Strumenti di rete Pretendo per visualizzare i giocatori connessi e controllare lo stato del registro PIA.",
     "PLAYERS_IN_SESSION": "Giocatori nella sessione (PIA)",

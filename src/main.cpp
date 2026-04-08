@@ -124,8 +124,10 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 		SleepTime();
 
 		ItemSequence::Init();
+
 	//keeps internet connection when menu is opened
-		//InitKeepConnection();
+		InitKeepConnection();
+		menu->OnNewFrame = SendPlayerData;
 
 		Config::SetupLanguage(false);
 	//Load MenuFolders and Entrys (located in MenuCreate.cpp)

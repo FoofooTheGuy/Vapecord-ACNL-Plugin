@@ -481,9 +481,11 @@ namespace CTRPluginFramework {
 		ENVC->Append(CreateEntry(TextID::DAYTIME, Daytime, TextID::DAYTIME_NOTE, MenuEntryId::EnvironmentDaytime));
 		ENVC->Append(CreateEntry(TextID::ALWAYS_AURORA_MOD, auroralights , TextID::ALWAYS_AURORA_MOD_NOTE, MenuEntryId::EnvironmentAlwaysAurora));
 		ENVC->Append(CreateEntry(TextID::UNBREAK_FLOWER, unbreakableflower, TextID::UNBREAK_FLOWER_NOTE, MenuEntryId::EnvironmentUnbreakFlower));
-		MenuEntry *weatherMod = CreateEntry(TextID::WEATHER_MOD, nullptr, Weathermod , TextID::WEATHER_MOD_NOTE, MenuEntryId::EnvironmentWeatherMod);
-		weatherMod->SetSavedValueApplyCallback(WeatherModApplySaved);
-		ENVC->Append(weatherMod);
+		{
+			MenuEntry *weatherMod = CreateEntry(TextID::WEATHER_MOD, nullptr, Weathermod , TextID::WEATHER_MOD_NOTE, MenuEntryId::EnvironmentWeatherMod);
+			weatherMod->SetSavedValueApplyCallback(WeatherModApplySaved);
+			ENVC->Append(weatherMod);
+		}
 		ENVC->Append(CreateEntry(TextID::SEARCH_REPLACE_NAME, nullptr, SearchReplace, TextID::SEARCH_REPLACE_NOTE, MenuEntryId::ExtraSearchReplace)),
 		ENVC->Append(CreateEntry(TextID::REMOVE_MAP_ITEMS_NAME, nullptr, RemoveItemsCheat, TextID::REMOVE_MAP_ITEMS_NOTE, MenuEntryId::ExtraRemoveMapItems)),
 		ENVC->Append(CreateEntry(TextID::WATER_FLOWERS_NAME, nullptr, WaterAllFlowers, TextID::WATER_FLOWERS_NOTE, MenuEntryId::EnvironmentWaterFlowers));
@@ -496,7 +498,11 @@ namespace CTRPluginFramework {
 		ENVC->Append(CreateEntry(TextID::KEEP_GRASS_STATE, KeepGrassState, TextID::KEEP_GRASS_STATE_NOTE, MenuEntryId::EnvironmentKeepGrassState));
 		ENVC->Append(CreateEntry(TextID::BURIED_INSPECTOR, BuriedInspector, TextID::BURIED_INSPECTOR_NOTE, MenuEntryId::EnvironmentBuriedInspector));
 		ENVC->Append(CreateEntry(TextID::ITEMS_DONT_DISSAPPEAR, ItemsDontDissappearOnInvalidPositions, TextID::ITEMS_DONT_DISSAPPEAR_NOTE, MenuEntryId::EnvironmentItemsDontDissapear));
-
+		{
+			MenuEntry *setFoliage = CreateEntry(TextID::SET_FOLIAGE_SEASON, nullptr, SetFoliageSeason, TextID::SET_FOLIAGE_SEASON_NOTE, MenuEntryId::EnvironmentSetFoliageSeason);
+			setFoliage->SetSavedValueApplyCallback(SetFoliageSeasonApplySaved);
+			ENVC->Append(setFoliage);
+		}
 		menu->Append(ENVC);
 
 	//////////////////////

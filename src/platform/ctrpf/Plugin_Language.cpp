@@ -4,6 +4,24 @@
 #include "core/infrastructure/Language.hpp"
 
 namespace CTRPluginFramework {
+	static const char* SystemLanguageToShortName(LanguageId id) {
+		switch (id) {
+			case LanguageId::Japanese:            return "ja";
+			case LanguageId::English:             return "en";
+			case LanguageId::French:              return "fr";
+			case LanguageId::German:              return "de";
+			case LanguageId::Italian:             return "it";
+			case LanguageId::Spanish:             return "es";
+			case LanguageId::ChineseSimplified:   return "zh-CN";
+			case LanguageId::Korean:              return "ko";
+			case LanguageId::ChineseTraditional:  return "zh-TC";
+			case LanguageId::Dutch:               return "nl";
+			case LanguageId::Portugese:           return "pt";
+			case LanguageId::Russian:             return "ru";
+			default:                              return nullptr;
+		}
+	}
+
     void Config::SetupLanguage(bool SetInMenu) {
 		std::string language = "";
 		GetLanguage(language);
@@ -30,27 +48,41 @@ namespace CTRPluginFramework {
 		bool languageExists = std::find(languages.begin(), languages.end(), language) != languages.end();
 
         if(!languageExists || SetInMenu) {
-			std::vector<std::string> values;
-			for (const auto& pair : languages) {
-				values.push_back(pair.fullName);
+			// For first-time users, try to match the 3DS system language
+			if (!languageExists && !SetInMenu) {
+				const char* sysLang = SystemLanguageToShortName(System::GetSystemLanguage());
+				if (sysLang && std::find(languages.begin(), languages.end(), std::string(sysLang)) != languages.end()) {
+					language = sysLang;
+
+					if (SetLanguage(language)) {
+						languageExists = true;
+					}
+				}
 			}
 
-            Keyboard keyboard("Which language do you want to use?", values);
-			keyboard.CanAbort(SetInMenu);
+			if (!languageExists || SetInMenu) {
+				std::vector<std::string> values;
+				for (const auto& pair : languages) {
+					values.push_back(pair.fullName);
+				}
 
-			int sel = keyboard.Open();
-			if (sel < 0) {
-				return;
-			}
+				Keyboard keyboard("Which language do you want to use?", values);
+				keyboard.CanAbort(SetInMenu);
 
-			if (sel < (int)languages.size()) {
-            	language = languages[sel].shortName;
-			}
+				int sel = keyboard.Open();
+				if (sel < 0) {
+					return;
+				}
 
-			if (!SetLanguage(language)) { //write language mode to file
-				MessageBox(Utils::Format("Error 608\nCouldn't save chosen language.\nGet more info and help on the Discord Server: %s", DISCORDINV)).SetClear(ClearScreen::Top)();
+				if (sel < (int)languages.size()) {
+					language = languages[sel].shortName;
+				}
+
+				if (!SetLanguage(language)) {
+					MessageBox(Utils::Format("Error 608\nCouldn't save chosen language.\nGet more info and help on the Discord Server: %s", DISCORDINV)).SetClear(ClearScreen::Top)();
+				}
+				languageExists = true;
 			}
-			languageExists = true;
         }
 
 		if (!languageExists || !Language::getInstance()->loadFromBinary(PATH_LANGUAGE_BIN, language.c_str())) {

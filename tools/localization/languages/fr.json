@@ -1,6 +1,12 @@
 {
   "name": "Français",
   "entries": {
+    "SET_FOLIAGE_SEASON": "Changer la saison du feuillage",
+    "SET_FOLIAGE_SEASON_NOTE": "Change la saison du feuillage de la ville. Cela permet par exemple aux buissons de fleurir hors saison ou aux arbres d'afficher un état saisonnier différent.",
+    "SET_SEASON": "Définir la saison",
+    "FOLIAGE_SEASON": "Saison du feuillage (0-22) :",
+    "FOLIAGE_SEASON_SET": "Saison du feuillage définie sur %d",
+    "FOLIAGE_SEASON_DISABLED": "Saison du feuillage désactivée",
     "PRETENDO_CODES": "Codes Pretendo",
     "PRETENDO_CODES_NOTE": "Outils réseau Pretendo pour voir les joueurs connectés et vérifier l'état du journal PIA.",
     "PLAYERS_IN_SESSION": "Joueurs dans la session (PIA)",

@@ -178,6 +178,8 @@ namespace CTRPluginFramework {
 	void KeepGrassState(MenuEntry *entry);
 	void BuriedInspector(MenuEntry *entry);
 	void ItemsDontDissappearOnInvalidPositions(MenuEntry *entry);
+	void SetFoliageSeason(MenuEntry *entry);
+	void SetFoliageSeasonApplySaved(MenuEntry *entry, u32 savedValue);
 
 //Extra Codes
 	//Chat Codes

@@ -412,7 +412,237 @@ namespace CTRPluginFramework {
 		}
 	}
 
+	namespace {
+		struct Date {
+			u8 day;
+			u8 month;
+		};
+
+		struct DateRange {
+			Date start;
+			Date end;
+		};
+
+		struct SeasonPeriod {
+			DateRange range;
+			u8 id;
+		};
+
+		static constexpr SeasonPeriod SeasonCalendar[] = {
+			{ {{ 1,  1}, {15,  1}}, 0x00 }, //01.01 - 15.01
+			{ {{16,  1}, {18,  2}}, 0x01 }, //16.01 - 18.02
+			{ {{19,  2}, {24,  2}}, 0x02 }, //19.02 - 24.02
+			{ {{25,  2}, {31,  3}}, 0x03 }, //25.02 - 31.03
+			{ {{ 1,  4}, { 5,  4}}, 0x04 }, //01.04 - 05.04
+			{ {{ 6,  4}, {10,  4}}, 0x05 }, //06.04 - 10.04
+			{ {{11,  4}, {14,  4}}, 0x06 }, //11.04 - 14.04
+			{ {{15,  4}, { 7,  6}}, 0x07 }, //15.04 - 07.06
+			{ {{ 8,  6}, {15,  6}}, 0x08 }, //08.06 - 15.06
+			{ {{16,  6}, {27,  6}}, 0x09 }, //16.06 - 27.06
+			{ {{28,  6}, { 5,  7}}, 0x0A }, //28.06 - 05.07
+			{ {{ 6,  7}, {23,  7}}, 0x0B }, //06.07 - 23.07
+			{ {{24,  7}, { 7,  9}}, 0x0C }, //24.07 - 07.09
+			{ {{ 8,  9}, {15,  9}}, 0x0D }, //08.09 - 15.09
+			{ {{16,  9}, {16, 10}}, 0x0E }, //16.09 - 16.10
+			{ {{17, 10}, {24, 10}}, 0x0F }, //17.10 - 24.10
+			{ {{25, 10}, { 1, 11}}, 0x10 }, //25.10 - 01.11
+			{ {{ 2, 11}, { 9, 11}}, 0x11 }, //02.11 - 09.11
+			{ {{10, 11}, {17, 11}}, 0x12 }, //10.11 - 17.11
+			{ {{18, 11}, {25, 11}}, 0x13 }, //18.11 - 25.11
+			{ {{26, 11}, {30, 11}}, 0x14 }, //26.11 - 30.11
+			{ {{ 1, 12}, {10, 12}}, 0x15 }, //01.12 - 10.12
+			{ {{11, 12}, {31, 12}}, 0x16 }, //11.12 - 31.12
+		};
+
+		// Issue: bumping into bushes shows wrong model when snowy
+		// Snowy (seasons 0x16, 0-2) are the same for all foliage
+		struct FoliageBushInfo {
+			u16 itemID;
+			u8  flowerSeason;
+			u8  bloomCount;
+			u8  blooms[7];
+		};
+
+		static constexpr u8 SEASON_COUNT = 23;
+		static constexpr u8 SnowSeasons[] = { 0x16, 0x00, 0x01, 0x02 };
+
+		static constexpr FoliageBushInfo FoliageData[] = {
+			{ 0x0085, 0x05, 3, { 0x06, 0x07, 0x08 } },                         // pink azalea
+			{ 0x0088, 0x05, 3, { 0x06, 0x07, 0x08 } },                         // white azalea
+			{ 0x008B, 0x08, 2, { 0x09, 0x0A } },                               // blue hydrangea
+			{ 0x008E, 0x08, 2, { 0x09, 0x0A } },                               // pink hydrangea
+			{ 0x0091, 0x0A, 3, { 0x0B, 0x0C, 0x0D } },                         // red hibiscus
+			{ 0x0094, 0x0A, 3, { 0x0B, 0x0C, 0x0D } },                         // yellow hibiscus
+			{ 0x0097, 0x0D, 7, { 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14 } }, // sweet olive
+			{ 0x0082, 0x14, 2, { 0x15, 0x03 } },       						   // holly
+		};
+
+		enum class FoliageState : u8 { 
+			Flower, 
+			Bloom, 
+			Default, 
+			Snowy 
+		};
+
+		static bool isSeasonSnowy(u8 season) {
+			for(u8 s : SnowSeasons) {
+				if(season == s) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		static FoliageState GetFoliageState(const FoliageBushInfo &info, u8 season) {
+			if (isSeasonSnowy(season)) {
+				return FoliageState::Snowy;
+			}
+
+			if(season == info.flowerSeason) {
+				return FoliageState::Flower;
+			}
+
+			for(u8 i = 0; i < info.bloomCount; ++i) {
+				if(season == info.blooms[i]) {
+					return FoliageState::Bloom;
+				}
+			}
+
+			return FoliageState::Default;
+		}
+
+		static void OnFoliageSeasonChanged(Keyboard &kb, KeyboardEvent &event) {
+			if(event.type != KeyboardEvent::CharacterAdded) {
+				return;
+			}
+
+			u32 season = std::strtoul(kb.GetInput().c_str(), nullptr, 10);
+			if(season >= SEASON_COUNT) {
+				return;
+			}
+
+			static const std::string stateIcons[] = {
+				Color(0xFF69B4FF) << "Flower",
+				Color(pGreen) << "Bloom",
+				Color(pYellow) << "Default",
+				Color(pBlue) << "Snowy",
+			};
+
+			std::string msg = "Season " + std::to_string(season) + ":\n";
+			for(u8 i = 0; i < sizeof(FoliageData) / sizeof(FoliageData[0]); ++i) {
+				FoliageState state = GetFoliageState(FoliageData[i], static_cast<u8>(season));
+				Item item = { FoliageData[i].itemID, 0 };
+				msg += item.GetName();
+				msg += " : ";
+				msg += stateIcons[static_cast<u8>(state)];
+				msg += ResetColor();
+				msg += "\n";
+			}
+
+			msg.pop_back(); //remove last newline
+			msg += HorizontalSeparator();
+
+			{
+				//Special extra case for trees since they don't follow the same pattern as bushes
+				std::string state = Color(pYellow) << "Default";
+
+				if (isSeasonSnowy(season)) {
+					state = Color(pBlue) << "Snowy";
+				}
+				else if (season == 0x04 || season == 0x05) {
+					state = Color(0xFFB7C5FF) << "Cherry Blossoms";
+				}
+				
+				Item item = { 0x0026, 0 }; //tree
+				msg += item.GetName();
+				msg += " : ";
+				msg += state;
+				msg += ResetColor();
+				msg += "\n";
+			}
+
+			kb.GetMessage() = msg;
+		}
+
+		static void ApplyFoliageSeason(u32 season) {
+			static Address foliagePatch(0x59ABEC);
+			static Address setBushSnowy(0x5A36C8);
+			static Address setTreeSnowyWhenShaken(0x593EB4);
+			static Address setTreeAndBushSnowyWhenBumped(0x593CE4);
+
+			if(season >= SEASON_COUNT) {
+				foliagePatch.Unpatch();
+				setBushSnowy.Unpatch();
+				setTreeSnowyWhenShaken.Unpatch();
+				setTreeAndBushSnowyWhenBumped.Unpatch();
+				return;
+			}
+
+			foliagePatch.Patch(0xE3A08000 | season);
+
+			//If season is snowy, we patch this here so bumping trees/bushes shows the correct snowy models and particles
+			if(isSeasonSnowy(season)) {
+				setBushSnowy.Patch(0xE3A00001);
+				setTreeSnowyWhenShaken.Patch(0xE3A00001);
+				setTreeAndBushSnowyWhenBumped.Patch(0xE3A00001);
+			} else {
+				setBushSnowy.Unpatch();
+				setTreeSnowyWhenShaken.Unpatch();
+				setTreeAndBushSnowyWhenBumped.Unpatch();
+			}
+		}
+	};
+
+	void SetFoliageSeasonApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		ApplyFoliageSeason(savedValue);
+	}
+
 	void SetFoliageSeason(MenuEntry *entry) {
-		//TODO, implement it
+		static Address foliagePatch(0x59ABEC);
+
+		const bool isActive = *(u32 *)foliagePatch.addr != foliagePatch.origVal;
+
+		std::vector<std::string> options = {
+			(isActive ? Color(pGreen) : Color(pRed)) << Language::getInstance()->get(TextID::SET_SEASON),
+			(isActive ? Color(pRed) : Color(pGreen)) << Language::getInstance()->get(TextID::VECTOR_DISABLE)
+		};
+
+		Keyboard optKb(Language::getInstance()->get(TextID::KEY_CHOOSE_OPTION), options);
+		switch(optKb.Open()) {
+			case 0: {
+				u32 currentSeason = 0;
+				u32 currentInstr = *(u32 *)foliagePatch.addr;
+				if(isActive && (currentInstr & 0xFFFFFF00) == 0xE3A08000) {
+					currentSeason = currentInstr & 0xFF;
+				}
+
+				Keyboard kb(Language::getInstance()->get(TextID::FOLIAGE_SEASON));
+				kb.SetSlider(0, SEASON_COUNT-1, 1);
+				kb.IsHexadecimal(false);
+				kb.OnKeyboardEvent(OnFoliageSeasonChanged);
+
+				KeyboardEvent event{};
+				event.type = KeyboardEvent::CharacterAdded;
+				kb.GetInput() = std::to_string(currentSeason);
+				kb.ForceEvent(event);
+
+				u32 value = currentSeason;
+				if(kb.Open(value, value) < 0) {
+					return;
+				}
+
+				ApplyFoliageSeason(value);
+				entry->SetSavedValue(value);
+				MessageBox(Utils::Format(Language::getInstance()->get(TextID::FOLIAGE_SEASON_SET).c_str(), value))();
+				break;
+			}
+			case 1:
+				ApplyFoliageSeason(SEASON_COUNT+1);
+				MessageBox(Language::getInstance()->get(TextID::FOLIAGE_SEASON_DISABLED))();
+				break;
+			default:
+				break;
+		}
 	}
 }

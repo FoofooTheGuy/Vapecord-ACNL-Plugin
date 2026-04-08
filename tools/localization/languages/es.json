@@ -1,6 +1,12 @@
 {
   "name": "Español",
   "entries": {
+    "SET_FOLIAGE_SEASON": "Cambiar estación del follaje",
+    "SET_FOLIAGE_SEASON_NOTE": "Cambia la estación del follaje del pueblo. Esto hace que los arbustos florezcan fuera de temporada, por ejemplo, o que los árboles muestren un estado estacional diferente.",
+    "SET_SEASON": "Establecer estación",
+    "FOLIAGE_SEASON": "Estación del follaje (0-22):",
+    "FOLIAGE_SEASON_SET": "Estación del follaje establecida en %d",
+    "FOLIAGE_SEASON_DISABLED": "Estación del follaje desactivada",
     "PRETENDO_CODES": "Códigos Pretendo",
     "PRETENDO_CODES_NOTE": "Herramientas de red Pretendo para ver jugadores conectados y comprobar el estado del registro PIA.",
     "PLAYERS_IN_SESSION": "Jugadores en la sesión (PIA)",

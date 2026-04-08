@@ -1,6 +1,12 @@
 {
   "name": "简体中文",
   "entries": {
+    "SET_FOLIAGE_SEASON": "更改植被季节",
+    "SET_FOLIAGE_SEASON_NOTE": "更改小镇植被的季节。例如让灌木在非当季开花，或让树木显示不同的季节状态。",
+    "SET_SEASON": "设置季节",
+    "FOLIAGE_SEASON": "植被季节 (0-22):",
+    "FOLIAGE_SEASON_SET": "植被季节已设为 %d",
+    "FOLIAGE_SEASON_DISABLED": "植被季节已禁用",
     "PRETENDO_CODES": "Pretendo 代码",
     "PRETENDO_CODES_NOTE": "Pretendo网络工具，用于查看已连接的玩家和检查PIA日志状态。",
     "PLAYERS_IN_SESSION": "会话中的玩家 (PIA)",

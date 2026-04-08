@@ -127,7 +127,7 @@ namespace CTRPluginFramework {
 				KeyboardEvent event{};
 				event.type = KeyboardEvent::SelectionChanged;
 				event.selectedIndex = 0;
-				options.onSelectionChange(kb, event);
+				kb.ForceEvent(event);
 			}
 
 			int choice = kb.Open();
@@ -159,7 +159,7 @@ namespace CTRPluginFramework {
 					KeyboardEvent event{};
 					event.type = KeyboardEvent::SelectionChanged;
 					event.selectedIndex = 0;
-					options.onSelectionChange(kb, event);
+					kb.ForceEvent(event);
 				}
 				choice = kb.Open();
 				if (choice < 0)

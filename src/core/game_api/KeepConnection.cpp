@@ -147,32 +147,73 @@ namespace CTRPluginFramework {
 		Address(startFunc).Call<void>(threadfunc, threadargs);
 	}
 
-    void SendPlayerData/*0x1B6C28*/(Time time) { //needs to be set into OnNewFrame callback
+	bool userWantsToLeave() {
+		static Address usersWhoWantToLeave(0x94EE0C);
+		return *(u8 *)usersWhoWantToLeave.addr > 0;
+	}
+
+	//0x1B6C28
+    void SendPlayerData(Time time) { //needs to be set into OnNewFrame callback
+		{
+			if (userWantsToLeave()) {
+				PluginMenu *menu = PluginMenu::GetRunningInstance();
+				if (menu != nullptr) {
+					if (menu->IsOpen()) {
+						OSD::NotifySysFont("A player wants to leave the island! Closing menu...", Color::Purple);
+						menu->ForceClose();
+						return;
+					}
+				}
+			}
+		}
+		
 		if(Game::GetOnlinePlayerCount() <= 1 || PluginMenu::GetRunningInstance() == nullptr) {
 			return;
 		}
 
-		//0x1B6C28.Call<void>();
-		//return;
+		static Address netGameMgrHandleReceiveData(0x617D20);
+		static Address netGameMgrs_pInstance(0x954648);
+		static Address netGameMgrProcess(0x618024);
 
-		static Address sendData1(0x617D20);
-		static Address sendData2(0x60758C);
-		static Address sendData3(0x618024);
+		static Address s_SkipProcesses = Address(0x95D3F4).MoveOffset(-4);
 
-		static Address getData1(0x5204DC);
-		static Address getData2(0x520C98);
+		u32 pInstance = *(u32 *)netGameMgrs_pInstance.addr;
+		bool skipProcesses = *(bool *)(s_SkipProcesses.addr);
 
-		sendData1.Call<void>(*(u32 *)Address(0x954648).addr);
+		netGameMgrHandleReceiveData.Call<void>(pInstance);
 
-		if(*(u8 *)(Address(0x95D3F4).addr-4) == 0) {
-			u32 uVar3 = getData1.Call<u32>();
-			int iVar2 = getData2.Call<int>(uVar3, 2);
-			if(iVar2 == 0) {
-				sendData2.Call<void>();
-			}
-
-			sendData3.Call<void>(*(u32 *)Address(0x954648).addr);
+		if(!skipProcesses) {
+			netGameMgrProcess.Call<void>(pInstance);
 		}
+	}
+
+	/*
+	Thanks to nico for this research info:
+
+	User Joins: 0x62b2bc
+
+	0x94ee0c bit field of users who want to leave
+	0x94ee0b user who is allowed to leave next
+	Both gets set in 0x32d2c4 and used in 0x28335c
+
+	users who leave with talking to the npc calls function 0x282f8c
+
+	TODO:
+	show chat messages in plugin while paused
+	*/
+
+	//0x62b2bc
+	void UserJoinsHook(u32 u0, u32 *u1, u32 u2, u32 u3, u32 u4) {
+		PluginMenu *menu = PluginMenu::GetRunningInstance();
+		if (menu != nullptr) {
+			if (menu->IsOpen()) {
+				OSD::NotifySysFont("A player wants to join the island! Closing menu...", Color::Purple);
+				menu->ForceClose();
+			}
+		}
+
+		HookContext& ctx = HookContext::GetCurrent();
+		ctx.OriginalFunction<void, u32, u32*, u32, u32, u32>(u0, u1, u2, u3, u4);
 	}
 
     void InitKeepConnection(void) {
@@ -182,6 +223,10 @@ namespace CTRPluginFramework {
 		onlineThreadHook.Initialize(threadBeginAddress.addr, (u32)PatchThreadBegin);
 		onlineThreadHook.SetFlags(USE_LR_TO_RETURN);
 		onlineThreadHook.Enable();
+
+		static Hook userJoinsHook;
+		userJoinsHook.InitializeForMitm(0x62B2BC, (u32)UserJoinsHook);
+		userJoinsHook.Enable();
 		
 		Process::OnPauseResume = [](bool goingToPause) {
 			keepConnectionInCTRPF(goingToPause);

@@ -53,12 +53,16 @@ namespace CTRPluginFramework {
         svcCloseHandle(processHandle);
     }
 
+    void PerformAutoSaveBackup(void);
+
 //FwkSettings Patch Process/Gets called even if the game is not supported
 	void PatchProcess(FwkSettings &settings) {
 		ToggleTouchscreenForceOn();
 		settings.ThreadPriority = 0x30;
 
 		settings.CachedDrawMode = true;
+
+        settings.SaveBackupCallback = PerformAutoSaveBackup;
 
     //This hopefully fixes issues with wumiibo on old 3ds'
         if (!System::IsNew3DS()) {

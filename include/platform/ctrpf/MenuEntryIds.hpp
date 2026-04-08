@@ -180,6 +180,7 @@ namespace CTRPluginFramework {
 		constexpr u32 EnvironmentKeepGrassState = Make(GroupEnvironment, 0x0008);
 		constexpr u32 EnvironmentBuriedInspector = Make(GroupEnvironment, 0x0009);
 		constexpr u32 EnvironmentItemsDontDissapear = Make(GroupEnvironment, 0x000A);
+		constexpr u32 EnvironmentSetFoliageSeason = Make(GroupEnvironment, 0x000B);
 
 		// Chat subfolder
 		constexpr u32 ChatDontDissapear = Make(GroupChat, 0x0001);

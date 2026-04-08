@@ -1,6 +1,12 @@
 {
   "name": "日本語",
   "entries": {
+    "SET_FOLIAGE_SEASON": "葉の季節を変更",
+    "SET_FOLIAGE_SEASON_NOTE": "村の植物の季節を変更します。例えば、季節外れに低木を開花させたり、木を別の季節の状態にすることができます。",
+    "SET_SEASON": "季節を設定",
+    "FOLIAGE_SEASON": "葉の季節 (0-22):",
+    "FOLIAGE_SEASON_SET": "葉の季節を %d に設定しました",
+    "FOLIAGE_SEASON_DISABLED": "葉の季節を無効にしました",
     "PRETENDO_CODES": "Pretendoコード",
     "PRETENDO_CODES_NOTE": "接続中のプレイヤーの表示やPIAロガーの状態確認ができるPretendoネットワークツール。",
     "PLAYERS_IN_SESSION": "セッション中のプレイヤー (PIA)",

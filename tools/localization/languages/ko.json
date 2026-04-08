@@ -1,6 +1,12 @@
 {
   "name": "한국어",
   "entries": {
+    "SET_FOLIAGE_SEASON": "단풍 계절 변경",
+    "SET_FOLIAGE_SEASON_NOTE": "마을 식물의 계절을 변경합니다. 예를 들어 덤불이 계절에 맞지 않게 꽃을 피우거나 나무가 다른 계절 상태를 보입니다.",
+    "SET_SEASON": "계절 설정",
+    "FOLIAGE_SEASON": "단풍 계절 (0-22):",
+    "FOLIAGE_SEASON_SET": "단풍 계절을 %d(으)로 설정했습니다",
+    "FOLIAGE_SEASON_DISABLED": "단풍 계절이 비활성화되었습니다",
     "PRETENDO_CODES": "Pretendo 코드",
     "PRETENDO_CODES_NOTE": "연결된 플레이어 확인 및 PIA 로거 상태를 확인할 수 있는 Pretendo 네트워크 도구.",
     "PLAYERS_IN_SESSION": "세션 내 플레이어 (PIA)",
