@@ -218,6 +218,7 @@ namespace CTRPluginFramework {
 
     void InitKeepConnection(void) {
         static Address threadBeginAddress(0x12F3A8);
+		static Address userJoinsAddress(0x62B2BC);
 
         static Hook onlineThreadHook;
 		onlineThreadHook.Initialize(threadBeginAddress.addr, (u32)PatchThreadBegin);
@@ -225,7 +226,7 @@ namespace CTRPluginFramework {
 		onlineThreadHook.Enable();
 
 		static Hook userJoinsHook;
-		userJoinsHook.InitializeForMitm(0x62B2BC, (u32)UserJoinsHook);
+		userJoinsHook.InitializeForMitm(userJoinsAddress.addr, (u32)UserJoinsHook);
 		userJoinsHook.Enable();
 		
 		Process::OnPauseResume = [](bool goingToPause) {

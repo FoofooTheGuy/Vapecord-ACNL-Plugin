@@ -29,7 +29,7 @@ namespace CTRPluginFramework {
 
         void DisableGameKeyboardHooks(void) {
             static Address SetButton1Text(0x193B28);
-            static Address SetButton2Text(0x193B34);
+            static Address SetButton2Text = SetButton1Text.MoveOffset(0xC);
 
             SetButton1Text.Unpatch();
             SetButton2Text.Unpatch();
