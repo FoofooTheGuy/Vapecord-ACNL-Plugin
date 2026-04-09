@@ -95,6 +95,7 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 
 	void InitKeepConnection(void);
 	void LaunchGameKeyboardAsCustomQwerty(Keyboard &keyboard);
+	void PerformAutoSaveBackup(void);
 
 	int	main(void) {
 		std::string region = Address::LoadRegion();
@@ -115,6 +116,11 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 			menu->Run();
 			return 0;
 		}
+
+	//This gets set here and not in the PatchProcess because it should only be set if the game is new leaf
+		FwkSettings &settings = FwkSettings::Get();
+		settings.SaveBackupCallback = PerformAutoSaveBackup;
+		settings.SaveBackupMaxSlots = 3; //3 is currently the default
 
 		EnableAllChecks();
 		EnableAllPatches();

@@ -522,13 +522,13 @@ namespace CTRPluginFramework {
 			}
 
 			static const std::string stateIcons[] = {
-				Color(0xFF69B4FF) << "Flower",
-				Color(pGreen) << "Bloom",
-				Color(pYellow) << "Default",
-				Color(pBlue) << "Snowy",
+				Color(0xFF69B4FF) << Language::getInstance()->get(TextID::SET_FOLIAGE_FLOWERING),
+				Color(pGreen) << Language::getInstance()->get(TextID::SET_FOLIAGE_BLOOM),
+				Color(pYellow) << Language::getInstance()->get(TextID::SET_FOLIAGE_DEFAULT),
+				Color(pBlue) << Language::getInstance()->get(TextID::SET_FOLIAGE_SNOWY),
 			};
 
-			std::string msg = "Season " + std::to_string(season) + ":\n";
+			std::string msg = Language::getInstance()->get(TextID::SET_FOLIAGE_SEASON_X) + std::string(" ") + std::to_string(season) + ":\n";
 			for(u8 i = 0; i < sizeof(FoliageData) / sizeof(FoliageData[0]); ++i) {
 				FoliageState state = GetFoliageState(FoliageData[i], static_cast<u8>(season));
 				Item item = { FoliageData[i].itemID, 0 };
@@ -544,13 +544,13 @@ namespace CTRPluginFramework {
 
 			{
 				//Special extra case for trees since they don't follow the same pattern as bushes
-				std::string state = Color(pYellow) << "Default";
+				std::string state = Color(pYellow) << Language::getInstance()->get(TextID::SET_FOLIAGE_DEFAULT);
 
 				if (isSeasonSnowy(season)) {
-					state = Color(pBlue) << "Snowy";
+					state = Color(pBlue) << Language::getInstance()->get(TextID::SET_FOLIAGE_SNOWY);
 				}
 				else if (season == 0x04 || season == 0x05) {
-					state = Color(0xFFB7C5FF) << "Cherry Blossoms";
+					state = Color(0xFFB7C5FF) << Language::getInstance()->get(TextID::SET_FOLIAGE_CHERRY_BLOSSOM);
 				}
 				
 				Item item = { 0x0026, 0 }; //tree
