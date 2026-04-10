@@ -1,6 +1,10 @@
 {
   "name": "Español",
   "entries": {
+    "KEEP_CONNECTION": "Mantener conexión en menú (Experimental)",
+    "KEEP_CONNECTION_NOTE": "Mantiene la conexión en línea activa\nmientras el menú del plugin está abierto.",
+    "HIDE_DESIGN_OUTFITS": "Ocultar atuendos de diseño",
+    "HIDE_DESIGN_OUTFITS_NOTE": "Evita que los atuendos de diseño\naparezcan en el inventario.",
     "AUTOBACKUP_START": "Copia automática: iniciando...",
     "AUTOBACKUP_PARTIAL": "%s (parcial)",
     "AUTOBACKUP_FAIL": "Copia automática: fallida",
@@ -1027,6 +1031,10 @@
     "FILE_PROMPT": "¿Realmente quieres eliminar?",
     "FILE_RES1": "deleted!",
     "FILE_RES2": "Error\nCouldn't find any files to delete.",
-    "FILE_RES3": "Error\nNo se pudo borrar el archivo."
+    "FILE_RES3": "Error\nNo se pudo borrar el archivo.",
+    "SAVE_REMINDER_SETTINGS": "Recordatorios de guardado",
+    "SAVE_REMINDER_MESSAGE": "Recordatorio: ¡No olvides guardar tu partida! \uE008",
+    "SAVE_REMINDER_INTERVAL": "Intervalo: %d min",
+    "SAVE_REMINDER_INTERVAL_PROMPT": "Introduce el intervalo en minutos (5-120):"
   }
 }

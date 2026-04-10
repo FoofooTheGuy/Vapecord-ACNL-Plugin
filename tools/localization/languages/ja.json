@@ -1,6 +1,10 @@
 {
   "name": "日本語",
   "entries": {
+    "KEEP_CONNECTION": "メニュー内接続維持（実験的）",
+    "KEEP_CONNECTION_NOTE": "プラグインメニューを開いている間も\nオンライン接続を維持します。",
+    "HIDE_DESIGN_OUTFITS": "デザイン服を非表示",
+    "HIDE_DESIGN_OUTFITS_NOTE": "デザインパターンの服が\nインベントリに表示されなくなります。",
     "AUTOBACKUP_START": "自動バックアップ: 開始中...",
     "AUTOBACKUP_PARTIAL": "%s（一部）",
     "AUTOBACKUP_FAIL": "自動バックアップ: 失敗",
@@ -1027,6 +1031,10 @@
     "FILE_PROMPT": "本当に削除しますか？",
     "FILE_RES1": "削除しました。",
     "FILE_RES2": "ファイルが見つかりません。",
-    "FILE_RES3": "エラー\nファイルを削除できませんでした。"
+    "FILE_RES3": "エラー\nファイルを削除できませんでした。",
+    "SAVE_REMINDER_SETTINGS": "セーブリマインダー",
+    "SAVE_REMINDER_MESSAGE": "リマインダー：ゲームのセーブをお忘れなく！ \uE008",
+    "SAVE_REMINDER_INTERVAL": "間隔: %d分",
+    "SAVE_REMINDER_INTERVAL_PROMPT": "間隔を分単位で入力 (5-120):"
   }
 }

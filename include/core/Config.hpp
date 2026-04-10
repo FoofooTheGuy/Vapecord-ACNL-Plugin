@@ -15,6 +15,9 @@ namespace CTRPluginFramework {
 		struct PluginConfig {
 			std::string languageCode;
 			std::string pluginVersion;
+			bool saveReminderEnabled = true;
+			int saveReminderInterval = 25;
+			bool scamWarningShown = false;
 		};
 
 		std::string GetPluginVersionString();
@@ -32,5 +35,13 @@ namespace CTRPluginFramework {
 
 		void DeleteLanguage(void);
 		void SetupLanguage(bool SetInMenu);
+
+		bool GetSaveReminderEnabled(bool &outEnabled);
+		bool SetSaveReminderEnabled(bool enabled);
+		bool GetSaveReminderInterval(int &outInterval);
+		bool SetSaveReminderInterval(int interval);
+
+		bool GetScamWarningShown(bool &outShown);
+		bool SetScamWarningShown(bool shown);
 	};
 }

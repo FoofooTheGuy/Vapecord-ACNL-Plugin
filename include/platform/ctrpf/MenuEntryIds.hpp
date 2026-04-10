@@ -80,6 +80,7 @@ namespace CTRPluginFramework {
 		constexpr u32 InventoryGetSet = Make(GroupInventory, 0x0008);
 		constexpr u32 InventoryCustomButton = Make(GroupInventory, 0x0009);
 		constexpr u32 InventorySearchItem = Make(GroupInventory, 0x000A);
+		constexpr u32 InventoryHideDesignOutfits = Make(GroupInventory, 0x000B);
 
 		// PlayerSave folder
 		constexpr u32 PlayerSaveNameChanger = Make(GroupPlayerSave, 0x0001);
@@ -227,6 +228,7 @@ namespace CTRPluginFramework {
 		constexpr u32 MiscFastTextSpeed = Make(GroupMisc, 0x000A);
 		constexpr u32 MiscFastGameSpeed = Make(GroupMisc, 0x000B);
 		constexpr u32 MiscFastIsabelle = Make(GroupMisc, 0x000C);
+		constexpr u32 MiscKeepConnection = Make(GroupMisc, 0x000D);
 
 		// Default folder
 		constexpr u32 DefaultSeedItemLegit = Make(GroupDefault, 0x0001);

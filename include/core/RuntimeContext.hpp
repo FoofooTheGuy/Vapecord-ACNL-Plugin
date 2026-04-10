@@ -9,6 +9,7 @@ namespace CTRPluginFramework {
             bool v_isTurbo = false;
             bool v_isFov = false;
             bool v_isSaveMenuDisabled = false;
+            bool v_isDesignOutfitsLegit = true; //enabled by default
 
             RuntimeContext() = default;
             static RuntimeContext* instance;
@@ -21,5 +22,7 @@ namespace CTRPluginFramework {
             void setFov(bool value);
             bool isSaveMenuDisabled() const;
             void setSaveMenuDisabled(bool value);
+            bool isDesignOutfitsLegit() const;
+            void setDesignOutfitsLegit(bool value);
     };
 }

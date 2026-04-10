@@ -1,6 +1,10 @@
 {
   "name": "简体中文",
   "entries": {
+    "KEEP_CONNECTION": "菜单内保持连接（实验性）",
+    "KEEP_CONNECTION_NOTE": "在插件菜单打开时\n保持在线连接活跃。",
+    "HIDE_DESIGN_OUTFITS": "隐藏设计服装",
+    "HIDE_DESIGN_OUTFITS_NOTE": "防止设计图案服装\n出现在物品栏中。",
     "AUTOBACKUP_START": "自动备份：启动中...",
     "AUTOBACKUP_PARTIAL": "%s（部分）",
     "AUTOBACKUP_FAIL": "自动备份：失败",
@@ -1027,6 +1031,10 @@
     "FILE_PROMPT": "你真的要删除 %s吗？",
     "FILE_RES1": "%s 已删除!",
     "FILE_RES2": "错误\n找不到任何要删除的文件",
-    "FILE_RES3": "错误\n无法删除文件"
+    "FILE_RES3": "错误\n无法删除文件",
+    "SAVE_REMINDER_SETTINGS": "存档提醒",
+    "SAVE_REMINDER_MESSAGE": "提醒：别忘了保存游戏！ \uE008",
+    "SAVE_REMINDER_INTERVAL": "间隔: %d 分钟",
+    "SAVE_REMINDER_INTERVAL_PROMPT": "请输入间隔分钟数 (5-120):"
   }
 }

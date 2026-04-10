@@ -1,6 +1,10 @@
 {
   "name": "Français",
   "entries": {
+    "KEEP_CONNECTION": "Maintenir la connexion en menu (Expérimental)",
+    "KEEP_CONNECTION_NOTE": "Maintient la connexion en ligne active\nlorsque le menu du plugin est ouvert.",
+    "HIDE_DESIGN_OUTFITS": "Masquer les tenues design",
+    "HIDE_DESIGN_OUTFITS_NOTE": "Empêche les tenues à motifs\nde s'afficher dans l'inventaire.",
     "AUTOBACKUP_START": "Sauvegarde auto : démarrage...",
     "AUTOBACKUP_PARTIAL": "%s (partiel)",
     "AUTOBACKUP_FAIL": "Sauvegarde auto : échec",
@@ -1027,6 +1031,10 @@
     "FILE_PROMPT": "Voulez vous vraiment effacer",
     "FILE_RES1": "effacé!",
     "FILE_RES2": "Aucun fichier trouvé!",
-    "FILE_RES3": "Erreur\nFichier non effacé."
+    "FILE_RES3": "Erreur\nFichier non effacé.",
+    "SAVE_REMINDER_SETTINGS": "Rappels de sauvegarde",
+    "SAVE_REMINDER_MESSAGE": "Rappel : N'oublie pas de sauvegarder ta partie ! \uE008",
+    "SAVE_REMINDER_INTERVAL": "Intervalle : %d min",
+    "SAVE_REMINDER_INTERVAL_PROMPT": "Entre l'intervalle en minutes (5-120) :"
   }
 }

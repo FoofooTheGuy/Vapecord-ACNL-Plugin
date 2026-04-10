@@ -253,6 +253,7 @@ namespace CTRPluginFramework {
 		MenuEntry *customButtonEntry = CreateEntry(TextID::CUSTOM_BUTTON, nullptr, SettingsButton, TextID::CUSTOM_BUTTON_NOTE, MenuEntryId::InventoryCustomButton);
 		customButtonEntry->SetSavedValueApplyCallback(CustomButtonApplySaved);
 		INVC->Append(customButtonEntry);
+		INVC->Append(CreateEntry(TextID::HIDE_DESIGN_OUTFITS, HideDesignOutfits, TextID::HIDE_DESIGN_OUTFITS_NOTE, MenuEntryId::InventoryHideDesignOutfits));
 		menu->Append(INVC);
 
 	///////////////////////
@@ -566,6 +567,11 @@ namespace CTRPluginFramework {
 	/*Misc Codes Folder*/
 	/////////////////////
 		MenuFolder *MISC = CreateFolder(FolderType::Misc);
+		{
+			MenuEntry *keepConnEntry = CreateEntry(TextID::KEEP_CONNECTION, nullptr, KeepConnectionToggle, TextID::KEEP_CONNECTION_NOTE, MenuEntryId::MiscKeepConnection);
+			keepConnEntry->SetSavedValueApplyCallback(KeepConnectionApplySaved);
+			MISC->Append(keepConnEntry);
+		}
 		{
 			MenuEntry *gameTypeEntry = CreateEntry(TextID::GAME_TYPE, nullptr, mgtype, TextID::GAME_TYPE_NOTE, MenuEntryId::MiscGameType);
 			gameTypeEntry->SetSavedValueApplyCallback(GameTypeApplySaved);

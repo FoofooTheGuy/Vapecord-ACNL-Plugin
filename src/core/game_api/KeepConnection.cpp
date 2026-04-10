@@ -13,6 +13,45 @@ Thanks to PabloMK7 for the huge help with the thread loading!
 std::tuple<u32, u32*> onlineThreadsInfo[ONLINETHREADSAMOUNT];
 
 namespace CTRPluginFramework {
+	static bool s_keepConnectionEnabled = false;
+
+	static Hook onlineThreadHook;
+	static Hook userJoinsHook;
+	static bool s_hooksInitialized = false;
+
+	static void InitKeepConnection(void);
+	void keepConnectionInCTRPF(bool runOnline);
+
+	void SetKeepConnectionEnabled(bool enabled) {
+		s_keepConnectionEnabled = enabled;
+
+		if(enabled) {
+			if(!s_hooksInitialized) {
+				InitKeepConnection();
+			}
+			else {
+				onlineThreadHook.Enable();
+				userJoinsHook.Enable();
+			}
+
+			Process::OnPauseResume = [](bool goingToPause) {
+				keepConnectionInCTRPF(goingToPause);
+			};
+		}
+		else {
+			if(s_hooksInitialized) {
+				onlineThreadHook.Disable();
+				userJoinsHook.Disable();
+			}
+
+			Process::OnPauseResume = nullptr;
+		}
+	}
+
+	bool IsKeepConnectionEnabled(void) {
+		return s_keepConnectionEnabled;
+	}
+
     void keepConnectionInCTRPF(bool runOnline) {
 		static bool isRunOnline = false;
 
@@ -154,6 +193,10 @@ namespace CTRPluginFramework {
 
 	//0x1B6C28
     void SendPlayerData(Time time) { //needs to be set into OnNewFrame callback
+		if(!s_keepConnectionEnabled) {
+			return;
+		}
+
 		{
 			if (userWantsToLeave()) {
 				PluginMenu *menu = PluginMenu::GetRunningInstance();
@@ -216,18 +259,18 @@ namespace CTRPluginFramework {
 		ctx.OriginalFunction<void, u32, u32*, u32, u32, u32>(u0, u1, u2, u3, u4);
 	}
 
-    void InitKeepConnection(void) {
+    static void InitKeepConnection(void) {
         static Address threadBeginAddress(0x12F3A8);
 		static Address userJoinsAddress(0x62B2BC);
 
-        static Hook onlineThreadHook;
 		onlineThreadHook.Initialize(threadBeginAddress.addr, (u32)PatchThreadBegin);
 		onlineThreadHook.SetFlags(USE_LR_TO_RETURN);
 		onlineThreadHook.Enable();
 
-		static Hook userJoinsHook;
 		userJoinsHook.InitializeForMitm(userJoinsAddress.addr, (u32)UserJoinsHook);
 		userJoinsHook.Enable();
+
+		s_hooksInitialized = true;
 		
 		Process::OnPauseResume = [](bool goingToPause) {
 			keepConnectionInCTRPF(goingToPause);

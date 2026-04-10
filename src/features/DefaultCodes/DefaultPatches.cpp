@@ -2,6 +2,7 @@
 #include "features/cheats.hpp"
 #include "core/infrastructure/Address.hpp"
 #include "core/infrastructure/PluginUtils.hpp"
+#include "core/RuntimeContext.hpp"
 #include <functional>
 
 namespace CTRPluginFramework {
@@ -33,16 +34,32 @@ namespace CTRPluginFramework {
 	}
 
 	void SeedItemLegitimacy(bool enable) {
+		static Hook isItemLegitHook;
 		static Address skipSeedItemCheck(0x6BAC8C);
 		static Address allItemsLegit = skipSeedItemCheck.MoveOffset(0x14C);
 
+		const auto isItemLegit = +[]() -> bool {
+			register Item* item asm("r4");
+
+			if (!RuntimeContext::getInstance()->isDesignOutfitsLegit()) {
+				if (item->ID >= 0x33A7 && item->ID <= 0x33BB) { //custom pattern items
+					return false;
+				}
+			}
+
+			return true;
+		};
+
 		if(enable) {
 			skipSeedItemCheck.Patch(0xEA000006);
-			allItemsLegit.Patch(0xE3A00001);
+
+			isItemLegitHook.Initialize(allItemsLegit.addr, (u32)isItemLegit);
+			isItemLegitHook.SetFlags(USE_LR_TO_RETURN);
+			isItemLegitHook.Enable();
 		}
 		else {
 			skipSeedItemCheck.Unpatch();
-			allItemsLegit.Unpatch();
+			isItemLegitHook.Disable();
 		}
 	}
 

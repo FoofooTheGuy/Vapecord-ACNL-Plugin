@@ -9,7 +9,8 @@ namespace CTRPluginFramework {
 	void pluginSettingsEntry(MenuEntry *entry) {
 		const std::vector<std::string> settingsOptions = {
 			Language::getInstance()->get(TextID::CHANGE_LANGUAGE),
-			Language::getInstance()->get(TextID::CHANGE_MENU_COLORS)
+			Language::getInstance()->get(TextID::CHANGE_MENU_COLORS),
+			Language::getInstance()->get(TextID::SAVE_REMINDER_SETTINGS)
 		};
 
 		Keyboard keyboard(Language::getInstance()->get(TextID::PLUGIN_SETTINGS), settingsOptions);
@@ -24,6 +25,9 @@ namespace CTRPluginFramework {
 				break;
 			case 1:
 				EditColors();
+				break;
+			case 2:
+				SaveReminderSettings();
 				break;
 			default:
 				break;

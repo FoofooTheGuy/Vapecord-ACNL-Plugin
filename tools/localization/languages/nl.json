@@ -1,6 +1,10 @@
 {
   "name": "Nederlands",
   "entries": {
+    "KEEP_CONNECTION": "Verbinding in menu behouden (Experimenteel)",
+    "KEEP_CONNECTION_NOTE": "Houdt de online verbinding actief\nterwijl het pluginmenu open is.",
+    "HIDE_DESIGN_OUTFITS": "Ontwerp-outfits verbergen",
+    "HIDE_DESIGN_OUTFITS_NOTE": "Voorkomt dat ontwerp-outfits\nin de inventaris verschijnen.",
     "AUTOBACKUP_START": "Auto-backup: starten...",
     "AUTOBACKUP_PARTIAL": "%s (onvolledig)",
     "AUTOBACKUP_FAIL": "Auto-backup: mislukt",
@@ -1027,6 +1031,10 @@
     "FILE_PROMPT": "Wil je %s echt verwijderen?",
     "FILE_RES1": "%s verwijderd!",
     "FILE_RES2": "Fout\nKon geen bestanden vinden om te verwijderen.",
-    "FILE_RES3": "Fout\nKon bestand niet verwijderen."
+    "FILE_RES3": "Fout\nKon bestand niet verwijderen.",
+    "SAVE_REMINDER_SETTINGS": "Opslagherinneringen",
+    "SAVE_REMINDER_MESSAGE": "Herinnering: Vergeet niet je spel op te slaan! \uE008",
+    "SAVE_REMINDER_INTERVAL": "Interval: %d min",
+    "SAVE_REMINDER_INTERVAL_PROMPT": "Voer het interval in minuten in (5-120):"
   }
 }

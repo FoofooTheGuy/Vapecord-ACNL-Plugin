@@ -1,6 +1,10 @@
 {
   "name": "Italiano",
   "entries": {
+    "KEEP_CONNECTION": "Mantieni connessione nel menu (Sperimentale)",
+    "KEEP_CONNECTION_NOTE": "Mantiene la connessione online attiva\nmentre il menu del plugin è aperto.",
+    "HIDE_DESIGN_OUTFITS": "Nascondi abiti con design",
+    "HIDE_DESIGN_OUTFITS_NOTE": "Impedisce la comparsa degli abiti\ncon motivi nell'inventario.",
     "AUTOBACKUP_START": "Backup automatico: avvio...",
     "AUTOBACKUP_PARTIAL": "%s (parziale)",
     "AUTOBACKUP_FAIL": "Backup automatico: fallito",
@@ -1027,6 +1031,10 @@
     "FILE_PROMPT": "Vuoi veramente eliminarlo?",
     "FILE_RES1": "Eliminato!",
     "FILE_RES2": "Nessun file trovato!",
-    "FILE_RES3": "Errore\nImpossibile eliminare il file."
+    "FILE_RES3": "Errore\nImpossibile eliminare il file.",
+    "SAVE_REMINDER_SETTINGS": "Promemoria di salvataggio",
+    "SAVE_REMINDER_MESSAGE": "Promemoria: Non dimenticare di salvare il gioco! \uE008",
+    "SAVE_REMINDER_INTERVAL": "Intervallo: %d min",
+    "SAVE_REMINDER_INTERVAL_PROMPT": "Inserisci l'intervallo in minuti (5-120):"
   }
 }

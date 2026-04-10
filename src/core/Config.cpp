@@ -151,6 +151,15 @@ namespace CTRPluginFramework {
 						else if (key == "config_format") {
 							parsed.hasFormat = _TryParseInt(value, parsed.formatVersion);
 						}
+						else if (key == "save_reminder_enabled") {
+							parsed.config.saveReminderEnabled = (value == "1" || value == "true");
+						}
+						else if (key == "save_reminder_interval") {
+							_TryParseInt(value, parsed.config.saveReminderInterval);
+						}
+						else if (key == "scam_warning_shown") {
+							parsed.config.scamWarningShown = (value == "1" || value == "true");
+						}
 					}
 				}
 
@@ -167,7 +176,10 @@ namespace CTRPluginFramework {
 			return "# Vapecord ACNL Plugin config\n"
 				"config_format=" + std::to_string(CONFIG_FORMAT_VERSION) + "\n"
 				"plugin_version=" + config.pluginVersion + "\n"
-				"language=" + config.languageCode + "\n";
+				"language=" + config.languageCode + "\n"
+				"save_reminder_enabled=" + (config.saveReminderEnabled ? "1" : "0") + "\n"
+				"save_reminder_interval=" + std::to_string(config.saveReminderInterval) + "\n"
+				"scam_warning_shown=" + (config.scamWarningShown ? "1" : "0") + "\n";
 		}
 	}
 
@@ -287,6 +299,60 @@ namespace CTRPluginFramework {
 
 	void Config::DeleteLanguage(void) {
 		File::Remove(_GetConfigPath());
+	}
+
+	bool Config::GetSaveReminderEnabled(bool &outEnabled) {
+		PluginConfig config;
+		if (!ReadConfig(config)) {
+			return false;
+		}
+		outEnabled = config.saveReminderEnabled;
+		return true;
+	}
+
+	bool Config::SetSaveReminderEnabled(bool enabled) {
+		PluginConfig config;
+		if (!ReadConfig(config)) {
+			return false;
+		}
+		config.saveReminderEnabled = enabled;
+		return WriteConfig(config);
+	}
+
+	bool Config::GetSaveReminderInterval(int &outInterval) {
+		PluginConfig config;
+		if (!ReadConfig(config)) {
+			return false;
+		}
+		outInterval = config.saveReminderInterval;
+		return true;
+	}
+
+	bool Config::SetSaveReminderInterval(int interval) {
+		PluginConfig config;
+		if (!ReadConfig(config)) {
+			return false;
+		}
+		config.saveReminderInterval = interval;
+		return WriteConfig(config);
+	}
+
+	bool Config::GetScamWarningShown(bool &outShown) {
+		PluginConfig config;
+		if (!ReadConfig(config)) {
+			return false;
+		}
+		outShown = config.scamWarningShown;
+		return true;
+	}
+
+	bool Config::SetScamWarningShown(bool shown) {
+		PluginConfig config;
+		if (!ReadConfig(config)) {
+			return false;
+		}
+		config.scamWarningShown = shown;
+		return WriteConfig(config);
 	}
 
     void DisableAll() {

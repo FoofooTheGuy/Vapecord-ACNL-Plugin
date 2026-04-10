@@ -93,9 +93,9 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 		OSD::Stop(OSD_SplashScreen);
 	}
 
-	void InitKeepConnection(void);
 	void LaunchGameKeyboardAsCustomQwerty(Keyboard &keyboard);
 	void PerformAutoSaveBackup(void);
+	void ShowAntiScamScreen(void);
 
 	int	main(void) {
 		std::string region = Address::LoadRegion();
@@ -129,13 +129,16 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 
 		SleepTime();
 
+	//Show anti-scam warning on first launch
+		ShowAntiScamScreen();
+
 		ItemSequence::Init();
 
-	//keeps internet connection when menu is opened
-		//InitKeepConnection();
-		//menu->OnNewFrame = SendPlayerData;
+		menu->OnNewFrame = SendPlayerData;
 
 		Config::SetupLanguage(false);
+		InitSaveReminder();
+		
 	//Load MenuFolders and Entrys (located in MenuCreate.cpp)
 		InitMenu(menu);
 		Config::HandleConfigMigration();
@@ -143,6 +146,7 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 	//Load Callbacks
 		menu->OnOpening = SetSeederInfos;
 		menu->Callback(IndoorsSeedItemCheck);
+		menu->Callback(SaveReminderCallback);
 		Process::exceptionCallback = CustomExceptionHandler;
 
 	//Set custom keyboard

@@ -62,6 +62,7 @@ namespace CTRPluginFramework {
 	void SettingsButton(MenuEntry *entry);
 	void CustomButtonApplySaved(MenuEntry *entry, u32 savedValue);
 	void chatt2i(MenuEntry *entry);
+	void HideDesignOutfits(MenuEntry *entry);
 
 //Player Codes Folder
 	//Player Save Codes
@@ -221,6 +222,8 @@ namespace CTRPluginFramework {
 	void fasttalk(MenuEntry *entry);
 	void speedentry(MenuEntry *entry);
 	void fastisabelle(MenuEntry *entry);
+	void KeepConnectionToggle(MenuEntry *entry);
+	void KeepConnectionApplySaved(MenuEntry *entry, u32 savedValue);
 
 //Dev Codes
 	void customdump(MenuEntry *entry);
@@ -284,8 +287,13 @@ namespace CTRPluginFramework {
 
 	void pluginSettingsEntry(MenuEntry *entry);
 
+	void SaveReminderSettings(void);
+	void SaveReminderCallback(void);
+	void InitSaveReminder(void);
+
 //Helper functions
-  //Located in cheats.cpp
 	void SendPlayerData(Time time);
+	void SetKeepConnectionEnabled(bool enabled);
+	bool IsKeepConnectionEnabled(void);
 	bool TryGetFolderInfo(MenuFolder *folder, FolderType &folderType, SubFolder &subFolder);
 }

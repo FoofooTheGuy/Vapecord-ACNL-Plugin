@@ -1,6 +1,10 @@
 {
   "name": "English",
   "entries": {
+    "KEEP_CONNECTION": "Keep Connection In Menu (Experimental)",
+    "KEEP_CONNECTION_NOTE": "Keeps the online connection active\nwhile the plugin menu is open.",
+    "HIDE_DESIGN_OUTFITS": "Hide Design Outfits",
+    "HIDE_DESIGN_OUTFITS_NOTE": "Prevents design pattern outfits\nfrom appearing in inventory.",
     "AUTOBACKUP_START": "Auto-backup: starting...",
     "AUTOBACKUP_PARTIAL": "%s (partial)",
     "AUTOBACKUP_FAIL": "Auto-backup: failed",
@@ -1026,6 +1030,10 @@
     "FILE_PROMPT": "Do you really want to delete %s?",
     "FILE_RES1": "%s deleted!",
     "FILE_RES2": "Error\nCouldn't find any files to delete.",
-    "FILE_RES3": "Error\nCouldn't delete file."
+    "FILE_RES3": "Error\nCouldn't delete file.",
+    "SAVE_REMINDER_SETTINGS": "Save Reminders",
+    "SAVE_REMINDER_MESSAGE": "Reminder: Don't forget to save your game! \uE008",
+    "SAVE_REMINDER_INTERVAL": "Interval: %d min",
+    "SAVE_REMINDER_INTERVAL_PROMPT": "Enter interval in minutes (5-120):"
   }
 }
