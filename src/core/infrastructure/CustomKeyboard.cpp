@@ -71,7 +71,7 @@ namespace CTRPluginFramework {
 
         void EnableGameKeyboardHooks(void) {
             static Address SetButton1Text(0x193B28);
-            static Address SetButton2Text(0x193B34);
+            static Address SetButton2Text = SetButton1Text.MoveOffset(0xC);
             static Address FunctionForSubmit(0x1938BC);
             static Address CancelKeyboard(0x1938A8);
             static Address TypeAddr(0x193B1C);
