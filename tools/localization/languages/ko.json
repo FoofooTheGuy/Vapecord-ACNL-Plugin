@@ -1035,6 +1035,13 @@
     "SAVE_REMINDER_SETTINGS": "저장 알림",
     "SAVE_REMINDER_MESSAGE": "알림: 게임을 저장하는 것을 잊지 마세요! \uE008",
     "SAVE_REMINDER_INTERVAL": "간격: %d분",
-    "SAVE_REMINDER_INTERVAL_PROMPT": "간격을 분 단위로 입력 (5-120):"
+    "SAVE_REMINDER_INTERVAL_PROMPT": "간격을 분 단위로 입력 (5-120):",
+    "SCAM_TITLE": "! 중요 안내 !",
+    "SCAM_BODY1": "이 플러그인은 무료이며 오픈 소스입니다. 단독으로든 번들의 일부로든 판매해서는 안 됩니다.",
+    "SCAM_BODY2": "이 플러그인에 대해 비용을 지불했거나 유료 번들의 일부로 받았다면, 사기를 당한 것입니다. 환불을 요구하세요.",
+    "SCAM_CONTINUE": "\uE000 을 눌러 계속",
+    "SCAM_SUBTITLE": "무료 \u2022 오픈 소스",
+    "KEEP_CONN_PLAYER_LEAVING": "플레이어가 섬을 떠나려고 합니다! 메뉴를 닫습니다...",
+    "KEEP_CONN_PLAYER_JOINING": "플레이어가 섬에 참가하려고 합니다! 메뉴를 닫습니다..."
   }
 }

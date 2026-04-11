@@ -34,10 +34,10 @@ for lang, entries in languages.items():
         offsets.append(len(blob))
         blob += text.encode("utf-8") + b"\0"
 
-    # Header for each Language-Block: [count u16][offset u16*count][blob]
+    # Header for each Language-Block: [count u16][offset u32*count][blob]
     block = struct.pack("<H", len(master_keys))
     for off in offsets:
-        block += struct.pack("<H", off)  # NUR Offset
+        block += struct.pack("<I", off)  # only Offset
     block += blob
     language_blocks[lang] = block
 

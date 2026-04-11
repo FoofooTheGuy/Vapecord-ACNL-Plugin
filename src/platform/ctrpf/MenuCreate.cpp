@@ -649,23 +649,27 @@ namespace CTRPluginFramework {
 	///////////////////
 	/*Pretendo Folder*/
 	///////////////////
-		MenuFolder *PRET = CreateFolder(FolderType::Pretendo);
+		//MenuFolder *PRET = CreateFolder(FolderType::Pretendo);
 	////////////////////////////////
 	/*Players In Session SubFolder*/
 	////////////////////////////////
+	/*
 		if (getPiaLoggerStatus() == PatternStatus::Active) {
 			MenuFolder *PLAYSESS = CreateFolder(FolderType::Pretendo, SubFolder::PlayersInSession);
 			PLAYSESS->OnAction = onPiaPlayersFolderAction;
 			PRET->Append(PLAYSESS);
 		}
+	*/
 	////////////////////////////////
 	/*PIA logger Options SubFolder*/
 	////////////////////////////////
+	/*
 		MenuFolder *PIALOG = CreateFolder(FolderType::Pretendo, SubFolder::PIALoggerOptions);
 	    PIALOG->OnAction = onPiaLoggerOptionsFolderAction;
 		PRET->Append(PIALOG);
 
 		menu->Append(PRET);
+	*/
 	}
 }
 

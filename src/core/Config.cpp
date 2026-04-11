@@ -5,7 +5,7 @@
 
 namespace CTRPluginFramework {
 	namespace {
-		constexpr int CONFIG_FORMAT_VERSION = 1;
+		constexpr int CONFIG_FORMAT_VERSION = 2;
 
 		static std::string _GetConfigPath() {
 			return Utils::Format(PATH_PLUGIN_CONFIG, Address::regionName.c_str());
@@ -119,6 +119,7 @@ namespace CTRPluginFramework {
 			int formatVersion = 0;
 			bool hasLanguage = false;
 			bool hasPluginVersion = false;
+			bool hasSaveReminder = false;
 		};
 
 		static ParsedConfig _ParseConfig(const std::string &content) {
@@ -153,9 +154,11 @@ namespace CTRPluginFramework {
 						}
 						else if (key == "save_reminder_enabled") {
 							parsed.config.saveReminderEnabled = (value == "1" || value == "true");
+							parsed.hasSaveReminder = true;
 						}
 						else if (key == "save_reminder_interval") {
 							_TryParseInt(value, parsed.config.saveReminderInterval);
+							parsed.hasSaveReminder = true;
 						}
 						else if (key == "scam_warning_shown") {
 							parsed.config.scamWarningShown = (value == "1" || value == "true");
@@ -272,6 +275,9 @@ namespace CTRPluginFramework {
 		PluginConfig merged;
 		merged.languageCode = parsed.hasLanguage ? parsed.config.languageCode : "";
 		merged.pluginVersion = GetPluginVersionString();
+		merged.scamWarningShown = false;
+		merged.saveReminderEnabled = parsed.hasSaveReminder ? parsed.config.saveReminderEnabled : true;
+		merged.saveReminderInterval = parsed.hasSaveReminder ? parsed.config.saveReminderInterval : 25;
 
 		return WriteConfig(merged);
 	}
@@ -355,32 +361,8 @@ namespace CTRPluginFramework {
 		return WriteConfig(config);
 	}
 
-    void DisableAll() {
-        PluginMenu *menu = PluginMenu::GetRunningInstance();
-		if (menu) {
-			for (MenuFolder *folder : menu->GetFolderList()) {
-                if (!folder->GetFolderList().empty()) {
-                    for (MenuFolder *subFolder : folder->GetFolderList()) {
-                        for (MenuEntry *entry : folder->GetEntryList()) {
-                            entry->Disable();
-                        }
-                    }
-                }
-
-				for (MenuEntry *entry : folder->GetEntryList()) {
-                    entry->Disable();
-                }
-            }
-
-            for (MenuEntry *entry : menu->GetEntryList()) {
-                entry->Disable();
-            }
-		}
-    }
-
     void Config::HandleConfigMigration() {
 		if (IsConfigOutdated()) {
-			DisableAll();
 			UpdateConfig();
             OSD::NotifySysFont("Plugin configuration was migrated", Color::Purple);
 		}

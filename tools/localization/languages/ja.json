@@ -1035,6 +1035,13 @@
     "SAVE_REMINDER_SETTINGS": "セーブリマインダー",
     "SAVE_REMINDER_MESSAGE": "リマインダー：ゲームのセーブをお忘れなく！ \uE008",
     "SAVE_REMINDER_INTERVAL": "間隔: %d分",
-    "SAVE_REMINDER_INTERVAL_PROMPT": "間隔を分単位で入力 (5-120):"
+    "SAVE_REMINDER_INTERVAL_PROMPT": "間隔を分単位で入力 (5-120):",
+    "SCAM_TITLE": "！ 重要なお知らせ ！",
+    "SCAM_BODY1": "このプラグインは無料かつオープンソースです。単体でもセットの一部としても販売してはいけません。",
+    "SCAM_BODY2": "このプラグインにお金を払った、または有料セットの一部として受け取った場合、あなたは詐欺に遭っています。返金を要求してください。",
+    "SCAM_CONTINUE": "\uE000 で続行",
+    "SCAM_SUBTITLE": "無料 \u2022 オープンソース",
+    "KEEP_CONN_PLAYER_LEAVING": "プレイヤーが島を離れたいです！メニューを閉じます...",
+    "KEEP_CONN_PLAYER_JOINING": "プレイヤーが島に参加したいです！メニューを閉じます..."
   }
 }

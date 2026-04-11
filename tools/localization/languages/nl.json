@@ -1035,6 +1035,13 @@
     "SAVE_REMINDER_SETTINGS": "Opslagherinneringen",
     "SAVE_REMINDER_MESSAGE": "Herinnering: Vergeet niet je spel op te slaan! \uE008",
     "SAVE_REMINDER_INTERVAL": "Interval: %d min",
-    "SAVE_REMINDER_INTERVAL_PROMPT": "Voer het interval in minuten in (5-120):"
+    "SAVE_REMINDER_INTERVAL_PROMPT": "Voer het interval in minuten in (5-120):",
+    "SCAM_TITLE": "! Belangrijke mededeling !",
+    "SCAM_BODY1": "Deze plugin is gratis en open-source. Het mag niet worden verkocht, niet alleen en niet als onderdeel van een bundel.",
+    "SCAM_BODY2": "Als je hebt betaald voor deze plugin of het hebt ontvangen als onderdeel van een betaalde bundel, ben je opgelicht. Eis je geld terug.",
+    "SCAM_CONTINUE": "Druk op \uE000 om door te gaan",
+    "SCAM_SUBTITLE": "Gratis \u2022 Open Source",
+    "KEEP_CONN_PLAYER_LEAVING": "Een speler wil het eiland verlaten! Menu wordt gesloten...",
+    "KEEP_CONN_PLAYER_JOINING": "Een speler wil het eiland betreden! Menu wordt gesloten..."
   }
 }

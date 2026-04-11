@@ -2,6 +2,7 @@
 
 #include "core/game_api/Game.hpp"
 #include "core/infrastructure/Address.hpp"
+#include "core/infrastructure/Language.hpp"
 
 /*
 Thanks to PabloMK7 for the huge help with the thread loading!
@@ -202,8 +203,11 @@ namespace CTRPluginFramework {
 				PluginMenu *menu = PluginMenu::GetRunningInstance();
 				if (menu != nullptr) {
 					if (menu->IsOpen()) {
-						OSD::NotifySysFont("A player wants to leave the island! Closing menu...", Color::Purple);
+						OSD::NotifySysFont(Language::getInstance()->get(TextID::KEEP_CONN_PLAYER_LEAVING), Color::Purple);
 						menu->ForceClose();
+
+						static Address usersWhoWantToLeave(0x94EE0C);
+						usersWhoWantToLeave.Write<u8>(0); //might cause issues like that, but without it, it could cause a infinite loop
 						return;
 					}
 				}
@@ -250,7 +254,7 @@ namespace CTRPluginFramework {
 		PluginMenu *menu = PluginMenu::GetRunningInstance();
 		if (menu != nullptr) {
 			if (menu->IsOpen()) {
-				OSD::NotifySysFont("A player wants to join the island! Closing menu...", Color::Purple);
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::KEEP_CONN_PLAYER_JOINING), Color::Purple);
 				menu->ForceClose();
 			}
 		}

@@ -1034,6 +1034,13 @@
     "SAVE_REMINDER_SETTINGS": "Save Reminders",
     "SAVE_REMINDER_MESSAGE": "Reminder: Don't forget to save your game! \uE008",
     "SAVE_REMINDER_INTERVAL": "Interval: %d min",
-    "SAVE_REMINDER_INTERVAL_PROMPT": "Enter interval in minutes (5-120):"
+    "SAVE_REMINDER_INTERVAL_PROMPT": "Enter interval in minutes (5-120):",
+    "SCAM_TITLE": "! Important Notice !",
+    "SCAM_BODY1": "This plugin is free and open-source. It must not be sold, neither alone nor as part of a bundle.",
+    "SCAM_BODY2": "If you paid for this plugin or received it as part of a paid bundle, you have been scammed. Demand your money back.",
+    "SCAM_CONTINUE": "Press \uE000 to continue",
+    "SCAM_SUBTITLE": "Free \u2022 Open Source",
+    "KEEP_CONN_PLAYER_LEAVING": "A player wants to leave the island! Closing menu...",
+    "KEEP_CONN_PLAYER_JOINING": "A player wants to join the island! Closing menu..."
   }
 }

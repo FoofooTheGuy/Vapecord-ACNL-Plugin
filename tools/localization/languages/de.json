@@ -1035,6 +1035,13 @@
     "SAVE_REMINDER_SETTINGS": "Speicher-Erinnerungen",
     "SAVE_REMINDER_MESSAGE": "Erinnerung: Vergiss nicht, dein Spiel zu speichern! \uE008",
     "SAVE_REMINDER_INTERVAL": "Intervall: %d Min.",
-    "SAVE_REMINDER_INTERVAL_PROMPT": "Intervall in Minuten eingeben (5-120):"
+    "SAVE_REMINDER_INTERVAL_PROMPT": "Intervall in Minuten eingeben (5-120):",
+    "SCAM_TITLE": "! Wichtiger Hinweis !",
+    "SCAM_BODY1": "Dieses Plugin ist kostenlos und quelloffen. Es darf weder einzeln noch als Teil eines Pakets verkauft werden.",
+    "SCAM_BODY2": "Falls du für dieses Plugin bezahlt hast oder es als Teil eines kostenpflichtigen Pakets erhalten hast, wurdest du betrogen. Fordere dein Geld zurück.",
+    "SCAM_CONTINUE": "Drücke \uE000 zum Fortfahren",
+    "SCAM_SUBTITLE": "Kostenlos \u2022 Open Source",
+    "KEEP_CONN_PLAYER_LEAVING": "Ein Spieler möchte die Insel verlassen! Menü wird geschlossen...",
+    "KEEP_CONN_PLAYER_JOINING": "Ein Spieler möchte die Insel betreten! Menü wird geschlossen..."
   }
 }

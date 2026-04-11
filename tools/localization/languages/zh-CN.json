@@ -1035,6 +1035,13 @@
     "SAVE_REMINDER_SETTINGS": "存档提醒",
     "SAVE_REMINDER_MESSAGE": "提醒：别忘了保存游戏！ \uE008",
     "SAVE_REMINDER_INTERVAL": "间隔: %d 分钟",
-    "SAVE_REMINDER_INTERVAL_PROMPT": "请输入间隔分钟数 (5-120):"
+    "SAVE_REMINDER_INTERVAL_PROMPT": "请输入间隔分钟数 (5-120):",
+    "SCAM_TITLE": "！ 重要通知 ！",
+    "SCAM_BODY1": "此插件免费且开源。不得单独出售，也不得作为捆绑包的一部分出售。",
+    "SCAM_BODY2": "如果您为此插件付费或将其作为付费捆绑包的一部分获得，您已被骗。请要求退款。",
+    "SCAM_CONTINUE": "按 \uE000 继续",
+    "SCAM_SUBTITLE": "免费 \u2022 开源",
+    "KEEP_CONN_PLAYER_LEAVING": "有玩家想离开岛屿！正在关闭菜单...",
+    "KEEP_CONN_PLAYER_JOINING": "有玩家想加入岛屿！正在关闭菜单..."
   }
 }

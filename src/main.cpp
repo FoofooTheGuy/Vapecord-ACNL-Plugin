@@ -125,9 +125,17 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 		EnableAllChecks();
 		EnableAllPatches();
 
-		Config::EnsureConfigFile();
+		if (!Config::EnsureConfigFile()) {
+			OSD::NotifySysFont("Failed to create config file!", Color::Red);
+			menu->Run();
+			return 0;
+		}
+
+		Config::HandleConfigMigration();
 
 		SleepTime();
+
+		Config::SetupLanguage(false);
 
 	//Show anti-scam warning on first launch
 		ShowAntiScamScreen();
@@ -135,13 +143,19 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 		ItemSequence::Init();
 
 		menu->OnNewFrame = SendPlayerData;
-
-		Config::SetupLanguage(false);
 		InitSaveReminder();
-		
+
+	//Patch Pretendo + RCE fix + PIA Logger
+        PatternManager pm;
+		//initPiaLogger(pm);
+        initPretendoPatches(pm);
+
+		pm.Perform();
+
+		enablePretendoPatches();
+
 	//Load MenuFolders and Entrys (located in MenuCreate.cpp)
 		InitMenu(menu);
-		Config::HandleConfigMigration();
 
 	//Load Callbacks
 		menu->OnOpening = SetSeederInfos;
@@ -151,15 +165,6 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 
 	//Set custom keyboard
 		Keyboard::SetCustomQwertyCallback(LaunchGameKeyboardAsCustomQwerty);
-
-	//Patch Pretendo + RCE fix + PIA Logger
-        PatternManager pm;
-		initPiaLogger(pm);
-        initPretendoPatches(pm);
-
-        pm.Perform();
-
-        enablePretendoPatches();
 
 		OSD::NotifySysFont("ACNL Vapecord Plugin ready!");
 	//Run Menu Loop

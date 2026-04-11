@@ -1035,6 +1035,13 @@
     "SAVE_REMINDER_SETTINGS": "Recordatorios de guardado",
     "SAVE_REMINDER_MESSAGE": "Recordatorio: ¡No olvides guardar tu partida! \uE008",
     "SAVE_REMINDER_INTERVAL": "Intervalo: %d min",
-    "SAVE_REMINDER_INTERVAL_PROMPT": "Introduce el intervalo en minutos (5-120):"
+    "SAVE_REMINDER_INTERVAL_PROMPT": "Introduce el intervalo en minutos (5-120):",
+    "SCAM_TITLE": "! Aviso importante !",
+    "SCAM_BODY1": "Este plugin es gratuito y de código abierto. No debe venderse, ni solo ni como parte de un paquete.",
+    "SCAM_BODY2": "Si pagaste por este plugin o lo recibiste como parte de un paquete de pago, has sido estafado. Exige que te devuelvan el dinero.",
+    "SCAM_CONTINUE": "Pulsa \uE000 para continuar",
+    "SCAM_SUBTITLE": "Gratis \u2022 Código abierto",
+    "KEEP_CONN_PLAYER_LEAVING": "¡Un jugador quiere irse de la isla! Cerrando menú...",
+    "KEEP_CONN_PLAYER_JOINING": "¡Un jugador quiere unirse a la isla! Cerrando menú..."
   }
 }
