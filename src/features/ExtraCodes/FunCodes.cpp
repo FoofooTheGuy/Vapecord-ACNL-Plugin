@@ -78,7 +78,7 @@ namespace CTRPluginFramework {
 		for(u32 i = 0; i < kSizeSlotCount; ++i) {
 			const u8 mode = modes[i];
 			if(mode < 3) {
-				GetSizeAddressByIndex(i).WriteFloat(sizes[mode]);
+				GetSizeAddressByIndex(i).Write<float>(sizes[mode]);
 			}
 		}
 	}
@@ -132,9 +132,11 @@ namespace CTRPluginFramework {
 				return;
 			}
 			else if(op2 == 3) {
-				optKb.GetMessage() = Utils::Format(Language::getInstance()->get(TextID::KEY_OPTION_SIZE_CODES_CHOOSE).c_str(), sizeopt[op].c_str());
-				if(optKb.Open(size, size) >= 0) {
-					GetSizeAddressByIndex(op).WriteFloat(size);
+				Keyboard sizeKb(Utils::Format(Language::getInstance()->get(TextID::KEY_OPTION_SIZE_CODES_CHOOSE).c_str(), sizeopt[op].c_str()));
+				sizeKb.SetSlider(0.1, 5.0, 0.1);
+				sizeKb.SetSliderPrecision(1);
+				if(sizeKb.Open(size, size) >= 0) {
+					GetSizeAddressByIndex(op).Write<float>(size);
 
 					u8 modes[kSizeSlotCount] = { 0 };
 					LoadOrCreateSizeModes(entry, modes);
@@ -143,7 +145,7 @@ namespace CTRPluginFramework {
 				}
 			}
 			else {
-				GetSizeAddressByIndex(op).WriteFloat(sizes[op2]);
+				GetSizeAddressByIndex(op).Write<float>(sizes[op2]);
 
 				u8 modes[kSizeSlotCount] = { 0 };
 				LoadOrCreateSizeModes(entry, modes);
@@ -277,9 +279,9 @@ namespace CTRPluginFramework {
 			player->PlayerAppearance.PlayerOutfit.HeldItem.ID = 0x336A;
 			PartyEffect.Patch(PartyEffectID);
 
-			PartySnakeSpeed.WriteFloat(8.0);
-			party2.WriteFloat(2.0);
-			party3.WriteFloat(2.0);
+			PartySnakeSpeed.Write<float>(8.0);
+			party2.Write<float>(2.0);
+			party3.Write<float>(2.0);
 
 			hook1.Enable();
 			hook2.Enable();

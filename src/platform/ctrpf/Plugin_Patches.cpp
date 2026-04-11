@@ -59,6 +59,11 @@ namespace CTRPluginFramework {
 		settings.ThreadPriority = 0x30;
 
 		settings.CachedDrawMode = true;
+
+    //This hopefully fixes issues with wumiibo on old 3ds'
+        if (!System::IsNew3DS()) {
+            settings.UseGameHidMemory = true;
+        }
 	}
 
     void OnExitProcess(void) {

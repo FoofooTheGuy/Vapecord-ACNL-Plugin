@@ -5,6 +5,7 @@
 #include "core/game_api/Inventory.hpp"
 #include "Files.h"
 
+#include <charconv>
 #include <optional>
 #include <span>
 #include <string_view>
@@ -425,29 +426,99 @@ namespace CTRPluginFramework {
 					return {};
 				}
 
-				std::array<char, 0x400> recv;
-				recv.back() = 0;
-				result = httpcReceiveData(&ctx, reinterpret_cast<u8*>(recv.data()), recv.size());
+				std::array<char, 0x400> receivedData;
+				result = httpcReceiveData(&ctx, reinterpret_cast<u8*>(receivedData.data()), receivedData.size());
 				if (R_FAILED(result)) {
 					OSD::Notify(Utils::Format("httpcReceiveData: %08x", result));
 					return {};
 				}
 
 				//if the result structure ever changes, this will break...
-				std::string_view recvView = {recv.data() + 4};
-				size_t len = recvView.find("\",\""sv);
-				if (len == std::string_view::npos) {
+				std::string_view element {receivedData.begin() + 4, receivedData.size()};
+				size_t elementLength = element.find("]],n"sv);
+				if (elementLength == std::string_view::npos) {
 					OSD::Notify("received unexpected data");
 					return {};
 				}
-				recv[len + 4] = 0;
+				element = {element.begin(), elementLength};
+
+				std::string ret;
+				do {
+					static constexpr auto delimiter = "],[\""sv;
+					elementLength = element.find(delimiter);
+
+					size_t stringLength = element.find("\",\""sv);
+					if (stringLength == std::string_view::npos) {
+						OSD::Notify("received unexpected data");
+						return {};
+					}
+					size_t offset = element.data() - receivedData.data();
+					ret.append(element.data(), UnescapeString({receivedData.data() + offset, stringLength}));
+
+					if (elementLength != std::string_view::npos) {
+						element = {element.begin() + elementLength + delimiter.size(), element.end()};
+					}
+				} while (elementLength != std::string_view::npos);
 				error = false;
-				return {recvView.data(), len};
+				return ret;
 			}
 
 			static bool IsBusy() { return ctx.servhandle != 0 || ctx.httphandle != 0; }
 
 		private:
+			static size_t UnescapeString(std::span<char> string) {
+				char* dst = string.data();
+				const char* src = string.data();
+
+				const auto handleSimpleEscape = [&dst, src](size_t index) {
+					constexpr std::string_view escaped = "\"\\bfnrt";
+					constexpr std::string_view unescaped = "\"\\\b\f\n\r\t";
+					for (size_t i = 0; i < escaped.size(); i++) {
+						if (src[index] == escaped[i]) {
+							*dst = unescaped[i];
+							dst++;
+							return true;
+						}
+					}
+					return false;
+				};
+
+				for (size_t i = 0; i < string.size(); i++) {
+					if (src[i] != '\\') {
+						*dst = src[i];
+						dst++;
+						continue;
+					}
+
+					i++;
+					if (i >= string.size()) {
+						break;
+					}
+
+					if (handleSimpleEscape(i)) {
+						continue;
+					}
+
+					if (src[i] == 'u') {
+						const char* first = src + i + 1;
+						const char* last = src + i + 5;
+						i += 4;
+						if (i >= string.size()) {
+							break;
+						}
+
+						u16 unicodeValue = ' ';
+
+						// should only ever contain unicode escapes with codepoint <= 0x7f
+						if (std::from_chars(first, last, unicodeValue, 16).ptr == last && unicodeValue <= 0x7f) {
+							*dst = static_cast<char>(unicodeValue);
+							dst++;
+						}
+					}
+				}
+				return dst - string.data();
+			}
+
 			//only one context at a time for now
 			static inline constinit httpcContext ctx {0, 0};
 

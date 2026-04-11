@@ -7,6 +7,7 @@
 #include "core/game_api/Player.hpp"
 #include "core/game_api/GameKeyboard.hpp"
 #include "core/game_api/Animation.hpp"
+#include "core/RuntimeContext.hpp"
 
 #include "Color.h"
 #include "Files.h"
@@ -573,6 +574,14 @@ namespace CTRPluginFramework {
 					return;
 				}
 			}
+		}
+	}
+
+	void HideDesignOutfits(MenuEntry *entry) {
+		if (entry->WasJustActivated()) {
+			RuntimeContext::getInstance()->setDesignOutfitsLegit(false);
+		} else if (!entry->IsActivated()) {
+			RuntimeContext::getInstance()->setDesignOutfitsLegit(true);
 		}
 	}
 }

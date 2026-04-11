@@ -5,8 +5,8 @@
 #include <string>
 
 #define majorV 3
-#define minorV 2
-#define revisV 1
+#define minorV 3
+#define revisV 0
 
 #define APP_VERSION (majorV * 100 + minorV * 10 + revisV)
 
@@ -15,6 +15,9 @@ namespace CTRPluginFramework {
 		struct PluginConfig {
 			std::string languageCode;
 			std::string pluginVersion;
+			bool saveReminderEnabled = true;
+			int saveReminderInterval = 25;
+			bool scamWarningShown = false;
 		};
 
 		std::string GetPluginVersionString();
@@ -32,5 +35,13 @@ namespace CTRPluginFramework {
 
 		void DeleteLanguage(void);
 		void SetupLanguage(bool SetInMenu);
+
+		bool GetSaveReminderEnabled(bool &outEnabled);
+		bool SetSaveReminderEnabled(bool enabled);
+		bool GetSaveReminderInterval(int &outInterval);
+		bool SetSaveReminderInterval(int interval);
+
+		bool GetScamWarningShown(bool &outShown);
+		bool SetScamWarningShown(bool shown);
 	};
 }

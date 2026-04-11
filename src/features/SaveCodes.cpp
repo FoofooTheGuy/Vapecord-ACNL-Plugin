@@ -17,6 +17,7 @@
 #include "core/game_api/GameStructs.hpp"
 #include "Color.h"
 #include "Files.h"
+#include "core/infrastructure/SaveBackupManager.hpp"
 
 namespace CTRPluginFramework {
 //Town Name Changer | player specific save code
@@ -40,58 +41,66 @@ namespace CTRPluginFramework {
 
 //Save Backup and Restore | non player specific save code
 	void savebackup(MenuEntry *entry) {
+		const Language *lang = Language::getInstance();
+
 		const std::vector<std::string> options = {
-			Language::getInstance()->get(TextID::SAVE_DUMPER),
-			Language::getInstance()->get(TextID::SAVE_RESTORE),
-			Language::getInstance()->get(TextID::FILE_DELETE),
+			lang->get(TextID::SAVE_DUMPER),
+			lang->get(TextID::SAVE_RESTORE),
+			lang->get(TextID::FILE_DELETE),
 		};
 
-		MemoryRange lock;
-		lock.address = Address(0x2FB344).Call<u32 *>();
-		lock.length = 0x89B00;
-
-		Keyboard KB(Language::getInstance()->get(TextID::KEY_CHOOSE_BACKUP_ACTION), options);
+		Keyboard KB(lang->get(TextID::KEY_CHOOSE_BACKUP_ACTION), options);
 
 		switch(KB.Open()) {
 			default: break;
 			case 0: {
-				std::string filename = "";
-				Keyboard KB(Language::getInstance()->get(TextID::SAVE_DUMPER_DUMP));
-
-				if(KB.Open(filename) == -1) {
-					return;
+				if (!MessageBox(lang->get(TextID::SAVE_BACKUP_UNSAVED_CHANGES), DialogType::DialogYesNo).SetClear(ClearScreen::Top)()) {
+					break;
 				}
 
-				PluginUtils::Backup::DumpMemory(
-					Utils::Format(PATH_SAVE, Address::regionName.c_str()),
-					filename,
-					".dat",
-					{ lock }
-				);
+				Keyboard nameKB(lang->get(TextID::SAVE_DUMPER_DUMP));
+				std::string folderName;
+				if (nameKB.Open(folderName) < 0 || folderName.empty()) {
+					break;
+				}
+
+				if (SaveBackupManager::BackupAllToCheckpoint(folderName)) {
+					MessageBox(Utils::Format(lang->get(TextID::SAVE_BACKUP_SUCCESS).c_str(), folderName.c_str())).SetClear(ClearScreen::Top)();
+				}
+				else {
+					MessageBox(lang->get(TextID::SAVE_BACKUP_FAIL)).SetClear(ClearScreen::Top)();
+				}
 			} break;
 			case 1: {
-				if (PluginUtils::Backup::RestoreMemory(
-						Utils::Format(PATH_SAVE, Address::regionName.c_str()),
-						".dat",
-						Language::getInstance()->get(TextID::SAVE_RESTORE_SELECT),
-						{ lock }
-					) == OperationResult::Success) {
-					static Address fixfurno(0x6A6EE0);
-					static Address fixfurno1 = fixfurno.MoveOffset(0x41C);
+				MessageBox(lang->get(TextID::SAVE_RESTORE_CHECKPOINT)).SetClear(ClearScreen::Top)();
+			} break;
+			case 2: {
+				std::string gamePath = SaveBackupManager::GetGamePath();
+				std::vector<std::string> delBackups;
+				SaveBackupManager::ListBackups(gamePath, "", delBackups);
+				if (delBackups.empty()) {
+					MessageBox(lang->get(TextID::SAVE_DELETE_NON_FOUND)).SetClear(ClearScreen::Top)();
+					break;
+				}
 
-					fixfurno1.Patch(0xE1A00000);
+				Keyboard delKB(lang->get(TextID::FILE_DELETE), delBackups);
+				int delChoice = delKB.Open();
+				if (delChoice < 0) {
+					break;
+				}
 
-					fixfurno.Call<void>();
+				if (!MessageBox(Utils::Format(lang->get(TextID::SAVE_DELETE_CONFIRM).c_str(), delBackups[delChoice].c_str()), DialogType::DialogYesNo).SetClear(ClearScreen::Top)()) {
+					break;
+				}
 
-					fixfurno1.Unpatch();
+				std::string delPath = SaveBackupManager::GetGamePath() + "/" + delBackups[delChoice];
+				if (Directory::Remove(delPath) == 0) {
+					MessageBox(Utils::Format(lang->get(TextID::SAVE_DELETE_SUCCESS).c_str(), delBackups[delChoice].c_str())).SetClear(ClearScreen::Top)();
+				}
+				else {
+					MessageBox(lang->get(TextID::SAVE_DELETE_FAIL)).SetClear(ClearScreen::Top)();
 				}
 			} break;
-			case 2:
-				PluginUtils::Backup::DeleteBackup(
-					Utils::Format(PATH_SAVE, Address::regionName.c_str()),
-					".dat"
-				);
-			break;
 		}
 	}
 

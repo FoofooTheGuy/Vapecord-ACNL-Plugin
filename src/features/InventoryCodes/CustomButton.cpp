@@ -113,10 +113,10 @@ namespace CTRPluginFramework {
 
 		u8 closetslot;
 		if(Inventory::GetNextClosetItem({0x7FFE, 0}, closetslot)) {
-			Inventory::WriteSlot(itemSlot, {0x7FFE, 0});
-
 			ACNL_Player *player = Player::GetSaveData();
 			player->Dressers[closetslot] = *item;
+
+			Inventory::WriteSlot(itemSlot, {0x7FFE, 0});
 		}
 	}
 

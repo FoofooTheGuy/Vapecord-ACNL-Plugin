@@ -106,10 +106,6 @@ namespace CTRPluginFramework {
 		return Process::Patch(addr, newValue);
 	};
 
-	bool Address::WriteFloat(float newValue) {
-		return Process::WriteFloat(addr, newValue);
-	}
-
 	bool Address::Unpatch(void) {
 		return Process::Patch(addr, origVal);
 	}

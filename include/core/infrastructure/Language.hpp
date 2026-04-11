@@ -20,7 +20,7 @@ namespace CTRPluginFramework {
 
         std::vector<u8> buffer;
         const LangHeader* currentHeader;
-        std::vector<u16> offsets;
+        std::vector<u32> offsets;
         bool loaded = false;
         std::string currentLang;
 

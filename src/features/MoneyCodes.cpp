@@ -16,7 +16,10 @@ namespace CTRPluginFramework {
 		}
 
 		u32 money = 0;
-		if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 5, 0 }, money)) {
+		Keyboard kb(Language::getInstance()->get(TextID::ENTER_AMOUNT));
+		kb.SetSlider(0, 99999, 100);
+		kb.IsHexadecimal(false);
+		if(kb.Open(money) >= 0) {
 			Game::EncryptValue(&player->PocketMoney, money);
 		}
 	}
@@ -30,7 +33,10 @@ namespace CTRPluginFramework {
 		}
 
 		u32 money = 0;
-		if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 9, 0 }, money)) {
+		Keyboard kb(Language::getInstance()->get(TextID::ENTER_AMOUNT));
+		kb.SetSlider(0, 999999999, 10000);
+		kb.IsHexadecimal(false);
+		if(kb.Open(money) >= 0) {
 			Game::EncryptValue(&player->BankAmount, money);
 		}
 	}
@@ -44,7 +50,10 @@ namespace CTRPluginFramework {
 		}
 
 		u32 coupon = 0;
-		if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 4, 0 }, coupon)) {
+		Keyboard kb(Language::getInstance()->get(TextID::ENTER_AMOUNT));
+		kb.SetSlider(0, 9999, 10);
+		kb.IsHexadecimal(false);
+		if(kb.Open(coupon) >= 0) {
 			Game::EncryptValue(&player->MeowCoupons, coupon);
 		}
 	}
@@ -87,7 +96,10 @@ namespace CTRPluginFramework {
 		}
 
 		u32 medal = 0;
-		if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 4, 0 }, medal)) {
+		Keyboard kb(Language::getInstance()->get(TextID::ENTER_AMOUNT));
+		kb.SetSlider(0, 9999, 10);
+		kb.IsHexadecimal(false);
+		if(kb.Open(medal) >= 0) {
 			Game::EncryptValue(&player->MedalAmount, medal);
 		}
 	}
@@ -101,7 +113,10 @@ namespace CTRPluginFramework {
 		}
 
 		u32 turnip = 0;
-		if(PluginUtils::Input::PromptNumber<u32>({ Language::getInstance()->get(TextID::ENTER_AMOUNT), false, 5, 0 }, turnip)) {
+		Keyboard kb(Language::getInstance()->get(TextID::ENTER_AMOUNT));
+		kb.SetSlider(0, 99999, 10);
+		kb.IsHexadecimal(false);
+		if(kb.Open(turnip, turnip) == 0) {
 			for(int i = 0; i < 6; ++i) {
 				Game::EncryptValue(&town->TurnipPrices[i], turnip); //AM
 				Game::EncryptValue(&town->TurnipPrices[i + 6], turnip); //PM

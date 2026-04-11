@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CTRPluginFramework.hpp>
+#include <type_traits>
 
 #define TID_USA 		0x0004000000086300
 #define TID_USAWA 		0x0004000000198E00
@@ -43,10 +44,29 @@ namespace CTRPluginFramework {
 			static Region regionId;
 
 			Address MoveOffset(u32 offset);
-			bool WriteFloat(float newValue);
 			bool Patch(u32 newValue);
 			bool Unpatch(void);
 			bool IsPatched(void);
+
+			template <typename T>
+			bool Write(T newValue) {
+				if constexpr (std::is_same_v<T, u32>) {
+					return Patch(newValue);
+				}
+				else if constexpr (std::is_same_v<T, u16>) {
+					return Process::Write16(addr, newValue);
+				}
+				else if constexpr (std::is_same_v<T, u8>) {
+					return Process::Write8(addr, newValue);
+				}
+				else if constexpr (std::is_same_v<T, float>) {
+					return Process::WriteFloat(addr, newValue);
+				}
+				else if constexpr (std::is_same_v<T, u64>) {
+					return Process::Write64(addr, newValue);
+				}
+				else return false;
+			};
 
 			template <typename T, class ...Args>
 			T Call(Args ...args) {

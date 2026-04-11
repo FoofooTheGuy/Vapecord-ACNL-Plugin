@@ -20,6 +20,7 @@ namespace CTRPluginFramework {
             case FolderType::Misc:        return TextID::MISC_CODES;
             case FolderType::Default:     return TextID::DEFAULT_CODES;
             case FolderType::Dev:         return TextID::DEV_CODES;
+            case FolderType::Pretendo:    return TextID::PRETENDO_CODES;
             default:                      return TextID::NONE;
         }
     }
@@ -40,6 +41,7 @@ namespace CTRPluginFramework {
             case FolderType::Misc:        return TextID::MISC_CODES_NOTE;
             case FolderType::Default:     return TextID::DEFAULT_CODES_NOTE;
             case FolderType::Dev:         return TextID::DEV_CODES_NOTE;
+            case FolderType::Pretendo:    return TextID::PRETENDO_CODES_NOTE;
             default:                      return TextID::NONE;
         }
     }
@@ -75,6 +77,14 @@ namespace CTRPluginFramework {
                 switch (sub) {
                     case SubFolder::Chat: return TextID::CHAT_CODES;
                     case SubFolder::Fun: return TextID::FUN_CODES;
+                    default: break;
+                }
+                break;
+
+            case FolderType::Pretendo:
+                switch (sub) {
+                    case SubFolder::PlayersInSession: return TextID::PLAYERS_IN_SESSION;
+                    case SubFolder::PIALoggerOptions: return TextID::PIA_LOGGER_OPTIONS;
                     default: break;
                 }
                 break;
@@ -117,6 +127,14 @@ namespace CTRPluginFramework {
                 switch (sub) {
                     case SubFolder::Chat: return TextID::CHAT_CODES_NOTE;
                     case SubFolder::Fun: return TextID::FUN_CODES_NOTE;
+                    default: break;
+                }
+                break;
+
+            case FolderType::Pretendo:
+                switch (sub) {
+                    case SubFolder::PlayersInSession: return TextID::PLAYERS_IN_SESSION_NOTE;
+                    case SubFolder::PIALoggerOptions: return TextID::PIA_LOGGER_OPTIONS_NOTE;
                     default: break;
                 }
                 break;

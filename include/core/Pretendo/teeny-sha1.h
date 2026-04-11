@@ -19,16 +19,19 @@
  */
 
 #pragma once
+#ifndef __TEENY_SHA1_H__
+#define __TEENY_SHA1_H__
 
-#include <3ds.h>
-#include "PatternManager.hpp"
-#include "common.hpp"
+#include <types.h>
 
-namespace CTRPluginFramework {
-    PatternStatus getACNLPatchesStatus();
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    void initPretendoPatches(PatternManager& pm);
-    void enablePretendoPatches();
-    void disablePretendoPatches();
-    void finiPatches();
+int sha1digest(uint8_t *digest, char *hexdigest, const uint8_t *data, size_t databytes);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif

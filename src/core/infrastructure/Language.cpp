@@ -120,12 +120,12 @@ namespace CTRPluginFramework {
 
         offsets.resize(entryCount);
         for (u16 i = 0; i < entryCount; ++i) {
-            if (ptr + sizeof(u16) > buffer.data() + buffer.size()) {
+            if (ptr + sizeof(u32) > buffer.data() + buffer.size()) {
                 return false;
             }
 
-            offsets[i] = *reinterpret_cast<const u16*>(ptr);
-            ptr += sizeof(u16);
+            offsets[i] = *reinterpret_cast<const u32*>(ptr);
+            ptr += sizeof(u32);
         }
 
         loaded = true;
@@ -147,7 +147,7 @@ namespace CTRPluginFramework {
         }
 
         const u8* base = buffer.data();
-        const u8* blobStart = base + 2 + offsets.size() * 2; // skip count + offset table
+        const u8* blobStart = base + 2 + offsets.size() * 4; // skip count + offset table
         return std::string(reinterpret_cast<const char*>(blobStart + offsets[idx]));
     }
 }

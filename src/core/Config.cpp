@@ -5,7 +5,7 @@
 
 namespace CTRPluginFramework {
 	namespace {
-		constexpr int CONFIG_FORMAT_VERSION = 1;
+		constexpr int CONFIG_FORMAT_VERSION = 2;
 
 		static std::string _GetConfigPath() {
 			return Utils::Format(PATH_PLUGIN_CONFIG, Address::regionName.c_str());
@@ -119,6 +119,7 @@ namespace CTRPluginFramework {
 			int formatVersion = 0;
 			bool hasLanguage = false;
 			bool hasPluginVersion = false;
+			bool hasSaveReminder = false;
 		};
 
 		static ParsedConfig _ParseConfig(const std::string &content) {
@@ -151,6 +152,17 @@ namespace CTRPluginFramework {
 						else if (key == "config_format") {
 							parsed.hasFormat = _TryParseInt(value, parsed.formatVersion);
 						}
+						else if (key == "save_reminder_enabled") {
+							parsed.config.saveReminderEnabled = (value == "1" || value == "true");
+							parsed.hasSaveReminder = true;
+						}
+						else if (key == "save_reminder_interval") {
+							_TryParseInt(value, parsed.config.saveReminderInterval);
+							parsed.hasSaveReminder = true;
+						}
+						else if (key == "scam_warning_shown") {
+							parsed.config.scamWarningShown = (value == "1" || value == "true");
+						}
 					}
 				}
 
@@ -167,7 +179,10 @@ namespace CTRPluginFramework {
 			return "# Vapecord ACNL Plugin config\n"
 				"config_format=" + std::to_string(CONFIG_FORMAT_VERSION) + "\n"
 				"plugin_version=" + config.pluginVersion + "\n"
-				"language=" + config.languageCode + "\n";
+				"language=" + config.languageCode + "\n"
+				"save_reminder_enabled=" + (config.saveReminderEnabled ? "1" : "0") + "\n"
+				"save_reminder_interval=" + std::to_string(config.saveReminderInterval) + "\n"
+				"scam_warning_shown=" + (config.scamWarningShown ? "1" : "0") + "\n";
 		}
 	}
 
@@ -260,6 +275,9 @@ namespace CTRPluginFramework {
 		PluginConfig merged;
 		merged.languageCode = parsed.hasLanguage ? parsed.config.languageCode : "";
 		merged.pluginVersion = GetPluginVersionString();
+		merged.scamWarningShown = false;
+		merged.saveReminderEnabled = parsed.hasSaveReminder ? parsed.config.saveReminderEnabled : true;
+		merged.saveReminderInterval = parsed.hasSaveReminder ? parsed.config.saveReminderInterval : 25;
 
 		return WriteConfig(merged);
 	}
@@ -289,32 +307,62 @@ namespace CTRPluginFramework {
 		File::Remove(_GetConfigPath());
 	}
 
-    void DisableAll() {
-        PluginMenu *menu = PluginMenu::GetRunningInstance();
-		if (menu) {
-			for (MenuFolder *folder : menu->GetFolderList()) {
-                if (!folder->GetFolderList().empty()) {
-                    for (MenuFolder *subFolder : folder->GetFolderList()) {
-                        for (MenuEntry *entry : folder->GetEntryList()) {
-                            entry->Disable();
-                        }
-                    }
-                }
-
-				for (MenuEntry *entry : folder->GetEntryList()) {
-                    entry->Disable();
-                }
-            }
-
-            for (MenuEntry *entry : menu->GetEntryList()) {
-                entry->Disable();
-            }
+	bool Config::GetSaveReminderEnabled(bool &outEnabled) {
+		PluginConfig config;
+		if (!ReadConfig(config)) {
+			return false;
 		}
-    }
+		outEnabled = config.saveReminderEnabled;
+		return true;
+	}
+
+	bool Config::SetSaveReminderEnabled(bool enabled) {
+		PluginConfig config;
+		if (!ReadConfig(config)) {
+			return false;
+		}
+		config.saveReminderEnabled = enabled;
+		return WriteConfig(config);
+	}
+
+	bool Config::GetSaveReminderInterval(int &outInterval) {
+		PluginConfig config;
+		if (!ReadConfig(config)) {
+			return false;
+		}
+		outInterval = config.saveReminderInterval;
+		return true;
+	}
+
+	bool Config::SetSaveReminderInterval(int interval) {
+		PluginConfig config;
+		if (!ReadConfig(config)) {
+			return false;
+		}
+		config.saveReminderInterval = interval;
+		return WriteConfig(config);
+	}
+
+	bool Config::GetScamWarningShown(bool &outShown) {
+		PluginConfig config;
+		if (!ReadConfig(config)) {
+			return false;
+		}
+		outShown = config.scamWarningShown;
+		return true;
+	}
+
+	bool Config::SetScamWarningShown(bool shown) {
+		PluginConfig config;
+		if (!ReadConfig(config)) {
+			return false;
+		}
+		config.scamWarningShown = shown;
+		return WriteConfig(config);
+	}
 
     void Config::HandleConfigMigration() {
 		if (IsConfigOutdated()) {
-			DisableAll();
 			UpdateConfig();
             OSD::NotifySysFont("Plugin configuration was migrated", Color::Purple);
 		}

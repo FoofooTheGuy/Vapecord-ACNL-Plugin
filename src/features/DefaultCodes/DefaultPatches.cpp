@@ -2,6 +2,7 @@
 #include "features/cheats.hpp"
 #include "core/infrastructure/Address.hpp"
 #include "core/infrastructure/PluginUtils.hpp"
+#include "core/RuntimeContext.hpp"
 #include <functional>
 
 namespace CTRPluginFramework {
@@ -33,16 +34,32 @@ namespace CTRPluginFramework {
 	}
 
 	void SeedItemLegitimacy(bool enable) {
+		static Hook isItemLegitHook;
 		static Address skipSeedItemCheck(0x6BAC8C);
 		static Address allItemsLegit = skipSeedItemCheck.MoveOffset(0x14C);
 
+		const auto isItemLegit = +[]() -> bool {
+			register Item* item asm("r4");
+
+			if (!RuntimeContext::getInstance()->isDesignOutfitsLegit()) {
+				if (item->ID >= 0x33A7 && item->ID <= 0x33BB) { //custom pattern items
+					return false;
+				}
+			}
+
+			return true;
+		};
+
 		if(enable) {
 			skipSeedItemCheck.Patch(0xEA000006);
-			allItemsLegit.Patch(0xE3A00001);
+
+			isItemLegitHook.Initialize(allItemsLegit.addr, (u32)isItemLegit);
+			isItemLegitHook.SetFlags(USE_LR_TO_RETURN);
+			isItemLegitHook.Enable();
 		}
 		else {
 			skipSeedItemCheck.Unpatch();
-			allItemsLegit.Unpatch();
+			isItemLegitHook.Disable();
 		}
 	}
 
@@ -214,6 +231,83 @@ namespace CTRPluginFramework {
 		}
 	}
 
+	void FixPretendoOnlineIslandSession(bool enable) {
+		static Address createOnlineIslandSessionGameMode(0x514ABC);
+		static Address modifySessionAttributeIndex(0x5152D4);
+		static Address modifySessionAttributeValue(modifySessionAttributeIndex.MoveOffset(4));
+
+		if(enable) {
+			//change the game mode to match the one specified at
+			//https://github.com/PretendoNetwork/animal-crossing-new-leaf/blob/8b142ab51d028bba194a55d1914e3bbc0bcaf734/nex/register_common_secure_server_protocols.go#L80
+			//the pretendo server changes it only for sessions created during automatchmaking,
+			//so we need to change it for manually created sessions too.
+			createOnlineIslandSessionGameMode.Patch(33);
+
+			//the server increments the attribute index to account for SQL counting from 1,
+			//https://github.com/PretendoNetwork/nex-protocols-common-go/blob/main/matchmake-extension/database/update_game_attribute.go
+			//but the nex library version used by the game already does this at 0x3B4A20
+			//so we need to decrease it by one.
+			modifySessionAttributeIndex.Patch(0xE3A01001);
+
+			//set the attribute value to match the one at
+			//https://github.com/PretendoNetwork/animal-crossing-new-leaf/blob/8b142ab51d028bba194a55d1914e3bbc0bcaf734/nex/register_common_secure_server_protocols.go#L77
+			modifySessionAttributeValue.Patch(0xE3A02000);
+		}
+		else {
+			createOnlineIslandSessionGameMode.Unpatch();
+			modifySessionAttributeIndex.Unpatch();
+			modifySessionAttributeValue.Unpatch();
+		}
+	}
+
+	void FixPretendoFindSessionByOwnerCall(bool enable) {
+		static constexpr u32 sessionBufSize = 18;
+		static Address setSessionInfoListBufferSize(0x512EB8);
+		static Address nexSessionSearchCriteriaConstructor(0x40BC10);
+		static Address setMaxParticipants(0x40B358);
+		static Address setMinParticipants(setMaxParticipants.MoveOffset(0x20));
+		static Address searchSessions(0x51173C);
+		static Address joinSessionById(0x514BAC);
+		static Address joinSessionByOwnerCall(0x5179C4);
+		static Hook joinSessionByOwnerCallHook;
+
+		const auto joinSessionByOwner = +[](void* instance, const u32& ownerPrincipalId) {
+			*(u32*)((u8*)instance + 0x20) = ownerPrincipalId;
+
+			u8 searchCriteria[0xa18];
+			nexSessionSearchCriteriaConstructor.Call<void>(searchCriteria);
+			searchCriteria[4] = 2;
+			*(u32*)&searchCriteria[0xc] = sessionBufSize;
+			setMinParticipants.Call<void>(searchCriteria, 1);
+			setMaxParticipants.Call<void>(searchCriteria, 4);
+
+			std::array<u8*, sessionBufSize> sessionInfos;
+			size_t count = searchSessions.Call<size_t>(instance, searchCriteria, sessionInfos.data(), sessionInfos.size());
+			for (size_t i = 0; i < count; i++) {
+				u32 foundHostPrincipalId = *(u32*)(sessionInfos[i] + 0x444);
+				if (ownerPrincipalId == foundHostPrincipalId) {
+					u32 sessionId = *(u32*)(sessionInfos[i] + 0x8);
+					return joinSessionById.Call<unsigned int>(instance, sessionId);
+				}
+			}
+			return 0x80000006;
+		};
+
+		if(enable) {
+			setSessionInfoListBufferSize.Patch(0xe3a01000 + sessionBufSize);
+
+			//matchmaking protocol FindByOwner call isn't implemented on pretendo,
+			//so reimplement it using other means
+			joinSessionByOwnerCallHook.Initialize(joinSessionByOwnerCall.addr, (u32)joinSessionByOwner);
+			joinSessionByOwnerCallHook.SetFlags(USE_LR_TO_RETURN);
+			joinSessionByOwnerCallHook.Enable();
+		}
+		else {
+			setSessionInfoListBufferSize.Unpatch();
+			joinSessionByOwnerCallHook.Disable();
+		}
+	}
+
 	void EnableAllPatches() {
 		SeedItemLegitimacy(true);
 		OnlineDropLagRemover(true);
@@ -226,6 +320,8 @@ namespace CTRPluginFramework {
 		BypassGameChecks(true);
 		DisableNonSeedItemCheck(true);
 		PatchDropFunction(true);
+		FixPretendoOnlineIslandSession(true);
+		FixPretendoFindSessionByOwnerCall(true);
 	}
 
 	void DisableAllPatches() {
@@ -240,6 +336,8 @@ namespace CTRPluginFramework {
 		BypassGameChecks(false);
 		DisableNonSeedItemCheck(false);
 		PatchDropFunction(false);
+		FixPretendoOnlineIslandSession(false);
+		FixPretendoFindSessionByOwnerCall(false);
 	}
 
 	void SeedItemLegitimacyEntry(MenuEntry *entry) {
@@ -284,5 +382,13 @@ namespace CTRPluginFramework {
 
 	void PatchDropFunctionEntry(MenuEntry *entry) {
 		ToggleWithOptionKeyboard(Address(0x59FCA4).IsPatched(), PatchDropFunction);
+	}
+
+	void FixPretendoOnlineIslandSessionEntry(MenuEntry *entry) {
+		ToggleWithOptionKeyboard(Address(0x514ABC).IsPatched(), FixPretendoOnlineIslandSession);
+	}
+
+	void FixPretendoFindSessionByOwnerCallEntry(MenuEntry *entry) {
+		ToggleWithOptionKeyboard(Address(0x512EB8).IsPatched(), FixPretendoFindSessionByOwnerCall);
 	}
 }

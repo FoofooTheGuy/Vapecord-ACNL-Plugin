@@ -100,7 +100,7 @@ namespace CTRPluginFramework {
 
 		static float OnOff = 1.0;
 
-		fovlargeMod.WriteFloat(OnOff);
+		fovlargeMod.Write<float>(OnOff);
 
 		if(Game::GetRoom() == 1 || RuntimeContext::getInstance()->isFov()) {
 			OnOff = 1.0;
@@ -334,5 +334,31 @@ namespace CTRPluginFramework {
 				blockKeysPatchedByIsabelle = false;
 			}
 		}
+	}
+
+//Keep Connection Toggle
+	void KeepConnectionApplySaved(MenuEntry *entry, u32 savedValue) {
+		(void)entry;
+		SetKeepConnectionEnabled(savedValue != 0);
+	}
+
+	void KeepConnectionToggle(MenuEntry *entry) {
+		bool currentlyEnabled = IsKeepConnectionEnabled();
+
+		std::vector<std::string> options = {
+			currentlyEnabled
+				? (Color(pGreen) << Language::getInstance()->get(TextID::VECTOR_ENABLED))
+				: (Color(pRed) << Language::getInstance()->get(TextID::VECTOR_DISABLED)),
+		};
+
+		Keyboard optKb(Language::getInstance()->get(TextID::KEEP_CONNECTION_NOTE), options);
+		const int op = optKb.Open();
+		if(op < 0) {
+			return;
+		}
+
+		bool newState = !currentlyEnabled;
+		SetKeepConnectionEnabled(newState);
+		entry->SetSavedValue(newState ? true : false);
 	}
 }

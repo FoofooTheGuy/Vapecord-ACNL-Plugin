@@ -9,7 +9,7 @@ endif
 export TOPDIR ?= $(CURDIR)
 include $(DEVKITARM)/3ds_rules
 
-CTRPFLIB	?=	$(DEVKITPRO)/libctrpf
+CTRPFLIB	?=	$(DEVKITPRO)/libctrpfforvapecord
 
 TARGET		:= 	Vapecord_Public
 

@@ -7,6 +7,7 @@
 #include "features/cheats.hpp"
 #include "core/Pretendo/Pretendo.hpp"
 #include "core/Pretendo/PatternManager.hpp"
+#include "core/Pretendo/PIALogger.hpp"
 
 namespace CTRPluginFramework {
 	static const std::string NOTE =
@@ -92,7 +93,9 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 		OSD::Stop(OSD_SplashScreen);
 	}
 
-	void InitKeepConnection(void);
+	void LaunchGameKeyboardAsCustomQwerty(Keyboard &keyboard);
+	void PerformAutoSaveBackup(void);
+	void ShowAntiScamScreen(void);
 
 	int	main(void) {
 		std::string region = Address::LoadRegion();
@@ -114,34 +117,54 @@ Translators: NeitherHateNorLike(Chinese Simplified & Traditional), みるえも�
 			return 0;
 		}
 
+	//This gets set here and not in the PatchProcess because it should only be set if the game is new leaf
+		FwkSettings &settings = FwkSettings::Get();
+		settings.SaveBackupCallback = PerformAutoSaveBackup;
+		settings.SaveBackupMaxSlots = 3; //3 is currently the default
+
 		EnableAllChecks();
 		EnableAllPatches();
 
-		Config::EnsureConfigFile();
+		if (!Config::EnsureConfigFile()) {
+			OSD::NotifySysFont("Failed to create config file!", Color::Red);
+			menu->Run();
+			return 0;
+		}
+
+		Config::HandleConfigMigration();
 
 		SleepTime();
 
-		ItemSequence::Init();
-	//keeps internet connection when menu is opened
-		//InitKeepConnection();
-
 		Config::SetupLanguage(false);
+
+	//Show anti-scam warning on first launch
+		ShowAntiScamScreen();
+
+		ItemSequence::Init();
+
+		menu->OnNewFrame = SendPlayerData;
+		InitSaveReminder();
+
+	//Patch Pretendo + RCE fix + PIA Logger
+        PatternManager pm;
+		//initPiaLogger(pm);
+        initPretendoPatches(pm);
+
+		pm.Perform();
+
+		enablePretendoPatches();
+
 	//Load MenuFolders and Entrys (located in MenuCreate.cpp)
 		InitMenu(menu);
-		Config::HandleConfigMigration();
 
 	//Load Callbacks
 		menu->OnOpening = SetSeederInfos;
 		menu->Callback(IndoorsSeedItemCheck);
+		menu->Callback(SaveReminderCallback);
 		Process::exceptionCallback = CustomExceptionHandler;
 
-	//Patch Pretendo + RCE fix
-        PatternManager pm;
-        initPretendoPatches(pm);
-
-        pm.Perform();
-
-        enablePretendoPatches();
+	//Set custom keyboard
+		Keyboard::SetCustomQwertyCallback(LaunchGameKeyboardAsCustomQwerty);
 
 		OSD::NotifySysFont("ACNL Vapecord Plugin ready!");
 	//Run Menu Loop

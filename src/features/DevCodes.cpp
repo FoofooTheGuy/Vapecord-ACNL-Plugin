@@ -1907,4 +1907,21 @@ namespace CTRPluginFramework {
 			Process::Write32(Patch.addr, 0x05960028);
 		}
 	}
+
+	void PrivateIsland(MenuEntry *entry) {
+		static Address createAutoMatchSessionAttribute4(0x5139B8);
+		static Address searchAutoMatchSessionAttribute4(createAutoMatchSessionAttribute4.MoveOffset(0xFC));
+		static Address createSessionAttribute4(createAutoMatchSessionAttribute4.MoveOffset(0x1054));
+
+		if (entry->WasJustActivated()) {
+			createAutoMatchSessionAttribute4.Patch(0xE3A02003);
+			searchAutoMatchSessionAttribute4.Patch(0xE3A02003);
+			createSessionAttribute4.Patch(0xE3A02003);
+		}
+		else if (!entry->IsActivated()) {
+			createAutoMatchSessionAttribute4.Unpatch();
+			searchAutoMatchSessionAttribute4.Unpatch();
+			createSessionAttribute4.Unpatch();
+		}
+	}
 }

@@ -2,6 +2,7 @@
 
 #include "core/game_api/Game.hpp"
 #include "core/infrastructure/Address.hpp"
+#include "core/infrastructure/Language.hpp"
 
 /*
 Thanks to PabloMK7 for the huge help with the thread loading!
@@ -13,6 +14,45 @@ Thanks to PabloMK7 for the huge help with the thread loading!
 std::tuple<u32, u32*> onlineThreadsInfo[ONLINETHREADSAMOUNT];
 
 namespace CTRPluginFramework {
+	static bool s_keepConnectionEnabled = false;
+
+	static Hook onlineThreadHook;
+	static Hook userJoinsHook;
+	static bool s_hooksInitialized = false;
+
+	static void InitKeepConnection(void);
+	void keepConnectionInCTRPF(bool runOnline);
+
+	void SetKeepConnectionEnabled(bool enabled) {
+		s_keepConnectionEnabled = enabled;
+
+		if(enabled) {
+			if(!s_hooksInitialized) {
+				InitKeepConnection();
+			}
+			else {
+				onlineThreadHook.Enable();
+				userJoinsHook.Enable();
+			}
+
+			Process::OnPauseResume = [](bool goingToPause) {
+				keepConnectionInCTRPF(goingToPause);
+			};
+		}
+		else {
+			if(s_hooksInitialized) {
+				onlineThreadHook.Disable();
+				userJoinsHook.Disable();
+			}
+
+			Process::OnPauseResume = nullptr;
+		}
+	}
+
+	bool IsKeepConnectionEnabled(void) {
+		return s_keepConnectionEnabled;
+	}
+
     void keepConnectionInCTRPF(bool runOnline) {
 		static bool isRunOnline = false;
 
@@ -147,41 +187,94 @@ namespace CTRPluginFramework {
 		Address(startFunc).Call<void>(threadfunc, threadargs);
 	}
 
-    void SendPlayerData/*0x1B6C28*/(Time time) { //needs to be set into OnNewFrame callback
+	bool userWantsToLeave() {
+		static Address usersWhoWantToLeave(0x94EE0C);
+		return *(u8 *)usersWhoWantToLeave.addr > 0;
+	}
+
+	//0x1B6C28
+    void SendPlayerData(Time time) { //needs to be set into OnNewFrame callback
+		if(!s_keepConnectionEnabled) {
+			return;
+		}
+
+		{
+			if (userWantsToLeave()) {
+				PluginMenu *menu = PluginMenu::GetRunningInstance();
+				if (menu != nullptr) {
+					if (menu->IsOpen()) {
+						OSD::NotifySysFont(Language::getInstance()->get(TextID::KEEP_CONN_PLAYER_LEAVING), Color::Purple);
+						menu->ForceClose();
+
+						static Address usersWhoWantToLeave(0x94EE0C);
+						usersWhoWantToLeave.Write<u8>(0); //might cause issues like that, but without it, it could cause a infinite loop
+						return;
+					}
+				}
+			}
+		}
+		
 		if(Game::GetOnlinePlayerCount() <= 1 || PluginMenu::GetRunningInstance() == nullptr) {
 			return;
 		}
 
-		//0x1B6C28.Call<void>();
-		//return;
+		static Address netGameMgrHandleReceiveData(0x617D20);
+		static Address netGameMgrs_pInstance(0x954648);
+		static Address netGameMgrProcess(0x618024);
 
-		static Address sendData1(0x617D20);
-		static Address sendData2(0x60758C);
-		static Address sendData3(0x618024);
+		static Address s_SkipProcesses = Address(0x95D3F4).MoveOffset(-4);
 
-		static Address getData1(0x5204DC);
-		static Address getData2(0x520C98);
+		u32 pInstance = *(u32 *)netGameMgrs_pInstance.addr;
+		bool skipProcesses = *(bool *)(s_SkipProcesses.addr);
 
-		sendData1.Call<void>(*(u32 *)Address(0x954648).addr);
+		netGameMgrHandleReceiveData.Call<void>(pInstance);
 
-		if(*(u8 *)(Address(0x95D3F4).addr-4) == 0) {
-			u32 uVar3 = getData1.Call<u32>();
-			int iVar2 = getData2.Call<int>(uVar3, 2);
-			if(iVar2 == 0) {
-				sendData2.Call<void>();
-			}
-
-			sendData3.Call<void>(*(u32 *)Address(0x954648).addr);
+		if(!skipProcesses) {
+			netGameMgrProcess.Call<void>(pInstance);
 		}
 	}
 
-    void InitKeepConnection(void) {
-        static Address threadBeginAddress(0x12F3A8);
+	/*
+	Thanks to nico for this research info:
 
-        static Hook onlineThreadHook;
+	User Joins: 0x62b2bc
+
+	0x94ee0c bit field of users who want to leave
+	0x94ee0b user who is allowed to leave next
+	Both gets set in 0x32d2c4 and used in 0x28335c
+
+	users who leave with talking to the npc calls function 0x282f8c
+
+	TODO:
+	show chat messages in plugin while paused
+	*/
+
+	//0x62b2bc
+	void UserJoinsHook(u32 u0, u32 *u1, u32 u2, u32 u3, u32 u4) {
+		PluginMenu *menu = PluginMenu::GetRunningInstance();
+		if (menu != nullptr) {
+			if (menu->IsOpen()) {
+				OSD::NotifySysFont(Language::getInstance()->get(TextID::KEEP_CONN_PLAYER_JOINING), Color::Purple);
+				menu->ForceClose();
+			}
+		}
+
+		HookContext& ctx = HookContext::GetCurrent();
+		ctx.OriginalFunction<void, u32, u32*, u32, u32, u32>(u0, u1, u2, u3, u4);
+	}
+
+    static void InitKeepConnection(void) {
+        static Address threadBeginAddress(0x12F3A8);
+		static Address userJoinsAddress(0x62B2BC);
+
 		onlineThreadHook.Initialize(threadBeginAddress.addr, (u32)PatchThreadBegin);
 		onlineThreadHook.SetFlags(USE_LR_TO_RETURN);
 		onlineThreadHook.Enable();
+
+		userJoinsHook.InitializeForMitm(userJoinsAddress.addr, (u32)UserJoinsHook);
+		userJoinsHook.Enable();
+
+		s_hooksInitialized = true;
 		
 		Process::OnPauseResume = [](bool goingToPause) {
 			keepConnectionInCTRPF(goingToPause);

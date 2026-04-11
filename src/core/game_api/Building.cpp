@@ -127,11 +127,14 @@ namespace CTRPluginFramework {
 			Sleep(Milliseconds(20));
 
 			if(movePlayerForward) {
-				float *coords = PlayerClass::GetInstance()->GetCoordinates();
+				u32 x, y;
+				PlayerClass::GetInstance()->GetWorldCoords(&x, &y);
+				y += 2;
+
+				float *coords = PlayerClass::GetInstance()->GetCoordinates(x, y);
 				if(coords) {
-					coords[2] += 20;
+					Game::ReloadRoom(coords);
 				}
-				Game::ReloadRoom(coords);
 				return;
 			}
 

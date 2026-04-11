@@ -31,6 +31,7 @@ namespace CTRPluginFramework {
 		constexpr u32 GroupDefault = 0x14;
 		constexpr u32 GroupDev = 0x15;
 		constexpr u32 GroupPlugin = 0x16;
+		constexpr u32 GroupPretendo = 0x17;
 
 		constexpr u32 Make(u32 group, u32 index) {
 			return (group << 16) | (index & 0xFFFF);
@@ -79,6 +80,7 @@ namespace CTRPluginFramework {
 		constexpr u32 InventoryGetSet = Make(GroupInventory, 0x0008);
 		constexpr u32 InventoryCustomButton = Make(GroupInventory, 0x0009);
 		constexpr u32 InventorySearchItem = Make(GroupInventory, 0x000A);
+		constexpr u32 InventoryHideDesignOutfits = Make(GroupInventory, 0x000B);
 
 		// PlayerSave folder
 		constexpr u32 PlayerSaveNameChanger = Make(GroupPlayerSave, 0x0001);
@@ -179,6 +181,7 @@ namespace CTRPluginFramework {
 		constexpr u32 EnvironmentKeepGrassState = Make(GroupEnvironment, 0x0008);
 		constexpr u32 EnvironmentBuriedInspector = Make(GroupEnvironment, 0x0009);
 		constexpr u32 EnvironmentItemsDontDissapear = Make(GroupEnvironment, 0x000A);
+		constexpr u32 EnvironmentSetFoliageSeason = Make(GroupEnvironment, 0x000B);
 
 		// Chat subfolder
 		constexpr u32 ChatDontDissapear = Make(GroupChat, 0x0001);
@@ -225,6 +228,7 @@ namespace CTRPluginFramework {
 		constexpr u32 MiscFastTextSpeed = Make(GroupMisc, 0x000A);
 		constexpr u32 MiscFastGameSpeed = Make(GroupMisc, 0x000B);
 		constexpr u32 MiscFastIsabelle = Make(GroupMisc, 0x000C);
+		constexpr u32 MiscKeepConnection = Make(GroupMisc, 0x000D);
 
 		// Default folder
 		constexpr u32 DefaultSeedItemLegit = Make(GroupDefault, 0x0001);
@@ -253,6 +257,8 @@ namespace CTRPluginFramework {
 		constexpr u32 DefaultSetPlantRules = Make(GroupDefault, 0x0018);
 		constexpr u32 DefaultFixParticlesPuzzleLeague = Make(GroupDefault, 0x0019);
 		constexpr u32 DefaultSetCustomSpritesProDesigns = Make(GroupDefault, 0x001A);
+		constexpr u32 DefaultFixPretendoOnlineIslandSession = Make(GroupDefault, 0x001B);
+		constexpr u32 DefaultFixPretendoFindSessionByOwnerCall = Make(GroupDefault, 0x001C);
 
 		// Dev folder
 		constexpr u32 DevCustomDump = Make(GroupDev, 0x0001);
@@ -265,8 +271,13 @@ namespace CTRPluginFramework {
 		constexpr u32 DevWandAbility = Make(GroupDev, 0x0008);
 		constexpr u32 DevLightSwitchToggler = Make(GroupDev, 0x0009);
 		constexpr u32 DevExpressionMod = Make(GroupDev, 0x000A);
+		constexpr u32 DevPrivateIsland = Make(GroupDev, 0x000B);
 
 		// Plugin entries
 		constexpr u32 PluginSettings = Make(GroupPlugin, 0x0001);
+
+		// Pretendo folder
+		constexpr u32 PretendoPlayersInSession = Make(GroupPretendo, 0x0001);
+		constexpr u32 PretendoPIALoggerOptions = Make(GroupPretendo, 0x0002);
 	}
 }

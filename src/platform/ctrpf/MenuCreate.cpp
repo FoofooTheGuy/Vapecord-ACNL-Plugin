@@ -5,6 +5,7 @@
 #include "platform/ctrpf/Plugin_Color.hpp"
 #include "platform/ctrpf/FolderTypes.hpp"
 #include "platform/ctrpf/FolderTypeTextMap.hpp"
+#include "core/Pretendo/PIALogger.hpp"
 #include "Files.h"
 
 #include <unordered_map>
@@ -252,6 +253,7 @@ namespace CTRPluginFramework {
 		MenuEntry *customButtonEntry = CreateEntry(TextID::CUSTOM_BUTTON, nullptr, SettingsButton, TextID::CUSTOM_BUTTON_NOTE, MenuEntryId::InventoryCustomButton);
 		customButtonEntry->SetSavedValueApplyCallback(CustomButtonApplySaved);
 		INVC->Append(customButtonEntry);
+		INVC->Append(CreateEntry(TextID::HIDE_DESIGN_OUTFITS, HideDesignOutfits, TextID::HIDE_DESIGN_OUTFITS_NOTE, MenuEntryId::InventoryHideDesignOutfits));
 		menu->Append(INVC);
 
 	///////////////////////
@@ -480,9 +482,11 @@ namespace CTRPluginFramework {
 		ENVC->Append(CreateEntry(TextID::DAYTIME, Daytime, TextID::DAYTIME_NOTE, MenuEntryId::EnvironmentDaytime));
 		ENVC->Append(CreateEntry(TextID::ALWAYS_AURORA_MOD, auroralights , TextID::ALWAYS_AURORA_MOD_NOTE, MenuEntryId::EnvironmentAlwaysAurora));
 		ENVC->Append(CreateEntry(TextID::UNBREAK_FLOWER, unbreakableflower, TextID::UNBREAK_FLOWER_NOTE, MenuEntryId::EnvironmentUnbreakFlower));
-		MenuEntry *weatherMod = CreateEntry(TextID::WEATHER_MOD, nullptr, Weathermod , TextID::WEATHER_MOD_NOTE, MenuEntryId::EnvironmentWeatherMod);
-		weatherMod->SetSavedValueApplyCallback(WeatherModApplySaved);
-		ENVC->Append(weatherMod);
+		{
+			MenuEntry *weatherMod = CreateEntry(TextID::WEATHER_MOD, nullptr, Weathermod , TextID::WEATHER_MOD_NOTE, MenuEntryId::EnvironmentWeatherMod);
+			weatherMod->SetSavedValueApplyCallback(WeatherModApplySaved);
+			ENVC->Append(weatherMod);
+		}
 		ENVC->Append(CreateEntry(TextID::SEARCH_REPLACE_NAME, nullptr, SearchReplace, TextID::SEARCH_REPLACE_NOTE, MenuEntryId::ExtraSearchReplace)),
 		ENVC->Append(CreateEntry(TextID::REMOVE_MAP_ITEMS_NAME, nullptr, RemoveItemsCheat, TextID::REMOVE_MAP_ITEMS_NOTE, MenuEntryId::ExtraRemoveMapItems)),
 		ENVC->Append(CreateEntry(TextID::WATER_FLOWERS_NAME, nullptr, WaterAllFlowers, TextID::WATER_FLOWERS_NOTE, MenuEntryId::EnvironmentWaterFlowers));
@@ -495,7 +499,11 @@ namespace CTRPluginFramework {
 		ENVC->Append(CreateEntry(TextID::KEEP_GRASS_STATE, KeepGrassState, TextID::KEEP_GRASS_STATE_NOTE, MenuEntryId::EnvironmentKeepGrassState));
 		ENVC->Append(CreateEntry(TextID::BURIED_INSPECTOR, BuriedInspector, TextID::BURIED_INSPECTOR_NOTE, MenuEntryId::EnvironmentBuriedInspector));
 		ENVC->Append(CreateEntry(TextID::ITEMS_DONT_DISSAPPEAR, ItemsDontDissappearOnInvalidPositions, TextID::ITEMS_DONT_DISSAPPEAR_NOTE, MenuEntryId::EnvironmentItemsDontDissapear));
-
+		{
+			MenuEntry *setFoliage = CreateEntry(TextID::SET_FOLIAGE_SEASON, nullptr, SetFoliageSeason, TextID::SET_FOLIAGE_SEASON_NOTE, MenuEntryId::EnvironmentSetFoliageSeason);
+			setFoliage->SetSavedValueApplyCallback(SetFoliageSeasonApplySaved);
+			ENVC->Append(setFoliage);
+		}
 		menu->Append(ENVC);
 
 	//////////////////////
@@ -560,6 +568,11 @@ namespace CTRPluginFramework {
 	/////////////////////
 		MenuFolder *MISC = CreateFolder(FolderType::Misc);
 		{
+			MenuEntry *keepConnEntry = CreateEntry(TextID::KEEP_CONNECTION, nullptr, KeepConnectionToggle, TextID::KEEP_CONNECTION_NOTE, MenuEntryId::MiscKeepConnection);
+			keepConnEntry->SetSavedValueApplyCallback(KeepConnectionApplySaved);
+			MISC->Append(keepConnEntry);
+		}
+		{
 			MenuEntry *gameTypeEntry = CreateEntry(TextID::GAME_TYPE, nullptr, mgtype, TextID::GAME_TYPE_NOTE, MenuEntryId::MiscGameType);
 			gameTypeEntry->SetSavedValueApplyCallback(GameTypeApplySaved);
 			MISC->Append(gameTypeEntry);
@@ -591,6 +604,8 @@ namespace CTRPluginFramework {
 	DEFAULTC->Append(CreateEntry(TextID::BYPASS_GAME_CHECKS, nullptr, BypassGameChecksEntry, TextID::NONE, MenuEntryId::DefaultBypassGameChecks)),
 	DEFAULTC->Append(CreateEntry(TextID::DISABLE_NON_SEED_ITEM_CHECK, nullptr, DisableNonSeedItemCheckEntry, TextID::NONE, MenuEntryId::DefaultDisableNonSeedItemCheck)),
 	DEFAULTC->Append(CreateEntry(TextID::PATCH_DROP_FUNCTION, nullptr, PatchDropFunctionEntry, TextID::NONE, MenuEntryId::DefaultPatchDropFunction)),
+	DEFAULTC->Append(CreateEntry(TextID::FIX_PRETENO_ISLAND_SESSION, nullptr, FixPretendoOnlineIslandSessionEntry, TextID::NONE, MenuEntryId::DefaultFixPretendoOnlineIslandSession)),
+	DEFAULTC->Append(CreateEntry(TextID::FIX_PRETENDO_FIND_SESSION, nullptr, FixPretendoFindSessionByOwnerCallEntry, TextID::NONE, MenuEntryId::DefaultFixPretendoFindSessionByOwnerCall)),
 
 	DEFAULTC->Append(CreateEntry(TextID::CHECK_INVALID_BADGE, nullptr, CheckInvalidBadgeEntry, TextID::NONE, MenuEntryId::DefaultCheckInvalidBadge)),
 	DEFAULTC->Append(CreateEntry(TextID::DISABLE_OPEN_SAVE_MENU_WITH_START_BUTTON, nullptr, DisableOpenSaveMenuWithStartButton, TextID::NONE, MenuEntryId::DefaultDisableOpenSaveMenuWithStart)),
@@ -625,10 +640,36 @@ namespace CTRPluginFramework {
 		DEVC->Append(CreateEntry(TextID::WAND_ABILITY, wandability, TextID::WAND_ABILITY_NOTE, MenuEntryId::DevWandAbility)),
 		DEVC->Append(CreateEntry(TextID::LIGHT_SWITCH_TOGGLER, lightswitch, TextID::LIGHT_SWITCH_TOGGLER_NOTE, MenuEntryId::DevLightSwitchToggler)),
 		DEVC->Append(CreateEntry(TextID::EXPRESSION_MOD, FacialExpressionMod, SetFacialExpression, TextID::EXPRESSION_MOD_NOTE, MenuEntryId::DevExpressionMod)),
+		DEVC->Append(CreateEntry(TextID::PRIVATE_ISLAND, PrivateIsland, TextID::NONE, MenuEntryId::DevPrivateIsland)),
 		menu->Append(DEVC);
 	#endif
 
 		menu->Append(CreateEntry(TextID::PLUGIN_SETTINGS, nullptr, pluginSettingsEntry, TextID::NONE, MenuEntryId::PluginSettings));
+	
+	///////////////////
+	/*Pretendo Folder*/
+	///////////////////
+		//MenuFolder *PRET = CreateFolder(FolderType::Pretendo);
+	////////////////////////////////
+	/*Players In Session SubFolder*/
+	////////////////////////////////
+	/*
+		if (getPiaLoggerStatus() == PatternStatus::Active) {
+			MenuFolder *PLAYSESS = CreateFolder(FolderType::Pretendo, SubFolder::PlayersInSession);
+			PLAYSESS->OnAction = onPiaPlayersFolderAction;
+			PRET->Append(PLAYSESS);
+		}
+	*/
+	////////////////////////////////
+	/*PIA logger Options SubFolder*/
+	////////////////////////////////
+	/*
+		MenuFolder *PIALOG = CreateFolder(FolderType::Pretendo, SubFolder::PIALoggerOptions);
+	    PIALOG->OnAction = onPiaLoggerOptionsFolderAction;
+		PRET->Append(PIALOG);
+
+		menu->Append(PRET);
+	*/
 	}
 }
 

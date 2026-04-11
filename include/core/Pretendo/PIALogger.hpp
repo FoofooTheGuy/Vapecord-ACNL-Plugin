@@ -20,15 +20,23 @@
 
 #pragma once
 
-#include <3ds.h>
+#include <string>
 #include "PatternManager.hpp"
 #include "common.hpp"
 
-namespace CTRPluginFramework {
-    PatternStatus getACNLPatchesStatus();
+namespace CTRPluginFramework
+{
+    static const std::string PiaNatMapping[] = {
+        "Unknown", "Endpoint independent mapping", "Endpoint dependent mapping"
+    };
 
-    void initPretendoPatches(PatternManager& pm);
-    void enablePretendoPatches();
-    void disablePretendoPatches();
-    void finiPatches();
+    static const std::string PiaNatFiltering[] = {
+        "Unknown", "Port independent filtering", "Port dependent filtering"
+    };
+
+    bool onPiaPlayersFolderAction(MenuFolder& folder, ActionType type);
+    bool onPiaLoggerOptionsFolderAction(MenuFolder& folder, ActionType type);
+
+    void initPiaLogger(PatternManager& pm);
+    PatternStatus getPiaLoggerStatus();
 }

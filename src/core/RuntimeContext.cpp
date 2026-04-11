@@ -36,4 +36,12 @@ namespace CTRPluginFramework {
     void RuntimeContext::setSaveMenuDisabled(bool value) { 
         v_isSaveMenuDisabled = value; 
     }
+
+    bool RuntimeContext::isDesignOutfitsLegit() const {
+        return v_isDesignOutfitsLegit;
+    }
+
+    void RuntimeContext::setDesignOutfitsLegit(bool value) {
+        v_isDesignOutfitsLegit = value;
+    }
 }

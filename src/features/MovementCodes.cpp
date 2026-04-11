@@ -51,9 +51,9 @@ namespace CTRPluginFramework {
 //Coordinate Mod Speed Changer Keyboard
 	void coordspeed(MenuEntry *entry) {
 		Keyboard kb(Utils::Format(Language::getInstance()->get(TextID::COORD_MOD_ENTER_SPEED).c_str(), 5));
-		kb.IsHexadecimal(false);
-		kb.SetMaxLength(2);
-		if(kb.Open(cspeed) >= 0) {
+		kb.SetSlider(1.0, 99.0, 1.0);
+		kb.SetSliderPrecision(0);
+		if(kb.Open(cspeed, cspeed) >= 0) {
 			entry->SetSavedValue(EncodeFloatValue(cspeed));
 		}
 	}
@@ -330,27 +330,27 @@ namespace CTRPluginFramework {
 	float walkSpeed = 1;
 //Player Speed Changer
 	void speedMod(MenuEntry *entry) {
-		static const Address sp1(0x887880);
-		static const Address sp2(0x887888);
-		static const Address sp3(0x887958);
-		static const Address sp4(0x5D4C80);
-		static const Address sp5(0x8879B8);
-		static const Address sp6(0x887C68);
-		static const Address sp7(0x94EF34);
-		static const Address sp8(0x8878A4);
+		static Address sp1(0x887880);
+		static Address sp2(0x887888);
+		static Address sp3(0x887958);
+		static Address sp4(0x5D4C80);
+		static Address sp5(0x8879B8);
+		static Address sp6(0x887C68);
+		static Address sp7(0x94EF34);
+		static Address sp8(0x8878A4);
 
 		if(!entry->IsActivated()) {
 			walkSpeed = 1;
 		}
 
-		Process::WriteFloat(sp1.addr, walkSpeed);
-		Process::WriteFloat(sp2.addr, walkSpeed);
-		Process::WriteFloat(sp3.addr, walkSpeed);
-		Process::WriteFloat(sp4.addr, 1.8f * walkSpeed * 4096.0f); //swim speed
-		Process::Write16(sp5.addr, 0x16BC); //fast 0x20 rotate
-		Process::Write16(sp6.addr, 0xB5E); //fast 0x1F rotate
-		Process::Write16(sp7.addr, 0xB5E); //fast 0x1F rotate
-		Process::Write8(sp8.addr, 0x14 * walkSpeed); //slide
+		sp1.Write<float>(walkSpeed);
+		sp2.Write<float>(walkSpeed);
+		sp3.Write<float>(walkSpeed);
+		sp4.Write<float>(1.8f * walkSpeed * 4096.0f); //swim speed
+		sp5.Write<u16>(0x16BC); //fast 0x20 rotate
+		sp6.Write<u16>(0xB5E); //fast 0x1F rotate
+		sp7.Write<u16>(0xB5E); //fast 0x1F rotate
+		sp8.Write<u8>(0x14 * walkSpeed); //slide
 	}
 //Player Speed Changer Keyboard
 	void menuSpeedMod(MenuEntry *entry) {

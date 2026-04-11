@@ -16,7 +16,7 @@ namespace CTRPluginFramework {
 		enum GameMode : u8 {
 			OFFLINE = 0,
 			ONLINE1 = 1,
-			ONLINE2 = 2,
+			RANDOM_MATCH = 2,
 			DREAM = 3
 		};
 
