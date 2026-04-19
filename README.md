@@ -1,4 +1,4 @@
-<img src="./icon/vapecord.svg" alt="drawing" width="230"/>
+<img src="./icon/vapecord.svg" alt="drawing" width="200"/>
 
 # Vapecord-ACNL-Plugin
 
